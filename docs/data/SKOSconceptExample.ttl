@@ -2,6 +2,8 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix ex: <http://github.com/n4o-rse/amt-explore/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skosplus: <http://w3id.org/skos-plus/> .
 
 # AMT Ontology - Leonard Edition
 
@@ -29,43 +31,73 @@ ex:Concept amt:placeholder "Concept" .
 
 # roles
 
-ex:exactMatch rdf:type amt:Role .
-ex:exactMatch rdfs:label 'exactMatch' .
-ex:exactMatch rdfs:domain ex:Concept .
-ex:exactMatch rdfs:range ex:Concept .
+skos:exactMatch rdf:type amt:Role .
+skos:exactMatch rdfs:label 'exactMatch' .
+skos:exactMatch rdfs:domain ex:Concept .
+skos:exactMatch rdfs:range ex:Concept .
 
-ex:closeMatch rdf:type amt:Role .
-ex:closeMatch rdfs:label 'closeMatch' .
-ex:closeMatch rdfs:domain ex:Concept .
-ex:closeMatch rdfs:range ex:Concept .
+skos:closeMatch rdf:type amt:Role .
+skos:closeMatch rdfs:label 'closeMatch' .
+skos:closeMatch rdfs:domain ex:Concept .
+skos:closeMatch rdfs:range ex:Concept .
 
-ex:relatedMatch rdf:type amt:Role .
-ex:relatedMatch rdfs:label 'relatedMatch' .
-ex:relatedMatch rdfs:domain ex:Concept .
-ex:relatedMatch rdfs:range ex:Concept .
+skos:relatedMatch rdf:type amt:Role .
+skos:relatedMatch rdfs:label 'relatedMatch' .
+skos:relatedMatch rdfs:domain ex:Concept .
+skos:relatedMatch rdfs:range ex:Concept .
 
-ex:MatchStar7 rdf:type amt:Role .
-ex:MatchStar7 rdfs:label 'MatchStar7' .
-ex:MatchStar7 rdfs:domain ex:Concept .
-ex:MatchStar7 rdfs:range ex:Concept .
+skosplus:MatchStar7 rdf:type amt:Role .
+skosplus:MatchStar7 rdfs:label 'MatchStar7' .
+skosplus:MatchStar7 rdfs:domain ex:Concept .
+skosplus:MatchStar7 rdfs:range ex:Concept .
+
+skosplus:MatchStar6 rdf:type amt:Role .
+skosplus:MatchStar6 rdfs:label 'MatchStar6' .
+skosplus:MatchStar6 rdfs:domain ex:Concept .
+skosplus:MatchStar6 rdfs:range ex:Concept .
+
+skosplus:MatchStar5 rdf:type amt:Role .
+skosplus:MatchStar5 rdfs:label 'MatchStar5' .
+skosplus:MatchStar5 rdfs:domain ex:Concept .
+skosplus:MatchStar5 rdfs:range ex:Concept .
+
+skosplus:MatchStar4 rdf:type amt:Role .
+skosplus:MatchStar4 rdfs:label 'MatchStar4' .
+skosplus:MatchStar4 rdfs:domain ex:Concept .
+skosplus:MatchStar4 rdfs:range ex:Concept .
+
+skosplus:MatchStar3 rdf:type amt:Role .
+skosplus:MatchStar3 rdfs:label 'MatchStar3' .
+skosplus:MatchStar3 rdfs:domain ex:Concept .
+skosplus:MatchStar3 rdfs:range ex:Concept .
+
+skosplus:MatchStar2 rdf:type amt:Role .
+skosplus:MatchStar2 rdfs:label 'MatchStar2' .
+skosplus:MatchStar2 rdfs:domain ex:Concept .
+skosplus:MatchStar2 rdfs:range ex:Concept .
+
+skosplus:MatchStar1 rdf:type amt:Role .
+skosplus:MatchStar1 rdfs:label 'MatchStar1' .
+skosplus:MatchStar1 rdfs:domain ex:Concept .
+skosplus:MatchStar1 rdfs:range ex:Concept .
 
 # RoleChainAxioms
 
 ex:RCA0001 rdf:type amt:RoleChainAxiom .
-ex:RCA0001 amt:antecedent1 ex:exactMatch .
-ex:RCA0001 amt:antecedent2 ex:exactMatch .
-ex:RCA0001 amt:consequent ex:exactMatch .
+ex:RCA0001 amt:antecedent1 skos:exactMatch .
+ex:RCA0001 amt:antecedent2 skos:exactMatch .
+ex:RCA0001 amt:consequent skos:exactMatch .
 ex:RCA0001 amt:logic amt:ProductLogic .
 
 ex:RCA0002 rdf:type amt:RoleChainAxiom .
-ex:RCA0002 amt:antecedent1 ex:closeMatch .
-ex:RCA0002 amt:antecedent2 ex:closeMatch .
-ex:RCA0002 amt:consequent ex:closeMatch .
+ex:RCA0002 amt:antecedent1 skos:closeMatch .
+ex:RCA0002 amt:antecedent2 skos:closeMatch .
+ex:RCA0002 amt:consequent skos:closeMatch .
 ex:RCA0002 amt:logic amt:ProductLogic .
 
 ex:RCA0003 rdf:type amt:RoleChainAxiom .
-ex:RCA0003 amt:antecedent1 ex:relatedMatch .
-ex:RCA0003 amt:antecedent2 ex:relatedMatch .
+ex:RCA0003 amt:antecedent1 skos:relatedMatch .
+ex:RCA0003 amt:antecedent2 skos:relatedMatch .
 ex:RCA0003 amt:consequent ex:questionableMatch .
 ex:RCA0003 amt:logic amt:GoedelLogic .
 
@@ -76,27 +108,27 @@ ex:RCA0004 amt:consequent ex:MatchStar7 .
 ex:RCA0004 amt:logic amt:ProductLogic .
 
 ex:RCA0005 rdf:type amt:RoleChainAxiom .
-ex:RCA0005 amt:antecedent1 ex:exactMatch .
-ex:RCA0005 amt:antecedent2 ex:closeMatch .
-ex:RCA0005 amt:consequent ex:closeMatch .
+ex:RCA0005 amt:antecedent1 skos:exactMatch .
+ex:RCA0005 amt:antecedent2 skos:closeMatch .
+ex:RCA0005 amt:consequent skos:closeMatch .
 ex:RCA0005 amt:logic amt:ProductLogic .
 
 ex:RCA0006 rdf:type amt:RoleChainAxiom .
-ex:RCA0006 amt:antecedent1 ex:closeMatch .
-ex:RCA0006 amt:antecedent2 ex:exactMatch .
-ex:RCA0006 amt:consequent ex:closeMatch .
+ex:RCA0006 amt:antecedent1 skos:closeMatch .
+ex:RCA0006 amt:antecedent2 skos:exactMatch .
+ex:RCA0006 amt:consequent skos:closeMatch .
 ex:RCA0006 amt:logic amt:ProductLogic .
 
 ex:RCA0007 rdf:type amt:RoleChainAxiom .
-ex:RCA0007 amt:antecedent1 ex:exactMatch .
-ex:RCA0007 amt:antecedent2 ex:relatedMatch .
-ex:RCA0007 amt:consequent ex:closeMatch .
+ex:RCA0007 amt:antecedent1 skos:exactMatch .
+ex:RCA0007 amt:antecedent2 skos:relatedMatch .
+ex:RCA0007 amt:consequent skos:closeMatch .
 ex:RCA0007 amt:logic amt:ProductLogic .
 
 ex:RCA0008 rdf:type amt:RoleChainAxiom .
-ex:RCA0008 amt:antecedent1 ex:closeMatch .
-ex:RCA0008 amt:antecedent2 ex:relatedMatch .
-ex:RCA0008 amt:consequent ex:closeMatch .
+ex:RCA0008 amt:antecedent1 skos:closeMatch .
+ex:RCA0008 amt:antecedent2 skos:relatedMatch .
+ex:RCA0008 amt:consequent skos:closeMatch .
 ex:RCA0008 amt:logic amt:ProductLogic .
 
 # Example Data Concepts
@@ -109,21 +141,21 @@ ex:Concept4 amt:instanceOf ex:Concept. ex:Concept4 rdfs:label 'Concept 4'.
 # Example Data Roles
 
 _:node01 rdf:subject ex:Concept1 .
-_:node01 rdf:predicate ex:closeMatch . 
+_:node01 rdf:predicate skos:closeMatch . 
 _:node01 rdf:object ex:Concept2 . 
 _:node01 amt:weight 0.94 .
 
 _:node02 rdf:subject ex:Concept2 .
-_:node02 rdf:predicate ex:relatedMatch . 
+_:node02 rdf:predicate skos:relatedMatch . 
 _:node02 rdf:object ex:Concept3 . 
 _:node02 amt:weight 0.49 .
 
 _:node03 rdf:subject ex:Concept1 .
-_:node03 rdf:predicate ex:exactMatch . 
+_:node03 rdf:predicate skos:exactMatch . 
 _:node03 rdf:object ex:Concept2 . 
 _:node03 amt:weight 1.00 .
 
 _:node04 rdf:subject ex:Concept2 .
-_:node04 rdf:predicate ex:closeMatch . 
+_:node04 rdf:predicate skos:closeMatch . 
 _:node04 rdf:object ex:Concept4 . 
 _:node04 amt:weight 0.94 .
