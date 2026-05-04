@@ -63,6 +63,42 @@ var styleNodes = function(nodes) {
 };
 
 // ------------------------------------------------------------
+// shortenURI: turn a full IRI into a CURIE using the prefix map
+// captured from the TTL (set in amt.js after N3 parsing).
+// Falls back to the part after # or the last / if no prefix matches.
+// The "ex:" prefix is special-cased to render as bare local names
+// (matches the AMT viewer convention for instance/role data).
+// ------------------------------------------------------------
+var shortenURI = function(uri) {
+    if (typeof uri !== "string") return uri;
+    var prefixes = (_AMT && _AMT.prefixes) ? _AMT.prefixes : {};
+
+    // Find the longest matching namespace (so e.g. amt-vocab# wins over amt#)
+    var bestPrefix = null;
+    var bestNs     = "";
+    for (var p in prefixes) {
+        var ns = prefixes[p];
+        if (ns && uri.indexOf(ns) === 0 && ns.length > bestNs.length) {
+            bestPrefix = p;
+            bestNs     = ns;
+        }
+    }
+    if (bestPrefix !== null) {
+        var local = uri.substring(bestNs.length);
+        // Convention: drop the prefix label for the document's own "ex:"
+        // namespace so role labels stay short (e.g. "closeMatch" not "ex:closeMatch")
+        return bestPrefix === "ex" ? local : bestPrefix + ":" + local;
+    }
+
+    // Fallback: split on # or last /
+    var hash = uri.lastIndexOf("#");
+    if (hash >= 0) return uri.substring(hash + 1);
+    var slash = uri.lastIndexOf("/");
+    if (slash >= 0) return uri.substring(slash + 1);
+    return uri;
+};
+
+// ------------------------------------------------------------
 // styleEdges: uniform styling for all edges
 //   black  = original assertion
 //   red    = reasoned inference (set in amt.js updateReasoning)
@@ -70,7 +106,7 @@ var styleNodes = function(nodes) {
 var styleEdges = function(edges) {
     for (var i in edges) {
         var isReasoned = edges[i].font && edges[i].font.color === "red";
-        var roleShort  = edges[i].role.replace(_AMT.prefix, "");
+        var roleShort  = shortenURI(edges[i].role);
         var weightVal  = Math.round(edges[i].width * 1000) / 1000;
 
         edges[i].arrowStrikethrough = false;

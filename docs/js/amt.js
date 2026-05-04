@@ -80,6 +80,17 @@ var LocalStore = (function () {
             });
           } else {
             // quad === null means parsing is done
+            // N3.js passes the prefix map here as the third argument
+            if (prefixes && typeof window !== "undefined") {
+              window._AMT = window._AMT || {};
+              window._AMT.prefixes = {};
+              for (var p in prefixes) {
+                // N3 wraps namespaces as NamedNode objects; .value gives the IRI
+                var ns = prefixes[p];
+                window._AMT.prefixes[p] = (ns && ns.value) ? ns.value : ns;
+              }
+              console.log("TTL prefixes:", window._AMT.prefixes);
+            }
             _loaded = true;
             console.log("TTL loaded:", _triples.length, "triples");
             callback(null);
