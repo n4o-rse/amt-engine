@@ -104,6 +104,7 @@ ex:RCA0008 amt:logic amt:ProductLogic .
 ex:Concept1 amt:instanceOf ex:Concept. ex:Concept1 rdfs:label 'Concept 1'.
 ex:Concept2 amt:instanceOf ex:Concept. ex:Concept2 rdfs:label 'Concept 2'.
 ex:Concept3 amt:instanceOf ex:Concept. ex:Concept3 rdfs:label 'Concept 3'.
+ex:Concept4 amt:instanceOf ex:Concept. ex:Concept4 rdfs:label 'Concept 4'.
 
 # Example Data Roles
 
@@ -116,3 +117,13 @@ _:node02 rdf:subject ex:Concept2 .
 _:node02 rdf:predicate ex:relatedMatch . 
 _:node02 rdf:object ex:Concept3 . 
 _:node02 amt:weight 0.49 .
+
+_:node03 rdf:subject ex:Concept1 .
+_:node03 rdf:predicate ex:exactMatch . 
+_:node03 rdf:object ex:Concept2 . 
+_:node03 amt:weight 1.00 .
+
+_:node04 rdf:subject ex:Concept2 .
+_:node04 rdf:predicate ex:closeMatch . 
+_:node04 rdf:object ex:Concept4 . 
+_:node04 amt:weight 0.94 .
