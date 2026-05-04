@@ -1,0 +1,51 @@
+@prefix amt: <http://academic-meta-tool.xyz/vocab#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex:  <http://example.com/> .
+
+# Concepts
+ex:Person a amt:Concept ;
+    rdfs:label "Person" ;
+    amt:placeholder "Lastname, Firstname" .
+
+# Roles
+ex:knows a amt:Role ;
+    rdfs:label "knows" ;
+    rdfs:domain ex:Person ;
+    rdfs:range  ex:Person .
+
+ex:trusts a amt:Role ;
+    rdfs:label "trusts" ;
+    rdfs:domain ex:Person ;
+    rdfs:range  ex:Person .
+
+# Legacy 2-ary RoleChainAxiom
+ex:RCA1 a amt:RoleChainAxiom ;
+    amt:antecedent1 ex:knows ;
+    amt:antecedent2 ex:knows ;
+    amt:consequent  ex:knows ;
+    amt:logic       amt:GoedelLogic .
+
+# Modern 4-ary RoleChainAxiom with new logic
+ex:RCA4 a amt:RoleChainAxiom ;
+    amt:antecedents ( ex:knows ex:trusts ex:knows ex:trusts ) ;
+    amt:consequent  ex:trusts ;
+    amt:logic       amt:GeometricMean .
+
+# Hamacher with parameter
+ex:RCA_Hamacher a amt:RoleChainAxiom ;
+    amt:antecedents     ( ex:knows ex:trusts ex:knows ) ;
+    amt:consequent      ex:trusts ;
+    amt:logic           amt:HamacherProduct ;
+    amt:logicParameter  "2.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+
+# Inverse axiom
+ex:IA1 a amt:InverseAxiom ;
+    amt:antecedent ex:knows ;
+    amt:inverse    ex:trusts .
+
+# Quadruple
+_:q1 rdf:subject   ex:Person ;
+     rdf:predicate ex:knows ;
+     rdf:object    ex:Person ;
+     amt:weight    "0.8"^^<http://www.w3.org/2001/XMLSchema#decimal> .

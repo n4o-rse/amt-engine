@@ -1,0 +1,36 @@
+@prefix amt: <http://academic-meta-tool.xyz/vocab#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex:  <http://example.com/> .
+
+ex:Person a amt:Concept ;
+    rdfs:label "Person" .
+
+ex:knows a amt:Role ;
+    rdfs:label "knows" ;
+    rdfs:domain ex:Person ;
+    rdfs:range  ex:Person .
+
+# FEHLER 1: Beide Schreibweisen (legacy + modern) gleichzeitig
+ex:RCA_Mixed a amt:RoleChainAxiom ;
+    amt:antecedent1 ex:knows ;
+    amt:antecedent2 ex:knows ;
+    amt:antecedents ( ex:knows ex:knows ) ;
+    amt:consequent  ex:knows ;
+    amt:logic       amt:GoedelLogic .
+
+# FEHLER 2: Hamacher ohne Parameter
+ex:RCA_BadHamacher a amt:RoleChainAxiom ;
+    amt:antecedents ( ex:knows ex:knows ) ;
+    amt:consequent  ex:knows ;
+    amt:logic       amt:HamacherProduct .
+
+# FEHLER 3: Ungültiges weight (>1)
+_:badq rdf:subject   ex:Person ;
+       rdf:predicate ex:knows ;
+       rdf:object    ex:Person ;
+       amt:weight    "1.5"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+
+# FEHLER 4: InverseAxiom mit fehlendem inverse
+ex:BadIA a amt:InverseAxiom ;
+    amt:antecedent ex:knows .
