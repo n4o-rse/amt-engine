@@ -15,22 +15,27 @@ SPARQL — the ontology specifies the contract.
 | `amt.ttl` | Classes, properties, logic operators, reasoning rules. |
 | `amt-shapes.ttl` | SHACL shapes for validating AMT data files. |
 | `examples/` | Small valid and invalid example files used in tests. |
-| `../validate_examples.py` | Standalone validation demo (see below). |
+| `img/` | Diagrams illustrating role chain axioms of different lengths. |
+| `validate_examples.py` | Standalone validation demo (see below). |
 
 ## Quick start: run the validation demo
 
 The fastest way to see the ontology and shapes in action is the
-`validate_examples.py` script in the project root. It validates both example
-files and reports the outcome.
+`validate_examples.py` script. It validates both example files and reports
+the outcome.
 
 ### Folder layout it expects
 
+The script auto-detects whether it lives in the project root or inside
+`ontology/`. Both layouts work:
+
 ```
 your-project/
-├── validate_examples.py
 └── ontology/
+    ├── validate_examples.py
     ├── amt.ttl
     ├── amt-shapes.ttl
+    ├── img/
     └── examples/
         ├── example-valid.ttl
         └── example-invalid.ttl
@@ -45,7 +50,7 @@ your-project/
    ```
 3. Run the script:
    ```
-   python validate_examples.py
+   python ontology/validate_examples.py
    ```
    Or just press **F5** / the green Run button in VS Code.
 
@@ -110,7 +115,70 @@ amt:Logic       ⊂ rdfs:Class
 amt:ReasoningRule ⊂ rdfs:Class
 ```
 
-### Logic operators (instances of `amt:Logic`)
+## Visual reference: Role Chain Axioms
+
+A `amt:RoleChainAxiom` declares that a chain of antecedent roles implies a
+consequent role. Black solid arrows are asserted antecedent edges; the red
+dashed arrow is the inferred consequent computed via the chosen logic.
+
+### 2-ary (classical)
+
+![2-ary role chain](img/2ary.png)
+
+```turtle
+amt:rca rdf:type        amt:RoleChainAxiom .
+amt:rca amt:antecedents ( amt:Role amt:Role ) .
+amt:rca amt:consequent  amt:Role .
+amt:rca amt:logic       amt:Logic .
+```
+
+The legacy form using `amt:antecedent1` and `amt:antecedent2` is still
+supported. **Recommended logic:** Gödel or Product.
+
+### 3-ary
+
+![3-ary role chain](img/3ary.png)
+
+```turtle
+amt:rca3 rdf:type        amt:RoleChainAxiom .
+amt:rca3 amt:antecedents ( amt:Role amt:Role amt:Role ) .
+amt:rca3 amt:consequent  amt:Role .
+amt:rca3 amt:logic       amt:Logic .
+```
+
+**Recommended logic:** Gödel (default). Alternatives: Einstein product or
+geometric mean.
+
+### 4-ary
+
+![4-ary role chain](img/4ary.png)
+
+```turtle
+amt:rca4 rdf:type        amt:RoleChainAxiom .
+amt:rca4 amt:antecedents ( amt:Role amt:Role amt:Role amt:Role ) .
+amt:rca4 amt:consequent  amt:Role .
+amt:rca4 amt:logic       amt:Logic .
+```
+
+**Recommended logic:** geometric mean (default). Alternatives: Gödel or
+Einstein product. Product logic is not recommended at n=4 — it dampens
+the result too aggressively.
+
+### n-ary (general)
+
+![n-ary role chain](img/n-ary.png)
+
+```turtle
+amt:rcaN rdf:type        amt:RoleChainAxiom .
+amt:rcaN amt:antecedents ( amt:Role amt:Role amt:Role amt:Role amt:Role ) .  # n roles
+amt:rcaN amt:consequent  amt:Role .
+amt:rcaN amt:logic       amt:Logic .
+
+# Optional for parametrised logics (e.g. Hamacher):
+# amt:rcaN amt:logicParameter "2.0"^^xsd:decimal .
+```
+
+## Logic operators (instances of `amt:Logic`)
 
 | Operator | Arity | Formula | Recommended for |
 |----------|-------|---------|-----------------|
@@ -125,7 +193,7 @@ Each operator carries `amt:formula`, `amt:arity`, `amt:isParametrised` and
 `amt:recommendedFor` annotations directly in `amt.ttl`. See there for full
 descriptions.
 
-### Reasoning rules (instances of `amt:ReasoningRule`)
+## Reasoning rules (instances of `amt:ReasoningRule`)
 
 The four rules a compliant reasoner must implement are documented in
 `amt.ttl` with `amt:precondition` and `amt:effect` strings:
