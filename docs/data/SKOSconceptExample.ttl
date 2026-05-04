@@ -1,0 +1,118 @@
+@prefix amt: <http://academic-meta-tool.xyz/vocab#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://github.com/n4o-rse/amt-explore/> .
+
+# AMT Ontology - Leonard Edition
+
+amt:Concept rdfs:subClassOf rdfs:Class .
+amt:Role rdfs:subClassOf rdf:Property .
+amt:Axiom rdfs:subclassOf rdfs:Class .
+amt:InferenceAxiom rdfs:subClassOf amt:Axiom .
+amt:IntegrityAxiom rdfs:subClassOf amt:Axiom .
+amt:RoleChainAxiom rdfs:subClassOf amt:InferenceAxiom .
+amt:InverseAxiom rdfs:subClassOf amt:InferenceAxiom .
+amt:DisjointAxiom rdfs:subClassOf amt:IntegrityAxiom .
+amt:SelfDisjointAxiom rdfs:subClassOf amt:IntegrityAxiom .
+amt:Logic rdfs:subClassOf rdfs:Class .
+amt:LukasiewiczLogic rdf:type amt:Logic .
+amt:ProductLogic rdf:type amt:Logic .
+amt:GoedelLogic rdf:type amt:Logic .
+
+# SKOS Ontology
+
+# concepts
+
+ex:Concept rdf:type amt:Concept .
+ex:Concept rdfs:label "Concept" .
+ex:Concept amt:placeholder "Concept" .
+
+# roles
+
+ex:exactMatch rdf:type amt:Role .
+ex:exactMatch rdfs:label 'exactMatch' .
+ex:exactMatch rdfs:domain ex:Concept .
+ex:exactMatch rdfs:range ex:Concept .
+
+ex:closeMatch rdf:type amt:Role .
+ex:closeMatch rdfs:label 'closeMatch' .
+ex:closeMatch rdfs:domain ex:Concept .
+ex:closeMatch rdfs:range ex:Concept .
+
+ex:relatedMatch rdf:type amt:Role .
+ex:relatedMatch rdfs:label 'relatedMatch' .
+ex:relatedMatch rdfs:domain ex:Concept .
+ex:relatedMatch rdfs:range ex:Concept .
+
+ex:MatchStar7 rdf:type amt:Role .
+ex:MatchStar7 rdfs:label 'MatchStar7' .
+ex:MatchStar7 rdfs:domain ex:Concept .
+ex:MatchStar7 rdfs:range ex:Concept .
+
+# RoleChainAxioms
+
+ex:RCA0001 rdf:type amt:RoleChainAxiom .
+ex:RCA0001 amt:antecedent1 ex:exactMatch .
+ex:RCA0001 amt:antecedent2 ex:exactMatch .
+ex:RCA0001 amt:consequent ex:exactMatch .
+ex:RCA0001 amt:logic amt:ProductLogic .
+
+ex:RCA0002 rdf:type amt:RoleChainAxiom .
+ex:RCA0002 amt:antecedent1 ex:closeMatch .
+ex:RCA0002 amt:antecedent2 ex:closeMatch .
+ex:RCA0002 amt:consequent ex:closeMatch .
+ex:RCA0002 amt:logic amt:ProductLogic .
+
+ex:RCA0003 rdf:type amt:RoleChainAxiom .
+ex:RCA0003 amt:antecedent1 ex:relatedMatch .
+ex:RCA0003 amt:antecedent2 ex:relatedMatch .
+ex:RCA0003 amt:consequent ex:questionableMatch .
+ex:RCA0003 amt:logic amt:GoedelLogic .
+
+ex:RCA0004 rdf:type amt:RoleChainAxiom .
+ex:RCA0004 amt:antecedent1 ex:MatchStar7 .
+ex:RCA0004 amt:antecedent2 ex:MatchStar7 .
+ex:RCA0004 amt:consequent ex:MatchStar7 .
+ex:RCA0004 amt:logic amt:ProductLogic .
+
+ex:RCA0005 rdf:type amt:RoleChainAxiom .
+ex:RCA0005 amt:antecedent1 ex:exactMatch .
+ex:RCA0005 amt:antecedent2 ex:closeMatch .
+ex:RCA0005 amt:consequent ex:closeMatch .
+ex:RCA0005 amt:logic amt:ProductLogic .
+
+ex:RCA0006 rdf:type amt:RoleChainAxiom .
+ex:RCA0006 amt:antecedent1 ex:closeMatch .
+ex:RCA0006 amt:antecedent2 ex:exactMatch .
+ex:RCA0006 amt:consequent ex:closeMatch .
+ex:RCA0006 amt:logic amt:ProductLogic .
+
+ex:RCA0007 rdf:type amt:RoleChainAxiom .
+ex:RCA0007 amt:antecedent1 ex:exactMatch .
+ex:RCA0007 amt:antecedent2 ex:relatedMatch .
+ex:RCA0007 amt:consequent ex:closeMatch .
+ex:RCA0007 amt:logic amt:ProductLogic .
+
+ex:RCA0008 rdf:type amt:RoleChainAxiom .
+ex:RCA0008 amt:antecedent1 ex:closeMatch .
+ex:RCA0008 amt:antecedent2 ex:relatedMatch .
+ex:RCA0008 amt:consequent ex:closeMatch .
+ex:RCA0008 amt:logic amt:ProductLogic .
+
+# Example Data Concepts
+
+ex:Concept1 amt:instanceOf ex:Concept. ex:Concept1 rdfs:label 'Concept 1'.
+ex:Concept2 amt:instanceOf ex:Concept. ex:Concept2 rdfs:label 'Concept 2'.
+ex:Concept3 amt:instanceOf ex:Concept. ex:Concept3 rdfs:label 'Concept 3'.
+
+# Example Data Roles
+
+_:node01 rdf:subject ex:Concept1 .
+_:node01 rdf:predicate ex:closeMatch . 
+_:node01 rdf:object ex:Concept2 . 
+_:node01 amt:weight 0.94 .
+
+_:node02 rdf:subject ex:Concept2 .
+_:node02 rdf:predicate ex:relatedMatch . 
+_:node02 rdf:object ex:Concept3 . 
+_:node02 amt:weight 0.49 .
