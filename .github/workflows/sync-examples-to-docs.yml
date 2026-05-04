@@ -1,0 +1,42 @@
+name: Sync examples to docs/data
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "examples/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Copy *.ttl from examples/ to docs/data/
+        run: |
+          set -euo pipefail
+          mkdir -p docs/data
+          shopt -s nullglob
+          for src in examples/*.ttl; do
+            cp -v "$src" "docs/data/$(basename "$src")"
+          done
+
+      - name: Commit and push if changed
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- docs/data; then
+            echo "No changes in docs/data — nothing to commit."
+            exit 0
+          fi
+
+          git add docs/data
+          git commit -m "chore(docs): sync TTL examples to docs/data [skip ci]"
+          git push
