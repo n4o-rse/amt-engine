@@ -33,3 +33,5 @@ Thumbs.db
 # Local outputs (uncomment if you don't want to commit example exports)
 # *.cypher
 # /out/
+
+examples/out/
