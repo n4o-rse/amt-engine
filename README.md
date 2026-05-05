@@ -242,7 +242,7 @@ on those files alone.
 AMT.engine is developed within
 [**mainzed**](https://www.mainzed.org/) — Mainzer Zentrum für Digitalität
 in den Geistes- und Kulturwissenschaften — at
-[Hochschule Mainz, i3mainz](https://www.hs-mainz.de/forschung/institute/i3mainz/)
+[Hochschule Mainz, i3mainz](https://i3mainz.hs-mainz.de/)
 and the [Leibniz-Zentrum für Archäologie (LEIZA)](https://www.leiza.de/).
 
 This work is part of the DFG-funded NFDI initiative, specifically the
