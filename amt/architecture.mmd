@@ -1,0 +1,82 @@
+---
+config:
+  layout: elk
+  theme: neutral
+---
+flowchart TB
+    subgraph ONT["📁 ontology/ (read-only)"]
+        direction TB
+        AMT["amt.ttl<br/>(vocabulary)"]
+        SHP["amt-shapes.ttl<br/>(SHACL)"]
+    end
+
+    TTL["📄 user-data.ttl<br/>(data only)"]
+
+    subgraph PKG["📦 amt/ Python package"]
+        direction TB
+        VAL["validation.py<br/><i>SHACL + RDFS inference</i>"]
+        CORE["core.py<br/><i>load_amt, parser only</i>"]
+        REA["reasoning.py<br/><i>do_reasoning<br/>check_consistency</i>"]
+        LOG["logic.py<br/><i>aggregate_weights<br/>LOGIC_REGISTRY</i>"]
+        EXP["export.py<br/><i>RDF, Cypher, CSV</i>"]
+        VIZ["viz.py<br/><i>pyvis HTML</i>"]
+        INIT["__init__.py<br/><i>public API re-exports</i>"]
+    end
+
+    subgraph ORCH["🎛️ Orchestrators"]
+        direction TB
+        CLI["cli.py<br/><i>amt command<br/>(flag-driven)</i>"]
+        RUN["runner.py<br/><i>run_all()<br/>(full pipeline)</i>"]
+    end
+
+    subgraph OUT["📤 Outputs"]
+        direction LR
+        O_TTL["out.ttl"]
+        O_CYP["out.cypher"]
+        O_CSV["nodes.csv<br/>edges.csv"]
+        O_HTML["graph.html"]
+        O_RPT["report.md"]
+    end
+
+    TTL --> VAL
+    AMT -.->|"ont_graph"| VAL
+    SHP -.->|"shacl_graph"| VAL
+    AMT -.->|"RDFS inference"| CORE
+    VAL -->|"valid"| CORE
+    VAL -.->|"invalid"| ERR["❌ ValidationError"]
+
+    CORE -->|"amt-dict<br/>(asserted)"| REA
+    REA <-->|"aggregate_weights<br/>weights, logic, param"| LOG
+    REA -->|"amt-dict<br/>(asserted + inferred<br/>+ provenance)"| EXP
+    REA --> VIZ
+
+    EXP --> O_TTL
+    EXP --> O_CYP
+    EXP --> O_CSV
+    VIZ --> O_HTML
+    RUN --> O_RPT
+
+    CLI -.->|"orchestrates"| VAL
+    CLI -.->|"orchestrates"| CORE
+    CLI -.->|"orchestrates"| REA
+    CLI -.->|"orchestrates"| EXP
+    CLI -.->|"orchestrates"| VIZ
+    RUN -.->|"orchestrates"| VAL
+    RUN -.->|"orchestrates"| CORE
+    RUN -.->|"orchestrates"| REA
+    RUN -.->|"orchestrates"| EXP
+    RUN -.->|"orchestrates"| VIZ
+
+    classDef ontology fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+    classDef pkg fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+    classDef orch fill:#f1f8e9,stroke:#558b2f,color:#33691e
+    classDef output fill:#fff3e0,stroke:#e65100,color:#bf360c
+    classDef input fill:#f3e5f5,stroke:#6a1b9a,color:#4a148c
+    classDef error fill:#ffebee,stroke:#c62828,color:#b71c1c
+
+    class AMT,SHP ontology
+    class VAL,CORE,REA,LOG,EXP,VIZ,INIT pkg
+    class CLI,RUN orch
+    class O_TTL,O_CYP,O_CSV,O_HTML,O_RPT output
+    class TTL input
+    class ERR error

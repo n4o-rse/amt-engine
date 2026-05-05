@@ -29,7 +29,11 @@ the resulting graph as RDF, Cypher, CSV or interactive HTML.
 
 ## Architecture
 
-![AMT ach](AMT_architecture.png)
+![AMT architecture](AMT_architecture.png)
+
+The Mermaid source for this diagram is at
+[`docs/architecture.mmd`](docs/architecture.mmd). Re-render with
+[mermaid.live](https://mermaid.live) or any local `mmdc` install.
 
 ## Layout
 
@@ -50,6 +54,9 @@ ontology/                   formal AMT specification
 ├── amt-shapes.ttl          SHACL shapes
 ├── examples/               valid + invalid example data files
 └── validate_examples.py    standalone validation demo
+
+docs/                       documentation source
+└── architecture.mmd        Mermaid source for the diagram above
 
 examples/                   sample TTL inputs to play with
 tests/                      pytest test suite
@@ -229,3 +236,16 @@ on those files alone.
 | `examples/animals.ttl` | Taxonomy meets family tree: seven species, three animal families across 5/3/3 generations, four `RoleChainAxiom`s using Goedel, Product and Geometric Mean. The companion file [`examples/animals.md`](examples/animals.md) documents the family-tree diagrams and lists every expected derivation. |
 | `ontology/examples/example-valid.ttl` | Smallest possible file that passes SHACL validation. |
 | `ontology/examples/example-invalid.ttl` | Deliberately broken file used in the validation tests; produces exactly four expected SHACL violations. |
+
+## Acknowledgements
+
+AMT.engine is developed within
+[**mainzed**](https://www.mainzed.org/) — Mainzer Zentrum für Digitalität
+in den Geistes- und Kulturwissenschaften — at
+[Hochschule Mainz, i3mainz](https://www.hs-mainz.de/forschung/institute/i3mainz/)
+and the [Leibniz-Zentrum für Archäologie (LEIZA)](https://www.leiza.de/).
+
+This work is part of the DFG-funded NFDI initiative, specifically the
+[Research Data Infrastructure for the Material Remains of Human History
+(NFDI4Objects)](https://www.nfdi4objects.net/) — DFG project number
+**501836407**.
