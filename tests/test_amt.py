@@ -246,10 +246,22 @@ class TestExport:
             tmp_path, with_reasoning=True,
         )
         assert n_path.exists() and e_path.exists()
+        assert n_path.name == "nodes.csv"
+        assert e_path.name == "edges.csv"
         # nodes.csv: header + 4 nodes
         assert len(n_path.read_text().splitlines()) == 5
         # edges.csv: header + 7 edges (3 asserted + 4 inferred)
         assert len(e_path.read_text().splitlines()) == 8
+
+    def test_csv_export_with_prefix(self, tmp_path):
+        amt = load_amt(EXAMPLES / "chain-test.ttl")
+        n_path, e_path = export_csv(
+            amt["nodes"], amt["edges"], amt["axioms"],
+            tmp_path, with_reasoning=True, prefix="chain-test",
+        )
+        assert n_path.name == "chain-test.nodes.csv"
+        assert e_path.name == "chain-test.edges.csv"
+        assert n_path.exists() and e_path.exists()
 
     def test_cypher_export_includes_provenance(self, tmp_path):
         amt = load_amt(EXAMPLES / "chain-test.ttl")
@@ -270,3 +282,51 @@ class TestConsistency:
         ok, violations = check_consistency(amt["edges"], amt["axioms"])
         assert ok
         assert violations == []
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Real-world example: SKOS concept mapping across vocabularies
+# ─────────────────────────────────────────────────────────────────────────
+class TestSkosExample:
+    """Exercise all six logic operators and both integrity axiom kinds
+    against the bundled SKOS mapping example."""
+
+    @pytest.fixture
+    def amt(self):
+        return load_amt(EXAMPLES / "skos-mapping-example.ttl", validate=True)
+
+    def test_loads_and_validates(self, amt):
+        assert len(amt["concepts"]) == 1
+        assert len(amt["roles"]) == 6
+        assert len(amt["nodes"]) == 4
+        assert len(amt["edges"]) == 7
+        # 6 RoleChain (one per logic) + 1 Inverse + 2 Integrity = 9
+        assert len(amt["axioms"]) == 9
+
+    def test_all_six_logics_are_used(self, amt):
+        logics_used = {a["logic"] for a in amt["axioms"] if "logic" in a}
+        assert logics_used == {
+            GOEDEL, PRODUCT, LUKASIEWICZ,
+            EINSTEIN, GEOMETRIC, HAMACHER,
+        }
+
+    def test_inverse_axiom_creates_narrow_match(self, amt):
+        reasoned = do_reasoning(amt["edges"], amt["axioms"])
+        narrow = [
+            e for e in reasoned
+            if e["role"].endswith("narrowMatch") and e["inferred"]
+        ]
+        assert len(narrow) >= 1
+        # The inverse of broadMatch(RomanBrooch -> GarmentFastener, 0.75)
+        nm = next(e for e in narrow
+                  if e["from"].endswith("GarmentFastener")
+                  and e["to"].endswith("RomanBrooch"))
+        assert nm["weight"] == 0.75
+
+    def test_integrity_axioms_detect_violations(self, amt):
+        ok, violations = check_consistency(amt["edges"], amt["axioms"])
+        assert not ok
+        # We expect exactly two: one self-disjoint and one disjoint
+        kinds = [v.split(":")[0] for v in violations]
+        assert "SelfDisjointAxiom violated" in kinds
+        assert "DisjointAxiom violated" in kinds

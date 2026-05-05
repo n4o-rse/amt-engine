@@ -265,10 +265,28 @@ def load_amt(
             axioms.append(_normalise_axiom_entry(entry, g))
 
     # ── Best-guess prefix (used by exporters for short ``ex:`` names) ───
+    # Pick the most common prefix among Concepts, Roles, Nodes and Axioms.
+    # This is more robust than just looking at the first node, especially
+    # for SKOS-style mappings where instances span multiple vocabularies
+    # (e.g. AAT, Wikidata, project-internal).
     prefix = ""
-    if nodes:
-        first_id = next(iter(nodes.values()))["id"]
-        prefix = first_id.rsplit("/", 1)[0] + "/"
+    iri_pool: list[str] = []
+    iri_pool += [c["iri"] for c in concepts.values()]
+    iri_pool += [r["iri"] for r in roles.values()]
+    iri_pool += [n["id"] for n in nodes.values()]
+    iri_pool += [a["iri"] for a in axioms if a.get("iri", "").startswith("http")]
+    if iri_pool:
+        from collections import Counter
+        prefixes = [iri.rsplit("/", 1)[0] + "/" for iri in iri_pool]
+        # Exclude well-known vocabularies — they should never become "ex:"
+        prefixes = [
+            p for p in prefixes
+            if not p.startswith(AMT_PFX)
+            and not p.startswith("http://www.w3.org/")
+            and not p.startswith("http://purl.org/")
+        ]
+        if prefixes:
+            prefix = Counter(prefixes).most_common(1)[0][0]
 
     return {
         "concepts": concepts,

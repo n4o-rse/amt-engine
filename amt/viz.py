@@ -15,7 +15,8 @@ from pathlib import Path
 
 from pyvis.network import Network
 
-from .core import do_reasoning, local_name
+from .core import local_name
+from .reasoning import do_reasoning
 
 # Same colour order as ``AMT_PALETTE`` in ``amt-render.js``
 _PALETTE = [

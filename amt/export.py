@@ -62,6 +62,20 @@ def export_ttl(
     RDFS_NS = "http://www.w3.org/2000/01/rdf-schema#"
     XSD_NS  = "http://www.w3.org/2001/XMLSchema#"
 
+    # Well-known prefixes that we collapse if they appear in the data.
+    # Order matters — longer matches first.
+    KNOWN_PREFIXES = [
+        ("skos:",     "http://www.w3.org/2004/02/skos/core#"),
+        ("skosplus:", "http://w3id.org/skos-plus/"),
+        ("wd:",       "http://www.wikidata.org/entity/"),
+        ("aat:",      "http://vocab.getty.edu/aat/"),
+        ("dct:",      "http://purl.org/dc/terms/"),
+        ("foaf:",     "http://xmlns.com/foaf/0.1/"),
+    ]
+    # Detect which of the known prefixes actually appear in the data, so
+    # we only declare what we use.
+    used_known: list[tuple[str, str]] = []
+
     display_edges = do_reasoning(edges, axioms) if with_reasoning else edges
     base_count = len(edges)
 
@@ -78,16 +92,46 @@ def export_ttl(
             return "rdfs:" + iri[len(RDFS_NS):]
         if iri.startswith(XSD_NS):
             return "xsd:" + iri[len(XSD_NS):]
+        for short, long in KNOWN_PREFIXES:
+            if iri.startswith(long):
+                if (short, long) not in used_known:
+                    used_known.append((short, long))
+                return short + iri[len(long):]
         return f"<{iri}>"
+
+    # Pre-scan all IRIs to collect used known prefixes BEFORE writing the
+    # @prefix declarations. We build a small list of every IRI that will
+    # appear in the output and run it through pfx() to populate used_known.
+    _scan = []
+    for c in concepts.values():
+        _scan.append(c["iri"])
+    for r in roles.values():
+        _scan += [r["iri"], r["domain"], r["range"]]
+    for n in nodes.values():
+        _scan += [n["id"], n["concept"]]
+    for a in axioms:
+        for v in a.values():
+            if isinstance(v, str) and v.startswith("http"):
+                _scan.append(v)
+            elif isinstance(v, list):
+                _scan += [x for x in v if isinstance(x, str) and x.startswith("http")]
+    for e in display_edges:
+        _scan += [e["from"], e["to"], e["role"]]
+        _scan += list(e.get("provenance") or [])
+    for iri in _scan:
+        pfx(iri)  # populates used_known as a side-effect
 
     lines: list[str] = [
         f"@prefix amt:  <{AMT_NS}> .",
         f"@prefix rdf:  <{RDF_NS}> .",
         f"@prefix rdfs: <{RDFS_NS}> .",
         f"@prefix xsd:  <{XSD_NS}> .",
-        f"@prefix ex:   <{prefix}> .",
-        "",
     ]
+    for short, long in used_known:
+        lines.append(f"@prefix {short:9s} <{long}> .")
+    if prefix:
+        lines.append(f"@prefix ex:   <{prefix}> .")
+    lines.append("")
 
     # Concepts
     lines.append("# Concepts")
@@ -293,14 +337,25 @@ def export_csv(
     output_dir: str | Path,
     *,
     with_reasoning: bool = False,
+    prefix: str = "",
 ) -> tuple[Path, Path]:
     """
-    Write ``nodes.csv`` and ``edges.csv`` into ``output_dir``.
+    Write a nodes CSV and an edges CSV into ``output_dir``.
+
+    Parameters
+    ----------
+    output_dir
+        Directory the files are written into. Created if it doesn't exist.
+    prefix
+        Optional filename prefix. Without it the files are called
+        ``nodes.csv`` and ``edges.csv``. With ``prefix="foo"`` they are
+        called ``foo.nodes.csv`` and ``foo.edges.csv`` — useful when
+        multiple datasets share an output directory.
 
     Schema:
 
-    ``nodes.csv``  : ``iri, label, concept_iri``
-    ``edges.csv``  : ``source_iri, target_iri, role_iri, weight, inferred, provenance``
+    ``[prefix.]nodes.csv``  : ``iri, label, concept_iri``
+    ``[prefix.]edges.csv``  : ``source_iri, target_iri, role_iri, weight, inferred, provenance``
 
     The ``provenance`` column is a semicolon-separated list of axiom IRIs
     (empty for asserted edges).
@@ -312,8 +367,9 @@ def export_csv(
 
     display_edges = do_reasoning(edges, axioms) if with_reasoning else edges
 
-    nodes_path = out_dir / "nodes.csv"
-    edges_path = out_dir / "edges.csv"
+    stem = f"{prefix}." if prefix else ""
+    nodes_path = out_dir / f"{stem}nodes.csv"
+    edges_path = out_dir / f"{stem}edges.csv"
 
     with nodes_path.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)

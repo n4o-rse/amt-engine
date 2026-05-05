@@ -67,6 +67,17 @@ def run_all(
         raise FileNotFoundError(input_path)
 
     out_dir = Path(output_dir) if output_dir else input_path.parent / "out"
+    # Clear the output directory before writing — keeps it tidy across runs
+    # and prevents stale files from confusing the user. We only delete the
+    # *contents*, not the directory itself, so editor tabs pointing at the
+    # folder don't lose their reference.
+    if out_dir.exists():
+        import shutil
+        for entry in out_dir.iterdir():
+            if entry.is_dir():
+                shutil.rmtree(entry)
+            else:
+                entry.unlink()
     out_dir.mkdir(parents=True, exist_ok=True)
     stem = input_path.stem
 
@@ -150,10 +161,9 @@ def run_all(
         print(f"OK   wrote {path}")
 
     if export_csv_:
-        csv_dir = out_dir / f"{stem}.csv"
         nodes_p, edges_p = export_csv(
             amt["nodes"], amt["edges"], amt["axioms"],
-            csv_dir, with_reasoning=reason,
+            out_dir, with_reasoning=reason, prefix=stem,
         )
         print(f"OK   wrote {nodes_p}")
         print(f"OK   wrote {edges_p}")
