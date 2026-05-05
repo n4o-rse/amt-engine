@@ -1,161 +1,217 @@
-@prefix amt: <http://academic-meta-tool.xyz/vocab#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix ex: <http://github.com/n4o-rse/amt-explore/> .
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix amt:      <http://academic-meta-tool.xyz/vocab#> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
 @prefix skosplus: <http://w3id.org/skos-plus/> .
+@prefix ex:       <http://github.com/n4o-rse/amt-explore/> .
 
-# AMT Ontology - Leonard Edition
+# =============================================================================
+# AMT data file: SKOS concept matching with custom MatchStar role
+# =============================================================================
+#
+# This is a reasoning-focused SKOS example. Four concepts are linked by
+# the standard skos:exactMatch / closeMatch / relatedMatch properties,
+# plus a project-internal `skosplus:MatchStar7` role that demonstrates
+# how to add a custom typed-mapping relation alongside the SKOS ones.
+#
+# Eight role-chain axioms cover every interesting binary composition of
+# the SKOS match properties, picking a logic for each one that reflects
+# what that composition actually means:
+#
+#   * Goedel    — exactMatch ∘ exactMatch (transitive identity: chain
+#                 is no stronger than its weakest link)
+#   * Product   — closeMatch ∘ closeMatch and the heterogeneous chains
+#                 that mix exact + close (independent fuzzy evidence)
+#   * Lukasiewicz — relatedMatch ∘ relatedMatch (strict: only fires when
+#                 both confidences clear a high threshold)
+#   * Product   — exactMatch ∘ relatedMatch and closeMatch ∘ relatedMatch
+#                 (cross-strength chains that produce a closeMatch with
+#                 dampened confidence)
+#   * Goedel    — MatchStar7 transitivity (project-internal property,
+#                 modelled as classification-like)
+#
+# `questionableMatch` is also declared as a role, used as the
+# consequent for any chain whose semantics are uncertain enough that
+# results should be flagged for human review (currently used by the
+# relatedMatch² → questionableMatch axiom).
+#
+# The companion file `SKOSconceptExample.md` contains the full
+# match diagram and the expected inferences with their derivations.
 
-amt:Concept rdfs:subClassOf rdfs:Class .
-amt:Role rdfs:subClassOf rdf:Property .
-amt:Axiom rdfs:subclassOf rdfs:Class .
-amt:InferenceAxiom rdfs:subClassOf amt:Axiom .
-amt:IntegrityAxiom rdfs:subClassOf amt:Axiom .
-amt:RoleChainAxiom rdfs:subClassOf amt:InferenceAxiom .
-amt:InverseAxiom rdfs:subClassOf amt:InferenceAxiom .
-amt:DisjointAxiom rdfs:subClassOf amt:IntegrityAxiom .
-amt:SelfDisjointAxiom rdfs:subClassOf amt:IntegrityAxiom .
-amt:Logic rdfs:subClassOf rdfs:Class .
-amt:LukasiewiczLogic rdf:type amt:Logic .
-amt:ProductLogic rdf:type amt:Logic .
-amt:GoedelLogic rdf:type amt:Logic .
+# ── Concept class ────────────────────────────────────────────────────────────
+ex:Concept rdf:type        amt:Concept ;
+           rdfs:label      "Concept" ;
+           amt:placeholder "Concept" .
 
-# SKOS Ontology
+# ── SKOS mapping properties as AMT Roles ─────────────────────────────────────
+skos:exactMatch    rdf:type    amt:Role ;
+                   rdfs:label  "exactMatch" ;
+                   rdfs:domain ex:Concept ;
+                   rdfs:range  ex:Concept .
 
-# concepts
+skos:closeMatch    rdf:type    amt:Role ;
+                   rdfs:label  "closeMatch" ;
+                   rdfs:domain ex:Concept ;
+                   rdfs:range  ex:Concept .
 
-ex:Concept rdf:type amt:Concept .
-ex:Concept rdfs:label "Concept" .
-ex:Concept amt:placeholder "Concept" .
+skos:relatedMatch  rdf:type    amt:Role ;
+                   rdfs:label  "relatedMatch" ;
+                   rdfs:domain ex:Concept ;
+                   rdfs:range  ex:Concept .
 
-# roles
+# A custom typed-mapping relation. The number-7 suffix is part of the
+# label of a project-internal classification scheme — kept here as an
+# example of how to introduce a non-SKOS Role alongside the standard
+# vocabulary.
+skosplus:MatchStar7 rdf:type    amt:Role ;
+                    rdfs:label  "MatchStar7" ;
+                    rdfs:domain ex:Concept ;
+                    rdfs:range  ex:Concept .
 
-skos:exactMatch rdf:type amt:Role .
-skos:exactMatch rdfs:label 'exactMatch' .
-skos:exactMatch rdfs:domain ex:Concept .
-skos:exactMatch rdfs:range ex:Concept .
+# Used as the consequent for "weak chain" inferences. When the engine
+# concludes a relation that should be flagged for human review, it
+# writes it as questionableMatch instead of strengthening one of the
+# SKOS properties.
+ex:questionableMatch rdf:type    amt:Role ;
+                     rdfs:label  "questionableMatch" ;
+                     rdfs:domain ex:Concept ;
+                     rdfs:range  ex:Concept .
 
-skos:closeMatch rdf:type amt:Role .
-skos:closeMatch rdfs:label 'closeMatch' .
-skos:closeMatch rdfs:domain ex:Concept .
-skos:closeMatch rdfs:range ex:Concept .
+# =============================================================================
+# AXIOMS
+# =============================================================================
 
-skos:relatedMatch rdf:type amt:Role .
-skos:relatedMatch rdfs:label 'relatedMatch' .
-skos:relatedMatch rdfs:domain ex:Concept .
-skos:relatedMatch rdfs:range ex:Concept .
+# ── exactMatch transitivity (Goedel, n=2) ───────────────────────────────────
+# exactMatch ∘ exactMatch → exactMatch. Goedel takes the minimum: the
+# composed exact match is no stronger than the weaker of the two input
+# matches. This is the conservative, semantically correct choice for
+# transitive equivalence — there is no "stacking of evidence" reading
+# that would justify multiplying confidences here.
+ex:RCA_exactTransitive rdf:type        amt:RoleChainAxiom ;
+                       amt:antecedents ( skos:exactMatch skos:exactMatch ) ;
+                       amt:consequent  skos:exactMatch ;
+                       amt:logic       amt:GoedelLogic .
 
-skosplus:MatchStar7 rdf:type amt:Role .
-skosplus:MatchStar7 rdfs:label 'MatchStar7' .
-skosplus:MatchStar7 rdfs:domain ex:Concept .
-skosplus:MatchStar7 rdfs:range ex:Concept .
+# ── closeMatch transitivity (Product, n=2) ──────────────────────────────────
+# closeMatch is the SKOS equivalent of "fuzzy equivalent" — chaining
+# two closeMatches dampens confidence multiplicatively, modelling them
+# as independent pieces of evidence.
+ex:RCA_closeTransitive rdf:type        amt:RoleChainAxiom ;
+                       amt:antecedents ( skos:closeMatch skos:closeMatch ) ;
+                       amt:consequent  skos:closeMatch ;
+                       amt:logic       amt:ProductLogic .
 
-skosplus:MatchStar6 rdf:type amt:Role .
-skosplus:MatchStar6 rdfs:label 'MatchStar6' .
-skosplus:MatchStar6 rdfs:domain ex:Concept .
-skosplus:MatchStar6 rdfs:range ex:Concept .
+# ── relatedMatch² → questionableMatch (Lukasiewicz, n=2) ────────────────────
+# relatedMatch is already a weak relation. Composing two relatedMatches
+# should produce something even weaker — and only fire if both inputs
+# are strong enough that their combined evidence overcomes the
+# Łukasiewicz threshold (max(0, x + y - 1)). The result is written as
+# questionableMatch because chains of relatedMatch are exactly the kind
+# of inference humans should review.
+ex:RCA_relatedQuestionable rdf:type        amt:RoleChainAxiom ;
+                           amt:antecedents ( skos:relatedMatch skos:relatedMatch ) ;
+                           amt:consequent  ex:questionableMatch ;
+                           amt:logic       amt:LukasiewiczLogic .
 
-skosplus:MatchStar5 rdf:type amt:Role .
-skosplus:MatchStar5 rdfs:label 'MatchStar5' .
-skosplus:MatchStar5 rdfs:domain ex:Concept .
-skosplus:MatchStar5 rdfs:range ex:Concept .
+# ── MatchStar7 transitivity (Goedel, n=2) ───────────────────────────────────
+# Project-internal classification-like relation. Goedel for the same
+# reason as exactMatch: classification chains compose by their weakest
+# link, no multiplicative dampening.
+ex:RCA_matchStar7Trans rdf:type        amt:RoleChainAxiom ;
+                       amt:antecedents ( skosplus:MatchStar7 skosplus:MatchStar7 ) ;
+                       amt:consequent  skosplus:MatchStar7 ;
+                       amt:logic       amt:GoedelLogic .
 
-skosplus:MatchStar4 rdf:type amt:Role .
-skosplus:MatchStar4 rdfs:label 'MatchStar4' .
-skosplus:MatchStar4 rdfs:domain ex:Concept .
-skosplus:MatchStar4 rdfs:range ex:Concept .
+# ── exactMatch ∘ closeMatch → closeMatch (Product, n=2) ─────────────────────
+# Heterogeneous chain: an exact identity followed by a close-but-not-
+# identical mapping yields close. Product is the natural choice: the
+# exact link contributes its full confidence and the close link is the
+# limiting factor.
+ex:RCA_exactClose rdf:type        amt:RoleChainAxiom ;
+                  amt:antecedents ( skos:exactMatch skos:closeMatch ) ;
+                  amt:consequent  skos:closeMatch ;
+                  amt:logic       amt:ProductLogic .
 
-skosplus:MatchStar3 rdf:type amt:Role .
-skosplus:MatchStar3 rdfs:label 'MatchStar3' .
-skosplus:MatchStar3 rdfs:domain ex:Concept .
-skosplus:MatchStar3 rdfs:range ex:Concept .
+# ── closeMatch ∘ exactMatch → closeMatch (Product, n=2) ─────────────────────
+# Symmetric counterpart: close-then-exact is also close. SKOS doesn't
+# require symmetry of compositions, so this axiom is needed
+# explicitly. (If you wanted to enforce symmetry, see the comment in
+# `SKOSconceptExample.md` about adding an InverseAxiom for closeMatch.)
+ex:RCA_closeExact rdf:type        amt:RoleChainAxiom ;
+                  amt:antecedents ( skos:closeMatch skos:exactMatch ) ;
+                  amt:consequent  skos:closeMatch ;
+                  amt:logic       amt:ProductLogic .
 
-skosplus:MatchStar2 rdf:type amt:Role .
-skosplus:MatchStar2 rdfs:label 'MatchStar2' .
-skosplus:MatchStar2 rdfs:domain ex:Concept .
-skosplus:MatchStar2 rdfs:range ex:Concept .
+# ── exactMatch ∘ relatedMatch → closeMatch (Product, n=2) ───────────────────
+# Identity composed with a weak relation yields a close-not-exact
+# match. Product captures that the weak relation pulls the result
+# down, but the exact-identity link doesn't reduce it further beyond
+# what the related-link contributes.
+ex:RCA_exactRelated rdf:type        amt:RoleChainAxiom ;
+                    amt:antecedents ( skos:exactMatch skos:relatedMatch ) ;
+                    amt:consequent  skos:closeMatch ;
+                    amt:logic       amt:ProductLogic .
 
-skosplus:MatchStar1 rdf:type amt:Role .
-skosplus:MatchStar1 rdfs:label 'MatchStar1' .
-skosplus:MatchStar1 rdfs:domain ex:Concept .
-skosplus:MatchStar1 rdfs:range ex:Concept .
+# ── closeMatch ∘ relatedMatch → closeMatch (Product, n=2) ───────────────────
+# A close mapping followed by a weak related-link still yields a
+# close-not-exact mapping, with the relatedMatch dampening
+# confidence. Same logic and reading as exactMatch ∘ relatedMatch.
+ex:RCA_closeRelated rdf:type        amt:RoleChainAxiom ;
+                    amt:antecedents ( skos:closeMatch skos:relatedMatch ) ;
+                    amt:consequent  skos:closeMatch ;
+                    amt:logic       amt:ProductLogic .
 
-# RoleChainAxioms
+# =============================================================================
+# DATA: Individuals
+# =============================================================================
 
-ex:RCA0001 rdf:type amt:RoleChainAxiom .
-ex:RCA0001 amt:antecedent1 skos:exactMatch .
-ex:RCA0001 amt:antecedent2 skos:exactMatch .
-ex:RCA0001 amt:consequent skos:exactMatch .
-ex:RCA0001 amt:logic amt:ProductLogic .
+ex:Concept1 amt:instanceOf ex:Concept ; rdfs:label "Concept 1" .
+ex:Concept2 amt:instanceOf ex:Concept ; rdfs:label "Concept 2" .
+ex:Concept3 amt:instanceOf ex:Concept ; rdfs:label "Concept 3" .
+ex:Concept4 amt:instanceOf ex:Concept ; rdfs:label "Concept 4" .
 
-ex:RCA0002 rdf:type amt:RoleChainAxiom .
-ex:RCA0002 amt:antecedent1 skos:closeMatch .
-ex:RCA0002 amt:antecedent2 skos:closeMatch .
-ex:RCA0002 amt:consequent skos:closeMatch .
-ex:RCA0002 amt:logic amt:ProductLogic .
+# =============================================================================
+# DATA: Asserted edges (reified statements)
+# =============================================================================
+#
+# Concept1 == Concept2 (exact identity) and ~~ Concept2 (close)
+# Concept2 ~~ Concept4 (close, separate evidence)
+# Concept2 ~  Concept3 (related, weak)
 
-ex:RCA0003 rdf:type amt:RoleChainAxiom .
-ex:RCA0003 amt:antecedent1 skos:relatedMatch .
-ex:RCA0003 amt:antecedent2 skos:relatedMatch .
-ex:RCA0003 amt:consequent ex:questionableMatch .
-ex:RCA0003 amt:logic amt:GoedelLogic .
+_:n01 rdf:subject ex:Concept1 ; rdf:predicate skos:closeMatch   ; rdf:object ex:Concept2 ; amt:weight "0.94"^^xsd:decimal .
+_:n02 rdf:subject ex:Concept2 ; rdf:predicate skos:relatedMatch ; rdf:object ex:Concept3 ; amt:weight "0.49"^^xsd:decimal .
+_:n03 rdf:subject ex:Concept1 ; rdf:predicate skos:exactMatch   ; rdf:object ex:Concept2 ; amt:weight "1.00"^^xsd:decimal .
+_:n04 rdf:subject ex:Concept2 ; rdf:predicate skos:closeMatch   ; rdf:object ex:Concept4 ; amt:weight "0.94"^^xsd:decimal .
 
-ex:RCA0004 rdf:type amt:RoleChainAxiom .
-ex:RCA0004 amt:antecedent1 ex:MatchStar7 .
-ex:RCA0004 amt:antecedent2 ex:MatchStar7 .
-ex:RCA0004 amt:consequent ex:MatchStar7 .
-ex:RCA0004 amt:logic amt:ProductLogic .
-
-ex:RCA0005 rdf:type amt:RoleChainAxiom .
-ex:RCA0005 amt:antecedent1 skos:exactMatch .
-ex:RCA0005 amt:antecedent2 skos:closeMatch .
-ex:RCA0005 amt:consequent skos:closeMatch .
-ex:RCA0005 amt:logic amt:ProductLogic .
-
-ex:RCA0006 rdf:type amt:RoleChainAxiom .
-ex:RCA0006 amt:antecedent1 skos:closeMatch .
-ex:RCA0006 amt:antecedent2 skos:exactMatch .
-ex:RCA0006 amt:consequent skos:closeMatch .
-ex:RCA0006 amt:logic amt:ProductLogic .
-
-ex:RCA0007 rdf:type amt:RoleChainAxiom .
-ex:RCA0007 amt:antecedent1 skos:exactMatch .
-ex:RCA0007 amt:antecedent2 skos:relatedMatch .
-ex:RCA0007 amt:consequent skos:closeMatch .
-ex:RCA0007 amt:logic amt:ProductLogic .
-
-ex:RCA0008 rdf:type amt:RoleChainAxiom .
-ex:RCA0008 amt:antecedent1 skos:closeMatch .
-ex:RCA0008 amt:antecedent2 skos:relatedMatch .
-ex:RCA0008 amt:consequent skos:closeMatch .
-ex:RCA0008 amt:logic amt:ProductLogic .
-
-# Example Data Concepts
-
-ex:Concept1 amt:instanceOf ex:Concept. ex:Concept1 rdfs:label 'Concept 1'.
-ex:Concept2 amt:instanceOf ex:Concept. ex:Concept2 rdfs:label 'Concept 2'.
-ex:Concept3 amt:instanceOf ex:Concept. ex:Concept3 rdfs:label 'Concept 3'.
-ex:Concept4 amt:instanceOf ex:Concept. ex:Concept4 rdfs:label 'Concept 4'.
-
-# Example Data Roles
-
-_:node01 rdf:subject ex:Concept1 .
-_:node01 rdf:predicate skos:closeMatch . 
-_:node01 rdf:object ex:Concept2 . 
-_:node01 amt:weight 0.94 .
-
-_:node02 rdf:subject ex:Concept2 .
-_:node02 rdf:predicate skos:relatedMatch . 
-_:node02 rdf:object ex:Concept3 . 
-_:node02 amt:weight 0.49 .
-
-_:node03 rdf:subject ex:Concept1 .
-_:node03 rdf:predicate skos:exactMatch . 
-_:node03 rdf:object ex:Concept2 . 
-_:node03 amt:weight 1.00 .
-
-_:node04 rdf:subject ex:Concept2 .
-_:node04 rdf:predicate skos:closeMatch . 
-_:node04 rdf:object ex:Concept4 . 
-_:node04 amt:weight 0.94 .
+# =============================================================================
+# Expected inferences (sanity check — produced by `amt-runner`)
+# =============================================================================
+#
+# Reasoning produces exactly 2 inferred edges, but each is derived by
+# two of the axioms above. The reasoner takes the maximum weight and
+# merges all contributing axiom IRIs into the edge's provenance.
+#
+# Inferred edge 1:
+#   Concept1 -closeMatch-> Concept4   weight 0.94
+#     derivation A (RCA_exactClose, Product):     1.00 * 0.94 = 0.94
+#     derivation B (RCA_closeTransitive, Product): 0.94 * 0.94 = 0.8836
+#     → max = 0.94, provenance = [RCA_exactClose, RCA_closeTransitive]
+#
+# Inferred edge 2:
+#   Concept1 -closeMatch-> Concept3   weight 0.49
+#     derivation A (RCA_exactRelated, Product): 1.00 * 0.49 = 0.49
+#     derivation B (RCA_closeRelated, Product): 0.94 * 0.49 = 0.4606
+#     → max = 0.49, provenance = [RCA_exactRelated, RCA_closeRelated]
+#
+# The other axioms don't fire on this dataset:
+#   * RCA_exactTransitive    — only one exactMatch edge in the data
+#   * RCA_relatedQuestionable — only one relatedMatch edge in the data
+#   * RCA_matchStar7Trans     — no MatchStar7 edges in the data
+#   * RCA_closeExact          — no closeMatch ∘ exactMatch chain in
+#                               the data
+#
+# To exercise the unfired axioms, see the suggested extensions in
+# `SKOSconceptExample.md`.
+#
+# Consistency check should pass — no integrity axioms are defined.
