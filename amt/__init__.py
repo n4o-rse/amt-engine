@@ -1,5 +1,5 @@
 """
-Academic Meta Tool – Python edition (v2).
+AMT.engine — Academic Meta Tool reasoning engine.
 
 A pure-Python implementation of the AMT framework with:
 
@@ -8,7 +8,8 @@ A pure-Python implementation of the AMT framework with:
 * Six fuzzy-logic operators (Goedel, Product, Lukasiewicz, Einstein,
   Geometric Mean, Hamacher) via a unified registry-based aggregator
 * Provenance tracking on inferred edges
-* Three export formats: RDF/Turtle, Neo4J Cypher, two-file CSV
+* Four export formats: RDF/Turtle, Neo4J Cypher, two-file CSV, and a
+  self-contained interactive HTML graph
 
 Usage in three flavours from one codebase:
 

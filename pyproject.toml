@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "amt"
 version = "0.2.0"
-description = "Academic Meta Tool – Python edition (n-ary role chains, six fuzzy logics, SHACL validation)"
+description = "AMT.engine — Academic Meta Tool reasoning engine (n-ary role chains, six fuzzy logics, SHACL validation)"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "AMT contributors" }]
