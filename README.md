@@ -67,24 +67,24 @@ pip install -e ".[dev]"
 pytest tests/ -q                       # all green
 ```
 
-Then run the bundled SKOS-mapping example through the full pipeline:
+Then run the bundled animals example through the full pipeline:
 
 ```bash
-amt-runner examples/skos-mapping-example.ttl
+amt-runner examples/animals.ttl
 # or, equivalently:
-python -m amt.runner examples/skos-mapping-example.ttl
+python -m amt.runner examples/animals.ttl
 ```
 
 This validates the file, loads it, runs the consistency check and the
 reasoner, then writes six files into `examples/out/`:
 
 ```
-skos-mapping-example.reasoned.ttl     RDF/Turtle, asserted + inferred
-skos-mapping-example.cypher           Neo4J Cypher
-skos-mapping-example.nodes.csv        flat tabular nodes
-skos-mapping-example.edges.csv        flat tabular edges (with provenance)
-skos-mapping-example.html             interactive graph
-skos-mapping-example.report.md        human-readable run report
+animals.reasoned.ttl     RDF/Turtle, asserted + inferred
+animals.cypher           Neo4J Cypher
+animals.nodes.csv        flat tabular nodes
+animals.edges.csv        flat tabular edges (with provenance)
+animals.html             interactive graph
+animals.report.md        human-readable run report
 ```
 
 The output folder is cleared at the start of every run, so it always
@@ -226,6 +226,6 @@ on those files alone.
 | File | Purpose |
 |------|---------|
 | `examples/chain-test.ttl` | Minimal Alice/Bob/Carol/Dave chain — useful for understanding what reasoning produces from a simple input. |
-| `examples/skos-mapping-example.ttl` | SKOS concept mapping across Getty AAT, Wikidata and project-internal vocabularies. Exercises all six logic operators, both inverse and integrity axioms, and demonstrates merged provenance. |
+| `examples/animals.ttl` | Taxonomy meets family tree: seven species, three animal families across 5/3/3 generations, four `RoleChainAxiom`s using Goedel, Product and Geometric Mean. The companion file [`examples/animals.md`](examples/animals.md) documents the family-tree diagrams and lists every expected derivation. |
 | `ontology/examples/example-valid.ttl` | Smallest possible file that passes SHACL validation. |
 | `ontology/examples/example-invalid.ttl` | Deliberately broken file used in the validation tests; produces exactly four expected SHACL violations. |

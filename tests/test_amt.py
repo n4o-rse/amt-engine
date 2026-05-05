@@ -285,48 +285,109 @@ class TestConsistency:
 
 
 # ─────────────────────────────────────────────────────────────────────────
-# Real-world example: SKOS concept mapping across vocabularies
+# Real-world example: animals (taxonomy + family tree)
 # ─────────────────────────────────────────────────────────────────────────
-class TestSkosExample:
-    """Exercise all six logic operators and both integrity axiom kinds
-    against the bundled SKOS mapping example."""
+class TestAnimalsExample:
+    """Exercise the four-logic animals example. Verifies the canonical
+    derivations described in examples/animals.md."""
 
     @pytest.fixture
     def amt(self):
-        return load_amt(EXAMPLES / "skos-mapping-example.ttl", validate=True)
+        return load_amt(EXAMPLES / "animals.ttl", validate=True)
+
+    @pytest.fixture
+    def reasoned(self, amt):
+        return do_reasoning(amt["edges"], amt["axioms"])
+
+    @staticmethod
+    def _find(edges, src_local, role_local, tgt_local):
+        for e in edges:
+            ok_src = e["from"].endswith("/" + src_local)
+            ok_role = (
+                e["role"].endswith("#" + role_local)
+                or e["role"].endswith("/" + role_local)
+            )
+            ok_tgt = e["to"].endswith("/" + tgt_local)
+            if ok_src and ok_role and ok_tgt:
+                return e
+        return None
 
     def test_loads_and_validates(self, amt):
-        assert len(amt["concepts"]) == 1
-        assert len(amt["roles"]) == 6
-        assert len(amt["nodes"]) == 4
-        assert len(amt["edges"]) == 7
-        # 6 RoleChain (one per logic) + 1 Inverse + 2 Integrity = 9
-        assert len(amt["axioms"]) == 9
+        assert len(amt["concepts"]) == 2          # Species + Individual
+        assert len(amt["roles"]) == 7
+        assert len(amt["nodes"]) == 26            # 7 species + 19 individuals
+        assert len(amt["edges"]) == 46            # asserted only
+        # 4 RoleChain + 3 Inverse = 7 axioms (no integrity axioms here)
+        assert len(amt["axioms"]) == 7
 
-    def test_all_six_logics_are_used(self, amt):
+    def test_four_logics_used(self, amt):
         logics_used = {a["logic"] for a in amt["axioms"] if "logic" in a}
-        assert logics_used == {
-            GOEDEL, PRODUCT, LUKASIEWICZ,
-            EINSTEIN, GEOMETRIC, HAMACHER,
-        }
+        # Goedel appears twice (classTrans + classCrossover); Product once;
+        # GeometricMean once. Lukasiewicz/Einstein/Hamacher absent on purpose.
+        assert logics_used == {GOEDEL, PRODUCT, GEOMETRIC}
 
-    def test_inverse_axiom_creates_narrow_match(self, amt):
-        reasoned = do_reasoning(amt["edges"], amt["axioms"])
-        narrow = [
-            e for e in reasoned
-            if e["role"].endswith("narrowMatch") and e["inferred"]
-        ]
-        assert len(narrow) >= 1
-        # The inverse of broadMatch(RomanBrooch -> GarmentFastener, 0.75)
-        nm = next(e for e in narrow
-                  if e["from"].endswith("GarmentFastener")
-                  and e["to"].endswith("RomanBrooch"))
-        assert nm["weight"] == 0.75
+    def test_taxonomy_transitivity_via_goedel(self, reasoned):
+        # Tiger isSubclassOf Mammal, derived via Tiger->Cat->Mammal
+        e = self._find(reasoned, "Tiger", "isSubclassOf", "Mammal")
+        assert e is not None and e["weight"] == 1.0
+        # Tiger isSubclassOf Animal, after Tiger->Mammal becomes available
+        e = self._find(reasoned, "Tiger", "isSubclassOf", "Animal")
+        assert e is not None and e["weight"] == 1.0
 
-    def test_integrity_axioms_detect_violations(self, amt):
+    def test_class_crossover_propagates_individual_to_higher_class(self, reasoned):
+        # Mowgli is a Tiger, Tiger is a Cat, so Mowgli is a Cat
+        e = self._find(reasoned, "Mowgli", "isInstanceOf", "Cat")
+        assert e is not None and e["weight"] == 1.0
+        e = self._find(reasoned, "Mowgli", "isInstanceOf", "Animal")
+        assert e is not None and e["weight"] == 1.0
+
+    def test_pet_classification_uses_lower_confidence(self, reasoned):
+        # Buddy isInstanceOf Pet via Dog->Pet (0.85)
+        e = self._find(reasoned, "Buddy", "isInstanceOf", "Pet")
+        assert e is not None
+        assert abs(e["weight"] - 0.85) < 1e-6
+
+    def test_wolf_does_not_become_pet(self, reasoned):
+        # Akela is a Wolf; Wolf has no isSubclassOf Pet edge,
+        # so no Pet inference should fire.
+        e = self._find(reasoned, "Akela", "isInstanceOf", "Pet")
+        assert e is None
+
+    def test_grandparent_uses_product_logic(self, reasoned):
+        # Bagheera -> Shere_Khan = 0.92, Shere_Khan -> Raja = 0.95
+        # Product => 0.92 * 0.95 = 0.874
+        e = self._find(reasoned, "Bagheera", "isAncestorOf", "Raja")
+        assert e is not None
+        assert abs(e["weight"] - 0.874) < 1e-3
+
+    def test_long_ancestry_uses_geometric_mean(self, reasoned):
+        # Sher_Singh -> Mowgli via 4-step chain
+        # weights: 0.92, 0.92, 0.95, 0.97
+        # GeoMean: (0.92 * 0.92 * 0.95 * 0.97) ^ (1/4) ≈ 0.9398
+        import math
+        e = self._find(reasoned, "Sher_Singh", "isAncestorOf", "Mowgli")
+        assert e is not None
+        expected = (0.92 * 0.92 * 0.95 * 0.97) ** (1 / 4)
+        assert abs(e["weight"] - expected) < 1e-3
+
+    def test_inverse_axioms_produce_reverse_edges(self, reasoned):
+        # hasSubclass for Mammal -> Tiger (inverse of Tiger isSubclassOf Mammal)
+        e = self._find(reasoned, "Mammal", "hasSubclass", "Tiger")
+        assert e is not None and e["weight"] == 1.0
+        # isDescendantOf for Mowgli -> Sher_Singh (inverse of long-ancestry)
+        e = self._find(reasoned, "Mowgli", "isDescendantOf", "Sher_Singh")
+        assert e is not None
+        # Same weight as the ancestor edge it inverts
+        assert abs(e["weight"] - 0.9398) < 1e-3
+
+    def test_sibling_symmetry(self, reasoned):
+        # Asserted: Buddy isSiblingOf Daisy.
+        # Inferred (via IA_siblingSym): Daisy isSiblingOf Buddy.
+        e = self._find(reasoned, "Daisy", "isSiblingOf", "Buddy")
+        assert e is not None and e["inferred"]
+        assert e["weight"] == 1.0
+
+    def test_consistent(self, amt):
         ok, violations = check_consistency(amt["edges"], amt["axioms"])
-        assert not ok
-        # We expect exactly two: one self-disjoint and one disjoint
-        kinds = [v.split(":")[0] for v in violations]
-        assert "SelfDisjointAxiom violated" in kinds
-        assert "DisjointAxiom violated" in kinds
+        assert ok
+        assert violations == []
