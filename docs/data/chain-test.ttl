@@ -1,0 +1,45 @@
+@prefix amt:  <http://academic-meta-tool.xyz/vocab#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <http://example.com/> .
+
+# ── Concepts and roles ─────────────────────────────────────────────────
+ex:Person a amt:Concept ;
+    rdfs:label "Person" ;
+    amt:placeholder "Lastname, Firstname" .
+
+ex:knows a amt:Role ;
+    rdfs:label "knows" ;
+    rdfs:domain ex:Person ;
+    rdfs:range  ex:Person .
+
+ex:trusts a amt:Role ;
+    rdfs:label "trusts" ;
+    rdfs:domain ex:Person ;
+    rdfs:range  ex:Person .
+
+# ── Instances: a chain Alice -> Bob -> Carol -> Dave ───────────────────
+ex:alice amt:instanceOf ex:Person ; rdfs:label "Alice" .
+ex:bob   amt:instanceOf ex:Person ; rdfs:label "Bob" .
+ex:carol amt:instanceOf ex:Person ; rdfs:label "Carol" .
+ex:dave  amt:instanceOf ex:Person ; rdfs:label "Dave" .
+
+# ── Asserted edges along the chain ─────────────────────────────────────
+_:e1 rdf:subject ex:alice ; rdf:predicate ex:knows ; rdf:object ex:bob   ; amt:weight "0.9"^^xsd:decimal .
+_:e2 rdf:subject ex:bob   ; rdf:predicate ex:knows ; rdf:object ex:carol ; amt:weight "0.8"^^xsd:decimal .
+_:e3 rdf:subject ex:carol ; rdf:predicate ex:knows ; rdf:object ex:dave  ; amt:weight "0.7"^^xsd:decimal .
+
+# ── Axioms ─────────────────────────────────────────────────────────────
+# 2-ary, legacy form: knows o knows -> knows  (Goedel)
+ex:RCA2 a amt:RoleChainAxiom ;
+    amt:antecedent1 ex:knows ;
+    amt:antecedent2 ex:knows ;
+    amt:consequent  ex:knows ;
+    amt:logic       amt:GoedelLogic .
+
+# 3-ary, modern form: knows o knows o knows -> trusts  (Geometric mean)
+ex:RCA3 a amt:RoleChainAxiom ;
+    amt:antecedents ( ex:knows ex:knows ex:knows ) ;
+    amt:consequent  ex:trusts ;
+    amt:logic       amt:GeometricMean .
