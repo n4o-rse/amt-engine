@@ -2,45 +2,65 @@
 AMT Exporters
 =============
 
-Python port of ``amt-export.js``.
+* :func:`export_ttl`    – Turtle, round-trip-compatible with :func:`amt.core.load_amt`.
+                          Inferred edges carry ``amt:inferred "true"`` and
+                          ``amt:provenance`` references to the originating axioms.
+* :func:`export_cypher` – Neo4J Cypher, with the same provenance semantics
+                          encoded as relationship properties.
+* :func:`export_csv`    – Two CSV files (``nodes.csv`` and ``edges.csv``),
+                          suitable for import into Pandas, Excel, or any
+                          downstream tabular pipeline.
 
-* :func:`export_ttl`    – Turtle, round-trip-compatible with :func:`amt.core.load_amt`
-* :func:`export_cypher` – Neo4J Cypher
-
-Both accept ``with_reasoning=True`` to include inferred edges; inferred
-triples carry an additional ``amt:inferred "true"^^xsd:boolean`` flag.
+All three accept ``with_reasoning=True`` to include inferred edges. TTL has
+an additional ``include_vocabulary=True`` (default) flag that controls
+whether the AMT vocabulary scaffolding is emitted alongside the data.
 """
 from __future__ import annotations
 
+import csv
 import re
 from pathlib import Path
 
 from rdflib import Graph
 
-from .core import do_reasoning, local_name
+from .core import local_name
+from .reasoning import do_reasoning
 
 
+# ─────────────────────────────────────────────────────────────────────────
+# TTL export
+# ─────────────────────────────────────────────────────────────────────────
 def export_ttl(
     nodes: dict,
     edges: list,
     concepts: dict,
     roles: dict,
     axioms: list,
-    rdf_graph: Graph,           # kept in signature for API parity / future use
+    rdf_graph: Graph,            # kept for API parity / future use
     prefix: str,
     *,
     with_reasoning: bool = False,
+    include_vocabulary: bool = True,
 ) -> str:
     """
     Serialise the current AMT state to Turtle.
 
-    The output is **deterministic** and styled to match the JS exporter so
-    diffs against the original web tool stay readable.
+    Parameters
+    ----------
+    with_reasoning
+        Include inferred edges in the output.
+    include_vocabulary
+        Emit AMT vocabulary scaffolding (subClassOf hierarchy, Logic
+        instances) alongside the data. Default True for backward
+        compatibility with the original JS exporter and the webviewer,
+        which expect to find these triples in the data file. Set False to
+        produce a cleaner data-only file that validates against a separate
+        ontology.
     """
-    AMT_NS = "http://academic-meta-tool.xyz/vocab#"
-    RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    AMT_NS  = "http://academic-meta-tool.xyz/vocab#"
+    RDF_NS  = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     RDFS_NS = "http://www.w3.org/2000/01/rdf-schema#"
-    XSD_NS = "http://www.w3.org/2001/XMLSchema#"
+    XSD_NS  = "http://www.w3.org/2001/XMLSchema#"
 
     display_edges = do_reasoning(edges, axioms) if with_reasoning else edges
     base_count = len(edges)
@@ -102,17 +122,13 @@ def export_ttl(
             "",
         ]
 
-    # Axioms
-    if axioms:
-        # The reader needs the AMT vocabulary scaffolding so it knows that
-        # e.g. `RoleChainAxiom rdfs:subClassOf amt:Axiom`. We declare the
-        # subset that's actually in use.
+    # AMT vocabulary scaffolding (optional)
+    if axioms and include_vocabulary:
         lines.append("# AMT vocabulary (needed for axiom recognition)")
         used_types = sorted({ax.get("type", "Axiom") for ax in axioms})
         lines.append("amt:Axiom rdfs:subClassOf rdfs:Class .")
         lines.append("amt:InferenceAxiom rdfs:subClassOf amt:Axiom .")
         lines.append("amt:IntegrityAxiom rdfs:subClassOf amt:Axiom .")
-        # subClassOf for the concrete axiom kinds we know about
         _AXIOM_PARENT = {
             "RoleChainAxiom":    "InferenceAxiom",
             "InverseAxiom":      "InferenceAxiom",
@@ -123,24 +139,44 @@ def export_ttl(
             parent = _AXIOM_PARENT.get(t, "Axiom")
             lines.append(f"amt:{t} rdfs:subClassOf amt:{parent} .")
         lines.append("amt:Logic rdfs:subClassOf rdfs:Class .")
-        lines.append("amt:LukasiewiczLogic rdf:type amt:Logic .")
-        lines.append("amt:ProductLogic rdf:type amt:Logic .")
-        lines.append("amt:GoedelLogic rdf:type amt:Logic .")
+        for op in (
+            "GoedelLogic", "ProductLogic", "LukasiewiczLogic",
+            "EinsteinProduct", "GeometricMean", "HamacherProduct",
+        ):
+            lines.append(f"amt:{op} rdf:type amt:Logic .")
         lines.append("")
 
+    # Axioms
+    if axioms:
         lines.append("# Axioms")
         for idx, ax in enumerate(axioms, start=1):
             atype = ax.get("type", "Axiom")
-            iri = f"ex:AX{idx:04d}"  # stable, deterministic IRI
-            lines.append(f"{iri} rdf:type amt:{atype} .")
+            iri = ax.get("iri") or f"ex:AX{idx:04d}"
+            iri_short = pfx(iri) if iri.startswith("http") else iri
+            lines.append(f"{iri_short} rdf:type amt:{atype} .")
             for k, v in ax.items():
-                if k == "type":
+                if k in ("type", "iri"):
                     continue
-                rendered = pfx(v) if isinstance(v, str) and v.startswith("http") else f'"{v}"'
-                lines.append(f"{iri} amt:{k} {rendered} .")
+                if k == "antecedents":
+                    # Always emit the modern RDF-list form. Skip if the
+                    # legacy antecedent1/2 fields are also present —
+                    # they'll be emitted separately and SHACL forbids both
+                    # at once.
+                    if "antecedent1" in ax and "antecedent2" in ax:
+                        continue
+                    items = " ".join(pfx(role) for role in v)
+                    lines.append(f"{iri_short} amt:antecedents ( {items} ) .")
+                    continue
+                if isinstance(v, str) and v.startswith("http"):
+                    rendered = pfx(v)
+                elif isinstance(v, (int, float)):
+                    rendered = f'"{v}"^^xsd:decimal'
+                else:
+                    rendered = f'"{v}"'
+                lines.append(f"{iri_short} amt:{k} {rendered} .")
             lines.append("")
 
-    # Original assertions (reified statements)
+    # Asserted assertions (reified statements)
     lines.append("# Original Assertions")
     for j, e in enumerate(display_edges[:base_count]):
         w = min(float(e["weight"]), 1.0)
@@ -154,24 +190,36 @@ def export_ttl(
             "",
         ]
 
+    # Inferred assertions, with provenance
     if with_reasoning and len(display_edges) > base_count:
         lines.append("# Inferred Assertions")
         for k, e in enumerate(display_edges[base_count:]):
             w = min(float(e["weight"]), 1.0)
             bn = f"_:i{k+1}"
-            lines += [
+            block = [
                 bn,
                 f'    rdf:subject    {pfx(e["from"])} ;',
                 f'    rdf:predicate  {pfx(e["role"])} ;',
                 f'    rdf:object     {pfx(e["to"])} ;',
                 f'    amt:weight     "{w:.6f}"^^xsd:double ;',
-                '    amt:inferred   "true"^^xsd:boolean .',
-                "",
+                '    amt:inferred   "true"^^xsd:boolean',
             ]
+            prov = e.get("provenance") or []
+            if prov:
+                prov_part = ", ".join(pfx(p) for p in prov)
+                block[-1] += " ;"
+                block.append(f"    amt:provenance {prov_part} .")
+            else:
+                block[-1] += " ."
+            block.append("")
+            lines += block
 
     return "\n".join(lines)
 
 
+# ─────────────────────────────────────────────────────────────────────────
+# Cypher export
+# ─────────────────────────────────────────────────────────────────────────
 def export_cypher(
     nodes: dict,
     edges: list,
@@ -179,7 +227,8 @@ def export_cypher(
     *,
     with_reasoning: bool = False,
 ) -> str:
-    """Serialise to Neo4J Cypher. Mirrors ``exportCypher()`` from ``amt-export.js``."""
+    """Serialise to Neo4J Cypher. Inferred edges carry inferred=true and
+    a provenance list (semicolon-separated axiom local names)."""
 
     def cypher_safe(s: str) -> str:
         return re.sub(r"[^a-zA-Z0-9_]", "_", s)
@@ -194,9 +243,11 @@ def export_cypher(
         f"// Nodes: {len(nodes)}  Edges: {len(display_edges)}",
         f"// (inferred: {len(display_edges) - base_count})",
         "",
+        "// Step 1: nodes",
     ]
 
-    node_lines, var_list = [], []
+    var_list = []
+    node_lines = []
     for n in nodes.values():
         var = var_map[n["id"]]
         label = cypher_safe(local_name(n["concept"]))
@@ -208,9 +259,9 @@ def export_cypher(
         )
         var_list.append(var)
 
-    lines.append("// Step 1: nodes")
     lines.append("\n".join(node_lines))
-    lines.append("WITH " + ", ".join(var_list))
+    if var_list:
+        lines.append("WITH " + ", ".join(var_list))
     lines.append("")
     lines.append("// Step 2: relationships")
 
@@ -220,16 +271,77 @@ def export_cypher(
         fv = var_map.get(e["from"], cypher_safe(local_name(e["from"])))
         tv = var_map.get(e["to"], cypher_safe(local_name(e["to"])))
         inferred = "true" if e.get("inferred") else "false"
+        prov_list = e.get("provenance") or []
+        prov_str = ";".join(local_name(p) for p in prov_list)
         lines.append(
             f"MERGE ({fv})-[:{rel} {{weight: {w}, "
-            f'role: "{local_name(e["role"])}", inferred: {inferred}}}]->({tv})'
+            f'role: "{local_name(e["role"])}", inferred: {inferred}, '
+            f'provenance: "{prov_str}"}}]->({tv})'
         )
 
     lines += ["", "RETURN *"]
     return "\n".join(lines)
 
 
-# Convenience wrappers ---------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────
+# CSV export — two files
+# ─────────────────────────────────────────────────────────────────────────
+def export_csv(
+    nodes: dict,
+    edges: list,
+    axioms: list,
+    output_dir: str | Path,
+    *,
+    with_reasoning: bool = False,
+) -> tuple[Path, Path]:
+    """
+    Write ``nodes.csv`` and ``edges.csv`` into ``output_dir``.
+
+    Schema:
+
+    ``nodes.csv``  : ``iri, label, concept_iri``
+    ``edges.csv``  : ``source_iri, target_iri, role_iri, weight, inferred, provenance``
+
+    The ``provenance`` column is a semicolon-separated list of axiom IRIs
+    (empty for asserted edges).
+
+    Returns the two file paths in (nodes, edges) order.
+    """
+    out_dir = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    display_edges = do_reasoning(edges, axioms) if with_reasoning else edges
+
+    nodes_path = out_dir / "nodes.csv"
+    edges_path = out_dir / "edges.csv"
+
+    with nodes_path.open("w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["iri", "label", "concept_iri"])
+        for n in nodes.values():
+            w.writerow([n["id"], n["label"], n["concept"]])
+
+    with edges_path.open("w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow([
+            "source_iri", "target_iri", "role_iri",
+            "weight", "inferred", "provenance",
+        ])
+        for e in display_edges:
+            prov = ";".join(e.get("provenance") or [])
+            w.writerow([
+                e["from"], e["to"], e["role"],
+                f"{float(e['weight']):.6f}",
+                "true" if e.get("inferred") else "false",
+                prov,
+            ])
+
+    return (nodes_path, edges_path)
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Convenience wrappers — write to disk in one call
+# ─────────────────────────────────────────────────────────────────────────
 def write_ttl(path: str | Path, *args, **kwargs) -> Path:
     """Convenience wrapper: :func:`export_ttl` + write to disk."""
     out = Path(path)

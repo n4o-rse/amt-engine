@@ -1,24 +1,50 @@
 """
-Academic Meta Tool – Python edition.
+Academic Meta Tool – Python edition (v2).
 
-A pure-Python port of http://academic-meta-tool.xyz/ (originally JavaScript:
-N3.js + vis.js). Designed to be used three ways from the same code base:
+A pure-Python implementation of the AMT framework with:
+
+* SHACL pre-validation of input files
+* n-ary RoleChainAxioms (legacy 2-ary form still supported)
+* Six fuzzy-logic operators (Goedel, Product, Lukasiewicz, Einstein,
+  Geometric Mean, Hamacher) via a unified registry-based aggregator
+* Provenance tracking on inferred edges
+* Three export formats: RDF/Turtle, Neo4J Cypher, two-file CSV
+
+Usage in three flavours from one codebase:
 
 1. **As a library** – ``from amt import load_amt, do_reasoning, export_ttl``
-2. **From the command line** – ``amt input.ttl --reason --export-ttl out.ttl``
-3. **Feeding the existing webviewer** – CLI writes a TTL, the JS viewer in
-   ``docs/`` loads it.
+2. **From the command line** – ``amt input.ttl --reason --validate --export-ttl out.ttl``
+3. **Full pipeline in one call** – ``from amt.runner import run_all; run_all("input.ttl")``
 
-See the ``README.md`` for examples.
+See ``README.md`` for examples.
 """
 from .core import (
-    AMT,
-    check_consistency,
-    do_reasoning,
     load_amt,
     local_name,
 )
+from .reasoning import (
+    check_consistency,
+    do_reasoning,
+)
+from .logic import (
+    LOGIC_REGISTRY,
+    aggregate_weights,
+    get_arity,
+    is_parametrised,
+    GOEDEL,
+    PRODUCT,
+    LUKASIEWICZ,
+    EINSTEIN,
+    GEOMETRIC,
+    HAMACHER,
+)
+from .validation import (
+    AMTValidationError,
+    ValidationResult,
+    validate_against_shapes,
+)
 from .export import (
+    export_csv,
     export_cypher,
     export_ttl,
     write_cypher,
@@ -30,18 +56,34 @@ from .viz import (
     show_in_notebook,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     # core
-    "AMT",
     "load_amt",
+    "local_name",
+    # reasoning
     "do_reasoning",
     "check_consistency",
-    "local_name",
+    # logic
+    "aggregate_weights",
+    "get_arity",
+    "is_parametrised",
+    "LOGIC_REGISTRY",
+    "GOEDEL",
+    "PRODUCT",
+    "LUKASIEWICZ",
+    "EINSTEIN",
+    "GEOMETRIC",
+    "HAMACHER",
+    # validation
+    "validate_against_shapes",
+    "AMTValidationError",
+    "ValidationResult",
     # export
     "export_ttl",
     "export_cypher",
+    "export_csv",
     "write_ttl",
     "write_cypher",
     # viz
