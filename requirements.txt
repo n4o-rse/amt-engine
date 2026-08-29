@@ -1,0 +1,16 @@
+# AMT.engine — runtime dependencies
+#
+# These mirror [project].dependencies in pyproject.toml. Installing the
+# package itself (pip install -e .) already pulls them in; this file exists
+# for environments that vendor the source tree instead of installing it —
+# CI images, Binder, Docker layers, and wrappers such as amt.runner that
+# clone the repository rather than pip-install it.
+#
+#   pip install -r requirements.txt
+#
+# Lower bounds only. Pin exact versions in a lockfile if you need a
+# byte-reproducible environment; the engine itself does not require it.
+
+rdflib>=7.0        # RDF parsing, Turtle serialisation, RDF list handling
+pyshacl>=0.25      # SHACL validation against ontology/amt-shapes.ttl
+pyvis>=0.3         # interactive HTML graph export

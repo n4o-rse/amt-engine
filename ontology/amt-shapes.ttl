@@ -165,6 +165,40 @@ amt:InverseAxiomShape a sh:NodeShape ;
 
 
 # -----------------------------------------------------------------------------
+# SubsumptionAxiom: exactly one sub-role and one super-role
+# -----------------------------------------------------------------------------
+
+amt:SubsumptionAxiomShape a sh:NodeShape ;
+    sh:targetClass amt:SubsumptionAxiom ;
+    sh:property [
+        sh:path amt:subRole ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class amt:Role ;
+        sh:message "SubsumptionAxiom must have exactly one amt:subRole of type amt:Role." ;
+    ] ;
+    sh:property [
+        sh:path amt:superRole ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class amt:Role ;
+        sh:message "SubsumptionAxiom must have exactly one amt:superRole of type amt:Role." ;
+    ] ;
+    # A role cannot be strictly finer than itself. Reflexive axioms are
+    # vacuous, and the reasoner would have to special-case them to stop a
+    # role from suppressing its own edges in minimal mode.
+    sh:sparql [
+        sh:message "SubsumptionAxiom must not declare a role as its own sub-role (amt:subRole and amt:superRole must differ)." ;
+        sh:select """
+            SELECT $this WHERE {
+              $this <http://academic-meta-tool.xyz/vocab#subRole>   ?r .
+              $this <http://academic-meta-tool.xyz/vocab#superRole> ?r .
+            }
+        """ ;
+    ] .
+
+
+# -----------------------------------------------------------------------------
 # DisjointAxiom: exactly two roles
 # -----------------------------------------------------------------------------
 

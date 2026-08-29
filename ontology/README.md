@@ -107,7 +107,8 @@ amt:Role        ⊂ rdf:Property
 amt:Axiom       ⊂ rdfs:Class
   ├─ amt:InferenceAxiom
   │    ├─ amt:RoleChainAxiom
-  │    └─ amt:InverseAxiom
+  │    ├─ amt:InverseAxiom
+  │    └─ amt:SubsumptionAxiom
   └─ amt:IntegrityAxiom
        ├─ amt:DisjointAxiom
        └─ amt:SelfDisjointAxiom
@@ -248,6 +249,7 @@ Any SHACL-compliant validator works. For Java use
 | `amt:RoleChainAxiomShape` | exactly one consequent + logic; either `antecedents` (n-ary) **xor** `antecedent1`+`antecedent2` (legacy) |
 | `amt:HamacherParameterShape` | axioms using Hamacher must specify `amt:logicParameter` |
 | `amt:InverseAxiomShape` | exactly one antecedent and one inverse |
+| `amt:SubsumptionAxiomShape` | exactly one `subRole` and one `superRole`, and they must differ |
 | `amt:DisjointAxiomShape` | exactly one `role1` and one `role2` |
 | `amt:SelfDisjointAxiomShape` | exactly one `role` |
 | `amt:WeightShape` | `amt:weight` is xsd:decimal in [0, 1] |
@@ -259,7 +261,7 @@ If you want to build an AMT-compliant tool, here's the contract:
 **1. Data model (from `amt.ttl`)**
 
 Parse Turtle/RDF input. Recognise instances of `amt:Concept`, `amt:Role`,
-the four `amt:Axiom` subclasses, `amt:Logic` operators, and weighted
+the five `amt:Axiom` subclasses, `amt:Logic` operators, and weighted
 quadruples (RDF reification with `amt:weight`).
 
 **2. Validation (from `amt-shapes.ttl`)**
@@ -272,6 +274,28 @@ proceed or report them clearly.
 Implement the role-chain and inverse inference rules. Iterate to a fixed
 point: keep applying rules until no new edges are produced. Mark inferred
 edges so they can be distinguished from asserted ones.
+
+`amt:SubsumptionAxiom` needs both of its readings, described in full by
+`amt:SubsumptionRule`. Entailment must be the default, because a consumer
+that does not carry the role hierarchy needs every edge spelled out;
+redundancy elimination must be available as an option, because a
+vocabulary whose roles are sets of finer roles (Freksa's 29 semi-interval
+relations have 137 proper subset relations among them) otherwise produces
+an edge count multiplied by the average chain length. Two rules that a
+conforming implementation must not get wrong: suppression requires
+`weight(subRole edge) >= weight(superRole edge)`, and an asserted edge is
+never suppressed.
+
+Apply the transitive closure of `subRole`/`superRole` rather than only the
+declared pairs, so a file that states the covering relation behaves like
+one that spells out every pair. Iterating the direct rule to a fixed point
+achieves this for entailment; elimination needs the closure computed
+explicitly.
+
+Iterate axiom application in a **deterministic order** — sort by axiom IRI.
+Applying axioms in the order a hash set happens to yield makes provenance
+lists differ between runs, which is enough to make exported files
+non-byte-identical for no semantic reason.
 
 **4. Logic operators (from `amt:Logic` instances)**
 

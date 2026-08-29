@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "amt"
-version = "0.2.0"
+version = "0.3.0"
 description = "AMT.engine — Academic Meta Tool reasoning engine (n-ary role chains, six fuzzy logics, SHACL validation)"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -24,8 +24,18 @@ notebook = ["ipython", "ipywidgets"]
 amt = "amt.cli:main"
 amt-runner = "amt.runner:main"
 
+# The ontology stays at the repository root, where ontology/README.md, the
+# diagrams and validate_examples.py expect it. package-dir maps that folder
+# into the package namespace at build time, so an installed AMT carries it
+# as amt/ontology/ instead of claiming a generic top-level "ontology/"
+# directory in site-packages. amt._resources resolves both layouts.
 [tool.setuptools]
-packages = ["amt"]
+packages = ["amt", "amt.ontology", "amt.ontology.examples"]
+
+[tool.setuptools.package-dir]
+"amt.ontology" = "ontology"
+"amt.ontology.examples" = "ontology/examples"
 
 [tool.setuptools.package-data]
-amt = ["../ontology/*.ttl", "../ontology/examples/*.ttl"]
+"amt.ontology" = ["*.ttl"]
+"amt.ontology.examples" = ["*.ttl"]

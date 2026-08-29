@@ -36,13 +36,11 @@ from typing import TypedDict
 from rdflib import Graph, Namespace, RDF, RDFS, URIRef
 from rdflib.collection import Collection
 
+from ._resources import ontology_dir as _bundled_ontology_dir
+
 # AMT vocabulary namespace
 AMT = Namespace("http://academic-meta-tool.xyz/vocab#")
 AMT_PFX = str(AMT)
-
-# Where the bundled ontology lives by default. Resolved relative to this
-# file so the package works whether installed via pip or run from a clone.
-_DEFAULT_ONTOLOGY_DIR = Path(__file__).resolve().parent.parent / "ontology"
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -169,10 +167,10 @@ def load_amt(
     # downstream "amt-dict" (which represents the user's data) doesn't get
     # polluted with vocabulary triples.
     vocab = Graph()
-    if ontology_path is None and _DEFAULT_ONTOLOGY_DIR.exists():
-        candidate = _DEFAULT_ONTOLOGY_DIR / "amt.ttl"
-        if candidate.exists():
-            ontology_path = candidate
+    if ontology_path is None:
+        bundled = _bundled_ontology_dir()
+        if bundled is not None:
+            ontology_path = bundled / "amt.ttl"
     if ontology_path is not None:
         vocab.parse(str(ontology_path), format="turtle")
 
@@ -243,13 +241,18 @@ def load_amt(
     # Defensive fallback if neither vocab nor data declared the hierarchy
     if not axiom_types:
         axiom_types = {
-            AMT.RoleChainAxiom, AMT.InverseAxiom,
+            AMT.RoleChainAxiom, AMT.InverseAxiom, AMT.SubsumptionAxiom,
             AMT.DisjointAxiom, AMT.SelfDisjointAxiom,
         }
 
+    # Sort both loops. Iterating a set makes the order in which RoleChain,
+    # Inverse and Subsumption axioms are applied depend on string hashing,
+    # which changes the order of amt:provenance lists between runs and so
+    # makes three of the six exported files non-byte-identical. Sorting by
+    # IRI pins the order across processes, machines and Python versions.
     axioms: list[dict] = []
-    for atype in axiom_types:
-        for axiom in g.subjects(RDF.type, atype):
+    for atype in sorted(axiom_types, key=str):
+        for axiom in sorted(g.subjects(RDF.type, atype), key=str):
             entry: dict = {"type": _local(atype), "iri": str(axiom)}
             for _, p, o in g.triples((axiom, None, None)):
                 if p == RDF.type:

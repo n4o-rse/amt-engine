@@ -1,0 +1,131 @@
+@prefix amt:  <http://academic-meta-tool.xyz/vocab#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <http://github.com/n4o-rse/amt-engine/subsumption-demo/> .
+
+# =============================================================================
+# AMT data file: subsumption-demo — coarse and fine temporal relations
+# =============================================================================
+#
+# A miniature of the situation that motivates amt:SubsumptionAxiom: a
+# vocabulary in which some roles are *sets* of finer roles, so that a coarse
+# relation is implied by a finer one between the same pair of events.
+#
+# Freksa (1992), "Temporal reasoning based on semi-intervals", extends
+# Allen's thirteen interval relations with sixteen conceptual
+# neighbourhoods. Each neighbourhood is a set of Allen relations —
+# `ob` ("older beginning") = {<, m, o}, `ol` ("older") = {<, m, o, fi, di} —
+# which produces chains of proper subset relations, `< ⊂ ob ⊂ ol ⊂ ?`.
+# The full vocabulary has 29 roles and 137 such subset relations. This file
+# has three roles and two, so that the reasoning fits on one screen.
+#
+#   ex:before  ⊑  ex:olderBeginning  ⊑  ex:older
+#
+# Two role chain axioms stand in for two entries of a composition table:
+# one composing fine relations, one composing coarse ones. Because both
+# fire on the same pair of events, the graph ends up carrying a fine and a
+# coarse statement about that pair — which is exactly the redundancy that
+# `--minimal` removes.
+#
+# Run it both ways to see the difference:
+#
+#   python -m amt.runner examples/subsumption-demo.ttl
+#   python -m amt.runner examples/subsumption-demo.ttl --minimal
+#
+# The companion file `subsumption-demo.md` walks through every inference.
+
+# ── Concepts ────────────────────────────────────────────────────────────────
+ex:Event rdf:type        amt:Concept ;
+         rdfs:label      "Event" ;
+         amt:placeholder "Event name" .
+
+# ── Roles ───────────────────────────────────────────────────────────────────
+# Fine: Allen's `<`. E ends strictly before F begins.
+ex:before          rdf:type    amt:Role ;
+                   rdfs:label  "before" ;
+                   rdfs:domain ex:Event ;
+                   rdfs:range  ex:Event .
+
+# Coarser: Freksa's `ob`, the set {<, m, o}. E begins before F begins.
+ex:olderBeginning  rdf:type    amt:Role ;
+                   rdfs:label  "olderBeginning" ;
+                   rdfs:domain ex:Event ;
+                   rdfs:range  ex:Event .
+
+# Coarsest: Freksa's `ol`, the set {<, m, o, fi, di}. E is older than F.
+ex:older           rdf:type    amt:Role ;
+                   rdfs:label  "older" ;
+                   rdfs:domain ex:Event ;
+                   rdfs:range  ex:Event .
+
+# ── Subsumption axioms ──────────────────────────────────────────────────────
+# Only the covering relation is declared. The engine computes the transitive
+# closure itself, so `before ⊑ older` holds without being written down.
+
+ex:SUB1 rdf:type      amt:SubsumptionAxiom ;
+        amt:subRole   ex:before ;
+        amt:superRole ex:olderBeginning .
+
+ex:SUB2 rdf:type      amt:SubsumptionAxiom ;
+        amt:subRole   ex:olderBeginning ;
+        amt:superRole ex:older .
+
+# ── Role chain axioms ───────────────────────────────────────────────────────
+# Two entries of a composition table, at two levels of granularity.
+#
+# Goedel logic in both cases: composing temporal relations loses no
+# confidence beyond the weakest link. If E is certainly before F and F is
+# 0.8-before G, then E is 0.8-before G — the chain length is not itself
+# evidence against the conclusion, so a length-penalising operator such as
+# Product would be wrong here.
+
+ex:CHAIN1 rdf:type       amt:RoleChainAxiom ;
+          rdfs:label     "before ∘ before → before" ;
+          amt:antecedents ( ex:before ex:before ) ;
+          amt:consequent ex:before ;
+          amt:logic      amt:GoedelLogic .
+
+ex:CHAIN2 rdf:type       amt:RoleChainAxiom ;
+          rdfs:label     "olderBeginning ∘ olderBeginning → older" ;
+          amt:antecedents ( ex:olderBeginning ex:olderBeginning ) ;
+          amt:consequent ex:older ;
+          amt:logic      amt:GoedelLogic .
+
+# ── Integrity ───────────────────────────────────────────────────────────────
+# Nothing is before itself. `older` gets no such axiom on purpose: as a set
+# of Allen relations it would contain `=` in the full Freksa vocabulary, so
+# self-loops on the coarse role are not an error.
+
+ex:SD1 rdf:type amt:SelfDisjointAxiom ;
+       amt:role ex:before .
+
+# ── Nodes ───────────────────────────────────────────────────────────────────
+ex:E1 amt:instanceOf ex:Event ; rdfs:label "E1 (dated layer)" .
+ex:E2 amt:instanceOf ex:Event ; rdfs:label "E2 (occupation)" .
+ex:E3 amt:instanceOf ex:Event ; rdfs:label "E3 (abandonment)" .
+ex:E4 amt:instanceOf ex:Event ; rdfs:label "E4 (kiln in use)" .
+ex:E5 amt:instanceOf ex:Event ; rdfs:label "E5 (ash deposit)" .
+ex:E6 amt:instanceOf ex:Event ; rdfs:label "E6 (backfill)" .
+
+# ── Asserted quadruples ─────────────────────────────────────────────────────
+#
+# Group A — E1/E2/E3. Fine and coarse evidence of equal strength. The fine
+# chain and the coarse chain both reach (E1, E3) at 0.80, so the coarse
+# conclusion adds nothing and --minimal drops it.
+
+_:a1 rdf:subject ex:E1 ; rdf:predicate ex:before          ; rdf:object ex:E2 ; amt:weight "0.90"^^xsd:decimal .
+_:a2 rdf:subject ex:E2 ; rdf:predicate ex:before          ; rdf:object ex:E3 ; amt:weight "0.80"^^xsd:decimal .
+_:a3 rdf:subject ex:E1 ; rdf:predicate ex:olderBeginning  ; rdf:object ex:E2 ; amt:weight "0.90"^^xsd:decimal .
+_:a4 rdf:subject ex:E2 ; rdf:predicate ex:olderBeginning  ; rdf:object ex:E3 ; amt:weight "0.80"^^xsd:decimal .
+
+# Group B — E4/E5/E6. The fine evidence is weak, the coarse evidence is
+# strong. The coarse conclusion (E4 older E6, 0.90) is worth more than the
+# fine one (E4 before E6, 0.40), so --minimal keeps both: a coarse relation
+# derived along a strong path outranks a fine relation derived along a weak
+# one, and suppressing it would throw information away.
+
+_:b1 rdf:subject ex:E4 ; rdf:predicate ex:before          ; rdf:object ex:E5 ; amt:weight "0.50"^^xsd:decimal .
+_:b2 rdf:subject ex:E5 ; rdf:predicate ex:before          ; rdf:object ex:E6 ; amt:weight "0.40"^^xsd:decimal .
+_:b3 rdf:subject ex:E4 ; rdf:predicate ex:olderBeginning  ; rdf:object ex:E5 ; amt:weight "0.90"^^xsd:decimal .
+_:b4 rdf:subject ex:E5 ; rdf:predicate ex:olderBeginning  ; rdf:object ex:E6 ; amt:weight "0.90"^^xsd:decimal .

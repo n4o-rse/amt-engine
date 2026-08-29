@@ -19,8 +19,7 @@ from pathlib import Path
 
 from pyshacl import validate as _pyshacl_validate
 
-# Default location: the ``ontology/`` folder shipped with the package.
-_DEFAULT_ONTOLOGY_DIR = Path(__file__).resolve().parent.parent / "ontology"
+from ._resources import ontology_candidates, ontology_dir as _bundled_ontology_dir
 
 
 class AMTValidationError(Exception):
@@ -73,14 +72,23 @@ def validate_against_shapes(
         With ``conforms`` (bool), ``violations`` (list of dicts with
         ``focus``/``path``/``message`` keys), and the full ``report_text``.
     """
-    ont_dir = Path(ontology_dir) if ontology_dir else _DEFAULT_ONTOLOGY_DIR
+    if ontology_dir:
+        ont_dir = Path(ontology_dir)
+    else:
+        ont_dir = _bundled_ontology_dir()
+        if ont_dir is None:
+            searched = ", ".join(str(c) for c in ontology_candidates())
+            raise FileNotFoundError(
+                "Could not find amt-shapes.ttl and amt.ttl. Looked in: "
+                f"{searched}. Pass ontology_dir=... or ensure the "
+                "ontology/ folder is bundled."
+            )
     shapes = ont_dir / "amt-shapes.ttl"
     ontology = ont_dir / "amt.ttl"
 
     if not shapes.exists() or not ontology.exists():
         raise FileNotFoundError(
-            f"Could not find amt-shapes.ttl and/or amt.ttl in {ont_dir}. "
-            "Pass ontology_dir=... or ensure the ontology/ folder is bundled."
+            f"Could not find amt-shapes.ttl and/or amt.ttl in {ont_dir}."
         )
 
     # Resolve data_source: if it's a path that exists, pass it through;

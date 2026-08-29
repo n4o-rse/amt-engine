@@ -10,6 +10,7 @@ Usage examples
     amt input.ttl --reason --export-ttl out.ttl
     amt input.ttl --reason --export-cypher out.cypher --export-html graph.html
     amt input.ttl --reason --export-csv out/
+    amt input.ttl --reason --minimal --export-ttl out.ttl
     amt input.ttl --check
     amt input.ttl --validate-only
 
@@ -26,7 +27,7 @@ from . import (
     AMTValidationError,
     __version__,
     check_consistency,
-    do_reasoning,
+    reason_with_stats,
     export_cypher,
     export_csv,
     export_ttl,
@@ -87,7 +88,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Pipeline steps
     p.add_argument("--reason", action="store_true",
-                   help="Apply RoleChain and Inverse axioms before export")
+                   help="Apply RoleChain, Inverse and Subsumption axioms before export")
+    p.add_argument("--minimal", action="store_true",
+                   help="With --reason: use SubsumptionAxioms to suppress inferred "
+                        "edges that a finer edge already implies, instead of "
+                        "spelling the role hierarchy out (no effect without "
+                        "SubsumptionAxioms)")
     p.add_argument("--check", action="store_true",
                    help="Run consistency check")
     p.add_argument("--info", action="store_true",
@@ -162,8 +168,23 @@ def main(argv: list[str] | None = None) -> int:
     if args.info:
         _print_info(amt)
 
+    if args.minimal and not args.reason:
+        print("WARN --minimal has no effect without --reason.", file=sys.stderr)
+
+    # Reason once and reuse the result for the consistency check and for
+    # every exporter, so a file with hundreds of role-chain axioms is not
+    # run to a fixed point six times over.
+    reasoned = None
+    stats: dict = {}
+    if args.reason or args.check:
+        reasoned, stats = reason_with_stats(
+            amt["edges"], amt["axioms"], minimal=args.minimal
+        )
+
     if args.check:
-        ok, violations = check_consistency(amt["edges"], amt["axioms"])
+        ok, violations = check_consistency(
+            amt["edges"], amt["axioms"], reasoned=reasoned
+        )
         if ok:
             print("\nOK  Consistency check passed.")
         else:
@@ -172,9 +193,14 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  - {v}")
 
     if args.reason:
-        reasoned = do_reasoning(amt["edges"], amt["axioms"])
         inferred = [e for e in reasoned if e.get("inferred")]
         print(f"  -> reasoning produced {len(inferred)} inferred edge(s)")
+        if args.minimal:
+            print(f"  -> minimal mode suppressed "
+                  f"{stats.get('suppressed', 0)} redundant edge(s)")
+        if not stats.get("reached_fixpoint", True):
+            print("WARN reasoning hit the iteration limit; "
+                  "the result may be incomplete.", file=sys.stderr)
 
     if args.export_ttl:
         ttl = export_ttl(
@@ -182,6 +208,7 @@ def main(argv: list[str] | None = None) -> int:
             amt["axioms"], rdf_graph=amt["graph"], prefix=amt["prefix"],
             with_reasoning=args.reason,
             include_vocabulary=not args.no_vocabulary,
+            reasoned_edges=reasoned,
         )
         args.export_ttl.write_text(ttl, encoding="utf-8")
         print(f"OK  wrote {args.export_ttl}")
@@ -189,7 +216,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.export_cypher:
         cy = export_cypher(
             amt["nodes"], amt["edges"], amt["axioms"],
-            with_reasoning=args.reason,
+            with_reasoning=args.reason, reasoned_edges=reasoned,
         )
         args.export_cypher.write_text(cy, encoding="utf-8")
         print(f"OK  wrote {args.export_cypher}")
@@ -198,6 +225,7 @@ def main(argv: list[str] | None = None) -> int:
         nodes_p, edges_p = export_csv(
             amt["nodes"], amt["edges"], amt["axioms"],
             args.export_csv, with_reasoning=args.reason,
+            reasoned_edges=reasoned,
         )
         print(f"OK  wrote {nodes_p}")
         print(f"OK  wrote {edges_p}")
@@ -209,6 +237,7 @@ def main(argv: list[str] | None = None) -> int:
             reasoning=args.reason,
             axioms=amt["axioms"],
             height=args.height,
+            reasoned_edges=reasoned,
         )
         print(f"OK  wrote {args.export_html}")
 

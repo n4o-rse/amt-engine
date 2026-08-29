@@ -73,6 +73,12 @@ amt:InverseAxiom a rdfs:Class ;
     rdfs:comment "Asserts that two roles are inverses of each other."@en ;
     skos:note    "Reasoning rule: if edge (a -antecedent-> b) exists with weight w, infer (b -inverse-> a) with weight w." .
 
+amt:SubsumptionAxiom a rdfs:Class ;
+    rdfs:subClassOf amt:InferenceAxiom ;
+    rdfs:label   "Subsumption Axiom"@en ;
+    rdfs:comment "Asserts that one role is finer than another: every edge carrying the sub-role also carries the super-role, at no lower weight. A statement about roles, not about any pair of nodes."@en ;
+    skos:note    "Two readings. Entailment: if edge (a -subRole-> b) exists with weight w, infer (a -superRole-> b) with weight w. Redundancy elimination: if both (a -subRole-> b, w1) and (a -superRole-> b, w2) exist with w1 >= w2, the super-role edge is implied and may be suppressed. An implementation must offer entailment as its default and elimination as an option, because a consumer that does not know the role hierarchy needs every edge spelled out." .
+
 amt:DisjointAxiom a rdfs:Class ;
     rdfs:subClassOf amt:IntegrityAxiom ;
     rdfs:label   "Disjoint Axiom"@en ;
@@ -157,6 +163,23 @@ amt:inverse a rdf:Property ;
     rdfs:label   "inverse"@en ;
     rdfs:comment "Inverse role of the antecedent."@en ;
     rdfs:domain  amt:InverseAxiom ;
+    rdfs:range   amt:Role .
+
+
+# =============================================================================
+# 4b. Properties for SubsumptionAxiom
+# =============================================================================
+
+amt:subRole a rdf:Property ;
+    rdfs:label   "sub-role"@en ;
+    rdfs:comment "The finer role. Every edge carrying it also carries the super-role."@en ;
+    rdfs:domain  amt:SubsumptionAxiom ;
+    rdfs:range   amt:Role .
+
+amt:superRole a rdf:Property ;
+    rdfs:label   "super-role"@en ;
+    rdfs:comment "The coarser role, implied by the sub-role at no lower weight."@en ;
+    rdfs:domain  amt:SubsumptionAxiom ;
     rdfs:range   amt:Role .
 
 
@@ -322,6 +345,14 @@ amt:InverseRule a amt:ReasoningRule ;
         "There exists an edge (a -antecedent-> b) with weight w." ;
     amt:effect
         "Add an edge (b -inverse-> a) with weight w. Mark the edge as inferred. Iterate to fixpoint." .
+
+amt:SubsumptionRule a amt:ReasoningRule ;
+    rdfs:label    "Subsumption Inference Rule"@en ;
+    amt:appliesTo amt:SubsumptionAxiom ;
+    amt:precondition
+        "There exists an edge (a -subRole-> b) with weight w." ;
+    amt:effect
+        "Default (entailment) mode: add an edge (a -superRole-> b) with weight w. Mark the edge as inferred. Iterate to fixpoint. Minimal mode: apply no entailment, and after the fixpoint suppress every inferred edge (a -superRole-> b, w2) for which an edge (a -subRole-> b, w1) with w1 >= w2 exists. Never suppress an asserted edge; when w1 < w2 keep both, because a coarse relation derived along a strong path can be worth more than a fine relation derived along a weak one." .
 
 amt:DisjointRule a amt:ReasoningRule ;
     rdfs:label    "Disjoint Consistency Rule"@en ;

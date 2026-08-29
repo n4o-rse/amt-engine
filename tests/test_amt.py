@@ -13,11 +13,15 @@ from amt import (
     AMTValidationError,
     aggregate_weights,
     check_consistency,
+    collect_direct_subsumptions,
     do_reasoning,
+    eliminate_redundant_edges,
     export_csv,
     export_cypher,
     export_ttl,
     load_amt,
+    reason_with_stats,
+    transitive_superroles,
     validate_against_shapes,
     GOEDEL, PRODUCT, LUKASIEWICZ, EINSTEIN, GEOMETRIC, HAMACHER,
 )
@@ -391,3 +395,191 @@ class TestAnimalsExample:
         ok, violations = check_consistency(amt["edges"], amt["axioms"])
         assert ok
         assert violations == []
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Subsumption: amt:SubsumptionAxiom in both readings
+# ─────────────────────────────────────────────────────────────────────────
+DEMO_NS = "http://github.com/n4o-rse/amt-engine/subsumption-demo/"
+
+
+def _demo(name: str) -> str:
+    return DEMO_NS + name
+
+
+def _pick(edges, frm, role, to):
+    for e in edges:
+        if (e["from"], e["role"], e["to"]) == (_demo(frm), _demo(role), _demo(to)):
+            return e
+    return None
+
+
+class TestSubsumptionAxiomParsing:
+    @pytest.fixture
+    def amt(self):
+        return load_amt(EXAMPLES / "subsumption-demo.ttl", validate=True)
+
+    def test_demo_file_validates(self):
+        result = validate_against_shapes(EXAMPLES / "subsumption-demo.ttl")
+        assert result.conforms, result.report_text
+
+    def test_subsumption_axioms_are_loaded(self, amt):
+        subs = [a for a in amt["axioms"] if a["type"] == "SubsumptionAxiom"]
+        assert len(subs) == 2
+        assert all("subRole" in a and "superRole" in a for a in subs)
+
+    def test_reflexive_axiom_is_discarded(self):
+        axioms = [
+            {"type": "SubsumptionAxiom", "iri": "x", "subRole": "r", "superRole": "r"},
+            {"type": "SubsumptionAxiom", "iri": "y", "subRole": "a", "superRole": "b"},
+        ]
+        assert collect_direct_subsumptions(axioms) == [("a", "b")]
+
+    def test_closure_is_transitive_and_irreflexive(self, amt):
+        closure = transitive_superroles(amt["axioms"])
+        assert closure[_demo("before")] == {
+            _demo("olderBeginning"), _demo("older"),
+        }
+        assert closure[_demo("olderBeginning")] == {_demo("older")}
+        assert _demo("older") not in closure
+
+    def test_closure_tolerates_a_cycle(self):
+        axioms = [
+            {"type": "SubsumptionAxiom", "iri": "1", "subRole": "a", "superRole": "b"},
+            {"type": "SubsumptionAxiom", "iri": "2", "subRole": "b", "superRole": "a"},
+        ]
+        closure = transitive_superroles(axioms)
+        assert closure == {"a": {"b"}, "b": {"a"}}
+
+
+class TestSubsumptionEntailment:
+    """Default mode: the role hierarchy is spelled out in the graph."""
+
+    @pytest.fixture
+    def amt(self):
+        return load_amt(EXAMPLES / "subsumption-demo.ttl")
+
+    @pytest.fixture
+    def reasoned(self, amt):
+        return do_reasoning(amt["edges"], amt["axioms"])
+
+    def test_fine_edge_entails_direct_superrole(self, reasoned):
+        # E1 before E2 (0.90, asserted) entails E1 olderBeginning E2 — which
+        # is also asserted, so the assertion stands and keeps its weight.
+        e = _pick(reasoned, "E1", "olderBeginning", "E2")
+        assert e is not None and e["weight"] == 0.9
+
+    def test_fine_edge_entails_transitive_superrole(self, reasoned):
+        # before -> olderBeginning -> older, one link per fixed-point pass.
+        e = _pick(reasoned, "E1", "older", "E2")
+        assert e is not None and e["inferred"] and e["weight"] == 0.9
+
+    def test_entailed_edge_carries_axiom_provenance(self, reasoned):
+        e = _pick(reasoned, "E1", "older", "E2")
+        assert _demo("SUB2") in e["provenance"]
+
+    def test_inferred_count(self, reasoned):
+        inferred = [e for e in reasoned if e["inferred"]]
+        assert len(inferred) == 10
+
+
+class TestRedundancyElimination:
+    """minimal=True: no entailment, and redundant conclusions are dropped."""
+
+    @pytest.fixture
+    def amt(self):
+        return load_amt(EXAMPLES / "subsumption-demo.ttl")
+
+    @pytest.fixture
+    def reasoned(self, amt):
+        return do_reasoning(amt["edges"], amt["axioms"], minimal=True)
+
+    def test_redundant_coarse_edge_is_suppressed(self, reasoned):
+        # E1 before E3 (0.80) and E1 older E3 (0.80) both derived; the
+        # coarse one says strictly less at no greater confidence.
+        assert _pick(reasoned, "E1", "before", "E3") is not None
+        assert _pick(reasoned, "E1", "older", "E3") is None
+
+    def test_stronger_coarse_edge_survives(self, reasoned):
+        # E4 before E6 is only 0.40 while E4 older E6 is 0.90: the coarse
+        # relation carries information the fine one does not.
+        assert _pick(reasoned, "E4", "before", "E6")["weight"] == 0.4
+        assert _pick(reasoned, "E4", "older", "E6")["weight"] == 0.9
+
+    def test_no_entailment_in_minimal_mode(self, reasoned):
+        assert _pick(reasoned, "E1", "older", "E2") is None
+
+    def test_asserted_edges_are_never_suppressed(self, reasoned):
+        # E1 olderBeginning E2 (0.90, asserted) is implied by the asserted
+        # E1 before E2 (0.90) but must survive regardless.
+        e = _pick(reasoned, "E1", "olderBeginning", "E2")
+        assert e is not None and not e["inferred"]
+
+    def test_stats_report_the_suppression(self, amt):
+        _edges, stats = reason_with_stats(
+            amt["edges"], amt["axioms"], minimal=True
+        )
+        assert stats["suppressed"] == 1
+        assert stats["reached_fixpoint"] is True
+
+    def test_minimal_is_smaller_than_default(self, amt):
+        full = do_reasoning(amt["edges"], amt["axioms"])
+        minimal = do_reasoning(amt["edges"], amt["axioms"], minimal=True)
+        assert len(minimal) < len(full)
+
+    def test_eliminate_partitions_the_edge_list(self, amt):
+        full = do_reasoning(amt["edges"], amt["axioms"])
+        kept, removed = eliminate_redundant_edges(full, amt["axioms"])
+        assert len(kept) + len(removed) == len(full)
+        assert all(e["inferred"] for e in removed)
+
+    def test_consistency_still_holds(self, amt, reasoned):
+        ok, violations = check_consistency(
+            amt["edges"], amt["axioms"], reasoned=reasoned
+        )
+        assert ok and violations == []
+
+
+class TestSubsumptionInertWithoutAxioms:
+    """Files without SubsumptionAxioms behave identically in both modes."""
+
+    def test_animals_unaffected_by_minimal(self):
+        amt = load_amt(EXAMPLES / "animals.ttl")
+        full = do_reasoning(amt["edges"], amt["axioms"])
+        minimal = do_reasoning(amt["edges"], amt["axioms"], minimal=True)
+        assert full == minimal
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Determinism: axiom application order must not depend on string hashing
+# ─────────────────────────────────────────────────────────────────────────
+class TestDeterminism:
+    def test_axioms_are_loaded_in_sorted_order(self):
+        amt = load_amt(EXAMPLES / "animals.ttl")
+        keys = [(a["type"], a["iri"]) for a in amt["axioms"]]
+        assert keys == sorted(keys)
+
+    def test_ttl_export_is_stable_across_hash_seeds(self, tmp_path):
+        import subprocess
+        import sys
+
+        script = (
+            "from amt import load_amt, export_ttl;"
+            "a = load_amt(r'%s');"
+            "print(export_ttl(a['nodes'], a['edges'], a['concepts'], a['roles'],"
+            " a['axioms'], rdf_graph=a['graph'], prefix=a['prefix'],"
+            " with_reasoning=True), end='')"
+        ) % (EXAMPLES / "animals.ttl")
+
+        outputs = []
+        for seed in ("0", "1", "12345"):
+            env = {"PYTHONHASHSEED": seed, "PATH": "/usr/bin:/bin"}
+            import os
+            env = {**os.environ, "PYTHONHASHSEED": seed}
+            outputs.append(
+                subprocess.run(
+                    [sys.executable, "-c", script],
+                    capture_output=True, text=True, check=True, env=env,
+                ).stdout
+            )
+        assert outputs[0] == outputs[1] == outputs[2]

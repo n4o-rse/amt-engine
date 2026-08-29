@@ -38,6 +38,7 @@ def build_network(
     axioms: list | None = None,
     height: str = "600px",
     notebook: bool = False,
+    reasoned_edges: list | None = None,
 ) -> Network:
     """
     Build a configured :class:`pyvis.network.Network` for an AMT graph.
@@ -56,10 +57,17 @@ def build_network(
     notebook
         Pass ``True`` only when calling from inside a Jupyter notebook *and*
         you want pyvis to use its inline-iframe mode.
+    reasoned_edges
+        An already-reasoned edge list. Pass it to draw a graph produced
+        with non-default reasoning options (e.g. ``minimal=True``) instead
+        of reasoning again here. Ignored unless ``reasoning`` is set.
     """
-    display_edges = (
-        do_reasoning(edges, axioms or []) if reasoning else edges
-    )
+    if not reasoning:
+        display_edges = edges
+    elif reasoned_edges is not None:
+        display_edges = reasoned_edges
+    else:
+        display_edges = do_reasoning(edges, axioms or [])
 
     net = Network(
         height=height,
@@ -139,6 +147,7 @@ def render_to_html(
     reasoning: bool = False,
     axioms: list | None = None,
     height: str = "600px",
+    reasoned_edges: list | None = None,
 ) -> Path:
     """
     Build the network and write a self-contained HTML file.
@@ -152,6 +161,7 @@ def render_to_html(
         axioms=axioms,
         height=height,
         notebook=False,
+        reasoned_edges=reasoned_edges,
     )
     out = Path(output_path)
     net.save_graph(str(out))

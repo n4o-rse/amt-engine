@@ -15,6 +15,9 @@ the resulting graph as RDF, Cypher, CSV or interactive HTML.
 - **n-ary RoleChainAxioms** via `amt:antecedents` (an RDF list of
   arbitrary length). Legacy 2-step `antecedent1`/`antecedent2` form is
   also accepted.
+- **Role subsumption** via `amt:SubsumptionAxiom`, for vocabularies whose
+  roles are sets of finer roles. Either spelled out as entailment
+  (default) or used to strip redundant conclusions (`--minimal`).
 - **Six fuzzy-logic operators** through one unified `aggregate_weights`
   API, registry-based for easy extension: Gödel, Product, Łukasiewicz,
   Einstein, Geometric Mean, Hamacher.
@@ -42,7 +45,9 @@ amt/                        pip-installable package
 ├── __init__.py             public API re-exports
 ├── core.py                 load_amt, parser only
 ├── reasoning.py            do_reasoning, check_consistency
+├── subsumption.py          role hierarchy: closure + redundancy removal
 ├── logic.py                aggregate_weights, LOGIC_REGISTRY
+├── _resources.py           locates the bundled ontology/ folder
 ├── validation.py           validate_against_shapes (SHACL wrapper)
 ├── export.py               export_ttl, export_cypher, export_csv
 ├── viz.py                  pyvis HTML visualisation
@@ -61,7 +66,15 @@ docs/                       documentation source
 examples/                   sample TTL inputs to play with
 tests/                      pytest test suite
 pyproject.toml              build config + entry points
+requirements.txt            runtime dependencies (mirrors pyproject)
+requirements-dev.txt        the above plus pytest
 ```
+
+`ontology/` stays at the repository root, where the ontology README, the
+diagrams and `validate_examples.py` expect it. `pyproject.toml` maps it
+into the package namespace at build time, so an *installed* AMT carries
+the vocabulary as `amt/ontology/` rather than claiming a generic
+top-level `ontology/` directory in `site-packages`.
 
 ## Quickstart
 
@@ -72,6 +85,14 @@ python -m venv .venv
 . .venv/bin/activate                   # Windows: .\.venv\Scripts\activate
 pip install -e ".[dev]"
 pytest tests/ -q                       # all green
+```
+
+If you vendor the source tree instead of installing it — a CI image, a
+Docker layer, a wrapper such as `amt.runner` that clones the repository —
+use the requirements files instead:
+
+```bash
+pip install -r requirements-dev.txt
 ```
 
 Then run the bundled animals example through the full pipeline:
@@ -147,6 +168,7 @@ The `amt` command is flag-driven — use it for selective steps:
 amt input.ttl --validate-only                 # just SHACL check, exit 0/1
 amt input.ttl --info                          # print ontology summary
 amt input.ttl --reason --check                # reason + integrity check
+amt input.ttl --reason --minimal              # drop subsumed conclusions
 amt input.ttl --reason \
     --export-ttl out.ttl \
     --export-csv out/ \
@@ -156,7 +178,47 @@ amt input.ttl --reason \
 
 The `amt-runner` command runs everything at once and writes a report.
 Use the equivalent `python -m amt.runner` form if you don't want to rely
-on the installed entry point.
+on the installed entry point. It takes `--minimal` too.
+
+## Role subsumption
+
+Some vocabularies define roles as *sets* of finer roles — Freksa's
+semi-interval relations, for instance, where `ob` = {`<`, `m`, `o`} and
+`ol` = {`<`, `m`, `o`, `fi`, `di`}. Set inclusion then gives chains of
+proper subset relations, and a reasoner that does not know about them
+derives every member of a chain independently. All are true; all but the
+finest are redundant.
+
+`amt:SubsumptionAxiom` states the relation between two roles, in the same
+way `amt:InverseAxiom` does:
+
+```turtle
+ex:SUB1 a amt:SubsumptionAxiom ;
+    amt:subRole   ex:before ;
+    amt:superRole ex:olderBeginning .
+```
+
+Read as: every `before` edge is also an `olderBeginning` edge, at no lower
+weight. Only the covering relation needs declaring — the engine computes
+the transitive closure itself.
+
+Two readings, and the caller picks one:
+
+| Mode | Effect |
+|------|--------|
+| default | **Entailment.** Every `subRole` edge yields a `superRole` edge at the same weight, so the hierarchy is spelled out for consumers that do not know it. Increases the edge count. |
+| `--minimal` / `do_reasoning(..., minimal=True)` | **Redundancy elimination.** No entailment; after the fixed point, an inferred edge is dropped when a finer edge relates the same pair at no lower weight. |
+
+Suppression requires `weight(fine) ≥ weight(coarse)`. A coarse relation
+derived along a strong path can be worth more than a fine relation derived
+along a weak one, so when the fine edge is weaker both are kept. Asserted
+edges are never suppressed, and `--minimal` runs the consistency check on
+the reduced graph — a `DisjointAxiom` over a coarse role will not fire on
+an edge that was removed.
+
+Files without `SubsumptionAxiom` behave identically in both modes.
+[`examples/subsumption-demo.md`](examples/subsumption-demo.md) works
+through every inference in both.
 
 ## Fuzzy-logic operators
 
@@ -233,6 +295,7 @@ on those files alone.
 | File | Purpose |
 |------|---------|
 | `examples/chain-test.ttl` | Minimal Alice/Bob/Carol/Dave chain — useful for understanding what reasoning produces from a simple input. |
+| `examples/subsumption-demo.ttl` | Six events and a three-role subsumption chain (`before ⊑ olderBeginning ⊑ older`), a miniature of Freksa's semi-interval vocabulary. Run it with and without `--minimal` to see both readings of `amt:SubsumptionAxiom`; the companion file [`examples/subsumption-demo.md`](examples/subsumption-demo.md) documents every derivation. |
 | `examples/animals.ttl` | Taxonomy meets family tree: seven species, three animal families across 5/3/3 generations, four `RoleChainAxiom`s using Goedel, Product and Geometric Mean. The companion file [`examples/animals.md`](examples/animals.md) documents the family-tree diagrams and lists every expected derivation. |
 | `ontology/examples/example-valid.ttl` | Smallest possible file that passes SHACL validation. |
 | `ontology/examples/example-invalid.ttl` | Deliberately broken file used in the validation tests; produces exactly four expected SHACL violations. |
@@ -249,3 +312,9 @@ This work is part of the DFG-funded NFDI initiative, specifically the
 [Research Data Infrastructure for the Material Remains of Human History
 (NFDI4Objects)](https://www.nfdi4objects.net/) — DFG project number
 **501836407**.
+
+## AI usage
+
+Parts of the Python code in this repository were written with the assistance of
+Claude (Anthropic). All AI-assisted code was reviewed, validated and supervised
+by Florian Thiery (research software engineering).

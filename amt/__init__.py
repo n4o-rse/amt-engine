@@ -5,6 +5,8 @@ A pure-Python implementation of the AMT framework with:
 
 * SHACL pre-validation of input files
 * n-ary RoleChainAxioms (legacy 2-ary form still supported)
+* Role subsumption (``amt:SubsumptionAxiom``), either as entailment or as
+  redundancy elimination (``minimal=True``)
 * Six fuzzy-logic operators (Goedel, Product, Lukasiewicz, Einstein,
   Geometric Mean, Hamacher) via a unified registry-based aggregator
 * Provenance tracking on inferred edges
@@ -26,6 +28,12 @@ from .core import (
 from .reasoning import (
     check_consistency,
     do_reasoning,
+    reason_with_stats,
+)
+from .subsumption import (
+    collect_direct_subsumptions,
+    eliminate_redundant_edges,
+    transitive_superroles,
 )
 from .logic import (
     LOGIC_REGISTRY,
@@ -57,7 +65,7 @@ from .viz import (
     show_in_notebook,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     # core
@@ -65,7 +73,12 @@ __all__ = [
     "local_name",
     # reasoning
     "do_reasoning",
+    "reason_with_stats",
     "check_consistency",
+    # subsumption
+    "collect_direct_subsumptions",
+    "transitive_superroles",
+    "eliminate_redundant_edges",
     # logic
     "aggregate_weights",
     "get_arity",

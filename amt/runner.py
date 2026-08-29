@@ -37,7 +37,7 @@ from . import (
     AMTValidationError,
     __version__,
     check_consistency,
-    do_reasoning,
+    reason_with_stats,
     export_csv,
     export_cypher,
     export_ttl,
@@ -103,10 +103,12 @@ class RunReport:
         self.consistency = {"ok": ok, "violations": list(violations)}
 
     def record_reasoning(self, asserted_count: int,
-                         inferred_edges: list[dict]) -> None:
+                         inferred_edges: list[dict],
+                         stats: dict | None = None) -> None:
         self.reasoning = {
             "asserted_count": asserted_count,
             "inferred":       list(inferred_edges),
+            "stats":          dict(stats or {}),
         }
 
     def record_output(self, path: Path) -> None:
@@ -147,7 +149,7 @@ class RunReport:
         # ── Options ─────────────────────────────────────────────────────
         lines.append("## Options")
         lines.append("")
-        for key in ("validate", "reason", "check", "info",
+        for key in ("validate", "reason", "minimal", "check", "info",
                     "export_ttl", "export_cypher", "export_csv",
                     "export_html", "ontology_dir", "output_dir", "height"):
             if key in self.options:
@@ -245,6 +247,23 @@ class RunReport:
                 f"Started from **{asserted}** asserted edges. "
                 f"Reasoning produced **{len(inf)}** inferred edge(s)."
             )
+            stats = self.reasoning.get("stats") or {}
+            if stats.get("iterations"):
+                lines.append("")
+                lines.append(
+                    f"Fixed point reached after **{stats['iterations']}** "
+                    f"iteration(s) over the axiom list."
+                    if stats.get("reached_fixpoint", True) else
+                    f"**Iteration limit reached** after {stats['iterations']} "
+                    f"passes — the result below may be incomplete."
+                )
+            if self.options.get("minimal"):
+                lines.append("")
+                lines.append(
+                    f"Minimal mode: **{stats.get('suppressed', 0)}** inferred "
+                    "edge(s) suppressed as redundant, because a finer role "
+                    "already relates the same pair at no lower weight."
+                )
             lines.append("")
             if inf:
                 lines.append("| Source | Role | Target | Weight | Provenance |")
@@ -299,6 +318,7 @@ def run_all(
     *,
     validate: bool = True,
     reason: bool = True,
+    minimal: bool = False,
     check: bool = True,
     info: bool = True,
     export_ttl_: bool = True,
@@ -315,6 +335,14 @@ def run_all(
 
     A Markdown run-report is written into the output folder by default
     (``<stem>.report.md``); pass ``write_report=False`` to skip it.
+
+    ``minimal=True`` switches ``amt:SubsumptionAxiom`` from entailment to
+    redundancy elimination: instead of spelling the role hierarchy out, an
+    inferred edge is dropped when a finer role already relates the same
+    pair at no lower weight. Files without SubsumptionAxioms are
+    unaffected. Note that the consistency check then runs on the reduced
+    graph, so a DisjointAxiom over a coarse role will not fire on an edge
+    that was suppressed.
     """
     input_path = Path(input_path)
     if not input_path.exists():
@@ -334,6 +362,7 @@ def run_all(
     report = RunReport(input_path=input_path, options={
         "validate":      validate,
         "reason":        reason,
+        "minimal":       minimal,
         "check":         check,
         "info":          info,
         "export_ttl":    export_ttl_,
@@ -395,8 +424,20 @@ def run_all(
                     )
             print(f"  - {a['type']:20s}  {details}")
 
+    # Reason once. Six exporters each running their own fixed point is
+    # merely slow on the bundled examples; on a vocabulary with hundreds of
+    # role-chain axioms it dominates the run.
+    reasoned = None
+    stats: dict = {}
+    if reason or check:
+        reasoned, stats = reason_with_stats(
+            amt["edges"], amt["axioms"], minimal=minimal
+        )
+
     if check:
-        ok, violations = check_consistency(amt["edges"], amt["axioms"])
+        ok, violations = check_consistency(
+            amt["edges"], amt["axioms"], reasoned=reasoned
+        )
         report.record_consistency(ok, violations)
         if ok:
             print("\nOK   Consistency check passed.")
@@ -406,17 +447,22 @@ def run_all(
                 print(f"  - {v}")
 
     if reason:
-        reasoned = do_reasoning(amt["edges"], amt["axioms"])
         inferred = [e for e in reasoned if e.get("inferred")]
         report.record_reasoning(asserted_count=len(amt["edges"]),
-                                inferred_edges=inferred)
+                                inferred_edges=inferred, stats=stats)
         print(f"\n     reasoning produced {len(inferred)} inferred edge(s)")
+        if minimal:
+            print(f"     minimal mode suppressed "
+                  f"{stats.get('suppressed', 0)} redundant edge(s)")
+        if not stats.get("reached_fixpoint", True):
+            print("WARN reasoning hit the iteration limit; "
+                  "the result may be incomplete.", file=sys.stderr)
 
     if export_ttl_:
         ttl = export_ttl(
             amt["nodes"], amt["edges"], amt["concepts"], amt["roles"],
             amt["axioms"], rdf_graph=amt["graph"], prefix=amt["prefix"],
-            with_reasoning=reason,
+            with_reasoning=reason, reasoned_edges=reasoned,
         )
         suffix = ".reasoned.ttl" if reason else ".ttl"
         path = out_dir / f"{stem}{suffix}"
@@ -427,7 +473,7 @@ def run_all(
     if export_cypher_:
         cy = export_cypher(
             amt["nodes"], amt["edges"], amt["axioms"],
-            with_reasoning=reason,
+            with_reasoning=reason, reasoned_edges=reasoned,
         )
         path = out_dir / f"{stem}.cypher"
         path.write_text(cy, encoding="utf-8")
@@ -438,6 +484,7 @@ def run_all(
         nodes_p, edges_p = export_csv(
             amt["nodes"], amt["edges"], amt["axioms"],
             out_dir, with_reasoning=reason, prefix=stem,
+            reasoned_edges=reasoned,
         )
         report.record_output(nodes_p)
         report.record_output(edges_p)
@@ -452,6 +499,7 @@ def run_all(
             reasoning=reason,
             axioms=amt["axioms"],
             height=height,
+            reasoned_edges=reasoned,
         )
         report.record_output(path)
         print(f"OK   wrote {path}")
@@ -477,6 +525,10 @@ def main(argv: list[str] | None = None) -> int:
                    help="Output directory (default: <input-dir>/out)")
     p.add_argument("--no-validate", action="store_true", help="Skip SHACL validation")
     p.add_argument("--no-reason",   action="store_true", help="Skip reasoning step")
+    p.add_argument("--minimal",     action="store_true",
+                   help="Use SubsumptionAxioms to suppress inferred edges that a "
+                        "finer role already implies, instead of spelling the role "
+                        "hierarchy out (no effect without SubsumptionAxioms)")
     p.add_argument("--no-check",    action="store_true", help="Skip consistency check")
     p.add_argument("--no-info",     action="store_true", help="Skip ontology summary printout")
     p.add_argument("--no-report",   action="store_true",
@@ -492,6 +544,7 @@ def main(argv: list[str] | None = None) -> int:
             output_dir=args.output_dir,
             validate=not args.no_validate,
             reason=not args.no_reason,
+            minimal=args.minimal,
             check=not args.no_check,
             info=not args.no_info,
             write_report=not args.no_report,

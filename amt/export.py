@@ -27,6 +27,28 @@ from .core import local_name
 from .reasoning import do_reasoning
 
 
+def _resolve_display_edges(
+    edges: list,
+    axioms: list,
+    with_reasoning: bool,
+    reasoned_edges: list | None,
+) -> list:
+    """
+    Decide which edge list an exporter should write.
+
+    Without ``with_reasoning`` the asserted edges are written as they are.
+    With it, a caller-supplied ``reasoned_edges`` wins over reasoning again
+    here — that is how ``minimal=True`` and other non-default reasoning
+    options reach the exporters, and it saves a redundant fixed point when
+    several formats are written from one run.
+    """
+    if not with_reasoning:
+        return edges
+    if reasoned_edges is not None:
+        return reasoned_edges
+    return do_reasoning(edges, axioms)
+
+
 # ─────────────────────────────────────────────────────────────────────────
 # TTL export
 # ─────────────────────────────────────────────────────────────────────────
@@ -41,6 +63,7 @@ def export_ttl(
     *,
     with_reasoning: bool = False,
     include_vocabulary: bool = True,
+    reasoned_edges: list | None = None,
 ) -> str:
     """
     Serialise the current AMT state to Turtle.
@@ -49,6 +72,11 @@ def export_ttl(
     ----------
     with_reasoning
         Include inferred edges in the output.
+    reasoned_edges
+        An already-reasoned edge list. Pass it to avoid running the fixed
+        point again, and to export a graph produced with non-default
+        reasoning options such as ``minimal=True``. Ignored unless
+        ``with_reasoning`` is set.
     include_vocabulary
         Emit AMT vocabulary scaffolding (subClassOf hierarchy, Logic
         instances) alongside the data. Default True for backward
@@ -76,8 +104,9 @@ def export_ttl(
     # we only declare what we use.
     used_known: list[tuple[str, str]] = []
 
-    display_edges = do_reasoning(edges, axioms) if with_reasoning else edges
-    base_count = len(edges)
+    display_edges = _resolve_display_edges(edges, axioms, with_reasoning, reasoned_edges)
+    asserted_edges = [e for e in display_edges if not e.get("inferred")]
+    inferred_edges = [e for e in display_edges if e.get("inferred")]
 
     def pfx(iri: str) -> str:
         if not iri:
@@ -222,7 +251,7 @@ def export_ttl(
 
     # Asserted assertions (reified statements)
     lines.append("# Original Assertions")
-    for j, e in enumerate(display_edges[:base_count]):
+    for j, e in enumerate(asserted_edges):
         w = min(float(e["weight"]), 1.0)
         bn = f"_:a{j+1}"
         lines += [
@@ -235,9 +264,9 @@ def export_ttl(
         ]
 
     # Inferred assertions, with provenance
-    if with_reasoning and len(display_edges) > base_count:
+    if with_reasoning and inferred_edges:
         lines.append("# Inferred Assertions")
-        for k, e in enumerate(display_edges[base_count:]):
+        for k, e in enumerate(inferred_edges):
             w = min(float(e["weight"]), 1.0)
             bn = f"_:i{k+1}"
             block = [
@@ -270,22 +299,25 @@ def export_cypher(
     axioms: list,
     *,
     with_reasoning: bool = False,
+    reasoned_edges: list | None = None,
 ) -> str:
     """Serialise to Neo4J Cypher. Inferred edges carry inferred=true and
-    a provenance list (semicolon-separated axiom local names)."""
+    a provenance list (semicolon-separated axiom local names).
+
+    ``reasoned_edges`` works as in :func:`export_ttl`."""
 
     def cypher_safe(s: str) -> str:
         return re.sub(r"[^a-zA-Z0-9_]", "_", s)
 
-    display_edges = do_reasoning(edges, axioms) if with_reasoning else edges
-    base_count = len(edges)
+    display_edges = _resolve_display_edges(edges, axioms, with_reasoning, reasoned_edges)
+    inferred_count = sum(1 for e in display_edges if e.get("inferred"))
 
     var_map = {n["id"]: cypher_safe(local_name(n["id"])) for n in nodes.values()}
 
     lines = [
         "// AMT Cypher export",
         f"// Nodes: {len(nodes)}  Edges: {len(display_edges)}",
-        f"// (inferred: {len(display_edges) - base_count})",
+        f"// (inferred: {inferred_count})",
         "",
         "// Step 1: nodes",
     ]
@@ -338,6 +370,7 @@ def export_csv(
     *,
     with_reasoning: bool = False,
     prefix: str = "",
+    reasoned_edges: list | None = None,
 ) -> tuple[Path, Path]:
     """
     Write a nodes CSV and an edges CSV into ``output_dir``.
@@ -346,6 +379,8 @@ def export_csv(
     ----------
     output_dir
         Directory the files are written into. Created if it doesn't exist.
+    reasoned_edges
+        An already-reasoned edge list; works as in :func:`export_ttl`.
     prefix
         Optional filename prefix. Without it the files are called
         ``nodes.csv`` and ``edges.csv``. With ``prefix="foo"`` they are
@@ -365,7 +400,7 @@ def export_csv(
     out_dir = Path(output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    display_edges = do_reasoning(edges, axioms) if with_reasoning else edges
+    display_edges = _resolve_display_edges(edges, axioms, with_reasoning, reasoned_edges)
 
     stem = f"{prefix}." if prefix else ""
     nodes_path = out_dir / f"{stem}nodes.csv"
