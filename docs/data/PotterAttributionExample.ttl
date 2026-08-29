@@ -1,103 +1,196 @@
-@prefix amt: <http://academic-meta-tool.xyz/vocab#> .
+@prefix amt:  <http://academic-meta-tool.xyz/vocab#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix ex: <http://github.com/leiza-scit/CAA2026-amt/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <http://github.com/leiza-scit/CAA2026-amt/> .
 
-# AMT Ontology - Leonard Edition
+# =============================================================================
+# AMT data file: Potter Attribution — typological dating chain
+# =============================================================================
+#
+# A small archaeological scenario: pottery sherds carry features (figure
+# types) that can be attributed to individual potters. Potters in turn
+# have a known active period, which lets us derive a probable dating for
+# the find context in which a sherd was excavated.
+#
+# The example exercises two binary chains over the four concepts
+# Feature → Potter → Sherd → FindContext, and one three-step chain that
+# composes them into a single feature-to-context attribution.
+#
+# Logic operators are chosen for what they actually mean here:
+#
+#   * Product       — independent attribution observations multiply:
+#                     a 0.83 belief that Potter B made Sherd Z and a 0.6
+#                     belief that Sherd Z dates to FindContext I yield
+#                     ~0.50 for Potter B → FindContext I.
+#   * Product       — Feature → Potter → Sherd is the same kind of chain.
+#   * EinsteinProduct — for the full 3-step Feature → Context chain.
+#                     Einstein is a stricter t-norm than Product
+#                     (slightly lower across (0,1)^n), making the
+#                     long-chain inference distinguishable in the
+#                     output from the binary Product chains above.
+#
+# The companion file `PotterAttributionExample.md` contains the full
+# attribution diagram and the expected inferences.
 
-amt:Concept rdfs:subClassOf rdfs:Class .
-amt:Role rdfs:subClassOf rdf:Property .
-amt:Axiom rdfs:subclassOf rdfs:Class .
-amt:InferenceAxiom rdfs:subClassOf amt:Axiom .
-amt:IntegrityAxiom rdfs:subClassOf amt:Axiom .
-amt:RoleChainAxiom rdfs:subClassOf amt:InferenceAxiom .
-amt:InverseAxiom rdfs:subClassOf amt:InferenceAxiom .
-amt:DisjointAxiom rdfs:subClassOf amt:IntegrityAxiom .
-amt:SelfDisjointAxiom rdfs:subClassOf amt:IntegrityAxiom .
-amt:Logic rdfs:subClassOf rdfs:Class .
-amt:LukasiewiczLogic rdf:type amt:Logic .
-amt:ProductLogic rdf:type amt:Logic .
-amt:GoedelLogic rdf:type amt:Logic .
+# ── Concepts ────────────────────────────────────────────────────────────────
+ex:Feature rdf:type        amt:Concept ;
+           rdfs:label      "Feature / Figure Type" ;
+           amt:placeholder "Feature / Figure Type" .
 
-# Potter Attribution Ontology
+ex:Potter rdf:type        amt:Concept ;
+          rdfs:label      "Potter" ;
+          amt:placeholder "Potter" .
 
-# concepts
+ex:Sherd rdf:type        amt:Concept ;
+         rdfs:label      "Sherd" ;
+         amt:placeholder "Pot Sherd" .
 
-ex:Feature rdf:type amt:Concept .
-ex:Feature rdfs:label "Feature / Figure Type" .
-ex:Feature amt:placeholder "Feature / Figure Type" .
+ex:FindContext rdf:type        amt:Concept ;
+               rdfs:label      "Find Context" ;
+               amt:placeholder "Find Context" .
 
-ex:Potter rdf:type amt:Concept .
-ex:Potter rdfs:label "Potter" .
-ex:Potter amt:placeholder "Potter" .
+# ── Roles ───────────────────────────────────────────────────────────────────
+# Asserted roles
+ex:FeatureAttributionDegree rdf:type    amt:Role ;
+                            rdfs:label  "feature attribution" ;
+                            rdfs:domain ex:Feature ;
+                            rdfs:range  ex:Potter .
 
-ex:Sherd rdf:type amt:Concept .
-ex:Sherd rdfs:label "Sherd" .
-ex:Sherd amt:placeholder "Pot Sherd" .
+ex:PotterAttributionDegree  rdf:type    amt:Role ;
+                            rdfs:label  "potter attribution" ;
+                            rdfs:domain ex:Potter ;
+                            rdfs:range  ex:Sherd .
 
-ex:FindContext rdf:type amt:Concept .
-ex:FindContext rdfs:label "Find Context" .
-ex:FindContext amt:placeholder "Find Context" .
+ex:WeightedDatingDegree     rdf:type    amt:Role ;
+                            rdfs:label  "weighted dating" ;
+                            rdfs:domain ex:Sherd ;
+                            rdfs:range  ex:FindContext .
 
-# roles
+# Derived roles (consequents of role chains)
+ex:FigureTypeRepertoireChoice rdf:type    amt:Role ;
+                              rdfs:label  "repertoire choice" ;
+                              rdfs:domain ex:Feature ;
+                              rdfs:range  ex:Sherd .
 
-ex:FeatureAttributionDegree rdf:type amt:Role .
-ex:FeatureAttributionDegree rdfs:label 'attribution' .
-ex:FeatureAttributionDegree rdfs:domain ex:Feature .
-ex:FeatureAttributionDegree rdfs:range ex:Potter .
+ex:DatingWeight rdf:type    amt:Role ;
+                rdfs:label  "dating weight" ;
+                rdfs:domain ex:Potter ;
+                rdfs:range  ex:FindContext .
 
-ex:PotterAttributionDegree rdf:type amt:Role .
-ex:PotterAttributionDegree rdfs:label 'attribution' .
-ex:PotterAttributionDegree rdfs:domain ex:Potter .
-ex:PotterAttributionDegree rdfs:range ex:Sherd .
+ex:FeatureDatingWeight rdf:type    amt:Role ;
+                       rdfs:label  "feature dating weight" ;
+                       rdfs:domain ex:Feature ;
+                       rdfs:range  ex:FindContext .
 
-ex:WeightedDatingDegree rdf:type amt:Role .
-ex:WeightedDatingDegree rdfs:label 'weighted dating' .
-ex:WeightedDatingDegree rdfs:domain ex:Sherd .
-ex:WeightedDatingDegree rdfs:range ex:FindContext .
+# =============================================================================
+# AXIOMS
+# =============================================================================
 
-ex:FigureTypeRepertoireChoice rdf:type amt:Role .
-ex:FigureTypeRepertoireChoice rdfs:label 'repertoire choice' .
-ex:FigureTypeRepertoireChoice rdfs:domain ex:Feature .
-ex:FigureTypeRepertoireChoice rdfs:range ex:Sherd .
+# ── Repertoire choice (Product, n=2) ────────────────────────────────────────
+# Feature → Potter → Sherd composes the feature-attribution and
+# potter-attribution into a direct claim that the feature is part of
+# this sherd's repertoire. Product because the two attributions are
+# independent observations: their confidences multiply.
+ex:RCA_repertoireChoice rdf:type        amt:RoleChainAxiom ;
+                        amt:antecedents ( ex:FeatureAttributionDegree
+                                          ex:PotterAttributionDegree ) ;
+                        amt:consequent  ex:FigureTypeRepertoireChoice ;
+                        amt:logic       amt:ProductLogic .
 
-ex:DatingWeight rdf:type amt:Role .
-ex:DatingWeight rdfs:label 'dating weight' .
-ex:DatingWeight rdfs:domain ex:Potter .
-ex:DatingWeight rdfs:range ex:FindContext .
+# ── Potter-to-context dating (Product, n=2) ─────────────────────────────────
+# Potter → Sherd → FindContext composes the potter-attribution and the
+# sherd's weighted dating into a probable dating window for the potter
+# at this find context. Product again — the two facts come from
+# independent sources (typology vs. stratigraphy).
+ex:RCA_potterDating rdf:type        amt:RoleChainAxiom ;
+                    amt:antecedents ( ex:PotterAttributionDegree
+                                      ex:WeightedDatingDegree ) ;
+                    amt:consequent  ex:DatingWeight ;
+                    amt:logic       amt:ProductLogic .
 
-# RoleChainAxioms
+# ── Feature-to-context dating (Einstein product, n=3) ───────────────────────
+# The full chain Feature → Potter → Sherd → FindContext, length 3.
+# Choosing a logic operator here is a modelling decision, not a
+# mechanical one. ProductLogic would multiply through (e.g. 0.5 * 0.6
+# * 0.51 ≈ 0.153), which is the canonical "independent evidence
+# multiplies" reading. EinsteinProduct is a stricter t-norm — it
+# returns slightly lower values than Product everywhere on (0,1)^n —
+# and is useful when the modeller wants to explicitly penalise long
+# chains relative to short ones, or to keep the operator distinct from
+# the binary Product chains above. See the companion .md file for a
+# side-by-side table.
+ex:RCA_featureDating rdf:type        amt:RoleChainAxiom ;
+                     amt:antecedents ( ex:FeatureAttributionDegree
+                                       ex:PotterAttributionDegree
+                                       ex:WeightedDatingDegree ) ;
+                     amt:consequent  ex:FeatureDatingWeight ;
+                     amt:logic       amt:EinsteinProduct .
 
-ex:RCA0001 rdf:type amt:RoleChainAxiom .
-ex:RCA0001 amt:antecedent1 ex:FeatureAttributionDegree .
-ex:RCA0001 amt:antecedent2 ex:PotterAttributionDegree .
-ex:RCA0001 amt:consequent ex:FigureTypeRepertoireChoice .
-ex:RCA0001 amt:logic amt:ProductLogic .
+# =============================================================================
+# DATA: Individuals
+# =============================================================================
 
-ex:RCA0002 rdf:type amt:RoleChainAxiom .
-ex:RCA0002 amt:antecedent1 ex:PotterAttributionDegree .
-ex:RCA0002 amt:antecedent2 ex:WeightedDatingDegree .
-ex:RCA0002 amt:consequent ex:DatingWeight .
-ex:RCA0002 amt:logic amt:ProductLogic .
+# ── Features (figure types) ─────────────────────────────────────────────────
+ex:Feature_Red   amt:instanceOf ex:Feature ; rdfs:label "Feature Red"   .
+ex:Feature_Blue  amt:instanceOf ex:Feature ; rdfs:label "Feature Blue"  .
+ex:Feature_Green amt:instanceOf ex:Feature ; rdfs:label "Feature Green" .
 
-# Example Data Concepts
+# ── Potters ────────────────────────────────────────────────────────────────
+ex:Potter_A amt:instanceOf ex:Potter ; rdfs:label "Potter A" .
+ex:Potter_B amt:instanceOf ex:Potter ; rdfs:label "Potter B" .
 
-ex:Feature_Red amt:instanceOf ex:Feature. ex:Feature_Red rdfs:label 'Feature Red'.
-ex:Feature_Blue amt:instanceOf ex:Feature. ex:Feature_Blue rdfs:label 'Feature Blue'.
-ex:Feature_Green amt:instanceOf ex:Feature. ex:Feature_Green rdfs:label 'Feature Green'.
-ex:Potter_A amt:instanceOf ex:Potter. ex:Potter_A rdfs:label 'Potter A'.
-ex:Potter_B amt:instanceOf ex:Potter. ex:Potter_B rdfs:label 'Potter B'.
-ex:Sherd_X amt:instanceOf ex:Sherd. ex:Sherd_X rdfs:label 'Sherd X'.
-ex:Sherd_Z amt:instanceOf ex:Sherd. ex:Sherd_Z rdfs:label 'Sherd Z'.
-ex:FindContext_I amt:instanceOf ex:FindContext. ex:FindContext_I rdfs:label 'Find Context I'.
+# ── Sherds ─────────────────────────────────────────────────────────────────
+ex:Sherd_X amt:instanceOf ex:Sherd ; rdfs:label "Sherd X" .
+ex:Sherd_Z amt:instanceOf ex:Sherd ; rdfs:label "Sherd Z" .
 
-# Example Data Roles
+# ── Find contexts ──────────────────────────────────────────────────────────
+ex:FindContext_I amt:instanceOf ex:FindContext ; rdfs:label "Find Context I" .
 
-_:node01 rdf:subject ex:Feature_Red . _:node01 rdf:predicate ex:FeatureAttributionDegree . _:node01 rdf:object ex:Potter_A . _:node01 amt:weight 0.5 .
-_:node02 rdf:subject ex:Potter_A . _:node02 rdf:predicate ex:PotterAttributionDegree . _:node02 rdf:object ex:Sherd_X . _:node02 amt:weight 0.6 .
-_:node03 rdf:subject ex:Sherd_X . _:node03 rdf:predicate ex:WeightedDatingDegree . _:node03 rdf:object ex:FindContext_I . _:node03 amt:weight 0.51 .
+# =============================================================================
+# DATA: Asserted edges (reified statements)
+# =============================================================================
 
-_:node11 rdf:subject ex:Feature_Blue . _:node11 rdf:predicate ex:FeatureAttributionDegree . _:node11 rdf:object ex:Potter_B . _:node11 amt:weight 1.0 .
-_:node21 rdf:subject ex:Feature_Green . _:node21 rdf:predicate ex:FeatureAttributionDegree . _:node21 rdf:object ex:Potter_B . _:node21 amt:weight 0.33 .
-_:node12 rdf:subject ex:Potter_B . _:node12 rdf:predicate ex:PotterAttributionDegree . _:node12 rdf:object ex:Sherd_Z . _:node12 amt:weight 0.83 .
-_:node13 rdf:subject ex:Sherd_Z . _:node13 rdf:predicate ex:WeightedDatingDegree . _:node13 rdf:object ex:FindContext_I . _:node13 amt:weight 0.6 .
+# ── Branch A: Feature_Red → Potter_A → Sherd_X → FindContext_I ──────────────
+# Lower-confidence attribution chain — useful to see how the three
+# logics dampen long chains differently in the inferences.
+_:a01 rdf:subject ex:Feature_Red ; rdf:predicate ex:FeatureAttributionDegree ; rdf:object ex:Potter_A      ; amt:weight "0.50"^^xsd:decimal .
+_:a02 rdf:subject ex:Potter_A    ; rdf:predicate ex:PotterAttributionDegree  ; rdf:object ex:Sherd_X       ; amt:weight "0.60"^^xsd:decimal .
+_:a03 rdf:subject ex:Sherd_X     ; rdf:predicate ex:WeightedDatingDegree     ; rdf:object ex:FindContext_I ; amt:weight "0.51"^^xsd:decimal .
+
+# ── Branch B: Feature_Blue / Feature_Green → Potter_B → Sherd_Z → FindContext_I
+# Higher-confidence branch — Potter_B is well-attested. Two features
+# are attributed to Potter_B, with Feature_Green considerably weaker
+# (0.33) than Feature_Blue (1.00).
+_:b01 rdf:subject ex:Feature_Blue  ; rdf:predicate ex:FeatureAttributionDegree ; rdf:object ex:Potter_B      ; amt:weight "1.00"^^xsd:decimal .
+_:b02 rdf:subject ex:Feature_Green ; rdf:predicate ex:FeatureAttributionDegree ; rdf:object ex:Potter_B      ; amt:weight "0.33"^^xsd:decimal .
+_:b03 rdf:subject ex:Potter_B      ; rdf:predicate ex:PotterAttributionDegree  ; rdf:object ex:Sherd_Z       ; amt:weight "0.83"^^xsd:decimal .
+_:b04 rdf:subject ex:Sherd_Z       ; rdf:predicate ex:WeightedDatingDegree     ; rdf:object ex:FindContext_I ; amt:weight "0.60"^^xsd:decimal .
+
+# =============================================================================
+# Expected inferences (sanity check — produced by `amt-runner`)
+# =============================================================================
+#
+# Product (RCA_repertoireChoice — Feature → Sherd):
+#   Feature_Red   -> Sherd_X    weight 0.50 * 0.60 = 0.300
+#   Feature_Blue  -> Sherd_Z    weight 1.00 * 0.83 = 0.830
+#   Feature_Green -> Sherd_Z    weight 0.33 * 0.83 = 0.274
+#
+# Product (RCA_potterDating — Potter → FindContext):
+#   Potter_A -> FindContext_I   weight 0.60 * 0.51 = 0.306
+#   Potter_B -> FindContext_I   weight 0.83 * 0.60 = 0.498
+#
+# EinsteinProduct (RCA_featureDating — Feature → FindContext, n=3):
+#   Feature_Red   -> FindContext_I   weight ≈ 0.093   (ProductLogic gives 0.153)
+#   Feature_Blue  -> FindContext_I   weight ≈ 0.466   (ProductLogic gives 0.498)
+#   Feature_Green -> FindContext_I   weight ≈ 0.113   (ProductLogic gives 0.164)
+#
+# Einstein product is ≤ Product across most of [0,1]^n. On these inputs
+# the gap is small at the high-confidence end (Feature_Blue) and larger
+# in the mid-range. It is *not* a "gentler" operator in the absolute
+# sense — but it spreads results more evenly and avoids Product's harsh
+# collapse near zero on long heterogeneous chains. See
+# `PotterAttributionExample.md` for a side-by-side comparison.
+#
+# Consistency check should pass — no integrity axioms are defined, so
+# the data has nothing it could violate.

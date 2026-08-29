@@ -1,0 +1,222 @@
+@prefix amt:      <http://academic-meta-tool.xyz/vocab#> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix skosplus: <http://w3id.org/skos-plus/> .
+@prefix aat:      <http://vocab.getty.edu/aat/> .
+@prefix wd:       <http://www.wikidata.org/entity/> .
+@prefix ex:       <http://github.com/n4o-rse/amt-explore/> .
+
+# =============================================================================
+# AMT data file: SKOS concept mappings across archaeological vocabularies
+# =============================================================================
+#
+# This file demonstrates how AMT handles n-ary role chains, the new logic
+# operators, and SKOS-style mapping reasoning. The scenario: four archaeology
+# concepts from three different thesauri (Getty AAT, Wikidata, and two
+# project-internal terminologies) and how mapping confidence propagates
+# along chains of skos:exactMatch, skos:closeMatch, skos:relatedMatch.
+#
+# No AMT vocabulary scaffolding here — the AMT package loads ontology/amt.ttl
+# automatically via the bundled ontology folder.
+
+# ── Concept class ────────────────────────────────────────────────────────────
+ex:Concept rdf:type        amt:Concept ;
+           rdfs:label      "Concept" ;
+           amt:placeholder "Concept" .
+
+# ── SKOS mapping properties as AMT Roles ─────────────────────────────────────
+skos:exactMatch    rdf:type   amt:Role ;
+                   rdfs:label "exactMatch" ;
+                   rdfs:domain ex:Concept ;
+                   rdfs:range  ex:Concept .
+
+skos:closeMatch    rdf:type   amt:Role ;
+                   rdfs:label "closeMatch" ;
+                   rdfs:domain ex:Concept ;
+                   rdfs:range  ex:Concept .
+
+skos:relatedMatch  rdf:type   amt:Role ;
+                   rdfs:label "relatedMatch" ;
+                   rdfs:domain ex:Concept ;
+                   rdfs:range  ex:Concept .
+
+skos:broadMatch    rdf:type   amt:Role ;
+                   rdfs:label "broadMatch" ;
+                   rdfs:domain ex:Concept ;
+                   rdfs:range  ex:Concept .
+
+skos:narrowMatch   rdf:type   amt:Role ;
+                   rdfs:label "narrowMatch" ;
+                   rdfs:domain ex:Concept ;
+                   rdfs:range  ex:Concept .
+
+# A project-internal "questionable" relation, derived when reasoning produces
+# weak inferences that should be flagged for human review.
+ex:questionableMatch  rdf:type   amt:Role ;
+                      rdfs:label "questionableMatch" ;
+                      rdfs:domain ex:Concept ;
+                      rdfs:range  ex:Concept .
+
+# =============================================================================
+# AXIOMS — one for each of the six fuzzy logic operators
+# =============================================================================
+
+# ── 1) Goedel (binary, default for n=2..3) ───────────────────────────────────
+# exactMatch is transitive: if A exactMatches B and B exactMatches C, then
+# A exactMatches C with the minimum of both confidences. Goedel is the
+# semantically conservative choice — the chain is no stronger than its
+# weakest link.
+ex:RCA_exactTransitive rdf:type        amt:RoleChainAxiom ;
+                       amt:antecedents ( skos:exactMatch skos:exactMatch ) ;
+                       amt:consequent  skos:exactMatch ;
+                       amt:logic       amt:GoedelLogic .
+
+# ── 2) Product (binary, classical SKOS chain) ────────────────────────────────
+# closeMatch is the SKOS equivalent of "fuzzy equivalent" — chaining two
+# closeMatches dampens confidence multiplicatively, modelling them as
+# independent pieces of evidence.
+ex:RCA_closeTransitive rdf:type        amt:RoleChainAxiom ;
+                       amt:antecedents ( skos:closeMatch skos:closeMatch ) ;
+                       amt:consequent  skos:closeMatch ;
+                       amt:logic       amt:ProductLogic .
+
+# ── 3) Lukasiewicz (binary, strict) ──────────────────────────────────────────
+# narrowMatch composed with itself: if a strictly narrower concept has
+# another strictly narrower concept, the result is even stricter.
+# Lukasiewicz models this as "evidence must overcome a threshold".
+ex:RCA_narrowChain rdf:type        amt:RoleChainAxiom ;
+                   amt:antecedents ( skos:narrowMatch skos:narrowMatch ) ;
+                   amt:consequent  skos:narrowMatch ;
+                   amt:logic       amt:LukasiewiczLogic .
+
+# ── 4) Einstein product (binary, medium-confidence) ──────────────────────────
+# Heterogeneous chain of length 3: exact + close + close. Einstein product
+# is gentler than ProductLogic for n=3, keeping more signal.
+ex:RCA_mixedHeterogeneous rdf:type        amt:RoleChainAxiom ;
+                          amt:antecedents ( skos:exactMatch skos:closeMatch skos:closeMatch ) ;
+                          amt:consequent  skos:closeMatch ;
+                          amt:logic       amt:EinsteinProduct .
+
+# ── 5) Geometric Mean (n-ary, recommended for n>=4) ──────────────────────────
+# A 4-step chain mixing closeMatch and relatedMatch. Geometric mean treats
+# each link symmetrically — useful when comparing chain confidence across
+# different chain lengths in a downstream evaluation.
+ex:RCA_longChain rdf:type        amt:RoleChainAxiom ;
+                 amt:antecedents ( skos:closeMatch skos:relatedMatch
+                                   skos:closeMatch skos:relatedMatch ) ;
+                 amt:consequent  ex:questionableMatch ;
+                 amt:logic       amt:GeometricMean .
+
+# ── 6) Hamacher product with gamma=2 (binary, parametrised) ──────────────────
+# Hamacher with gamma > 1 is softer than Product — useful for research
+# settings where path-length sensitivity should be tuned. Here applied to
+# a 3-step relatedMatch chain (which would collapse hard under Product).
+ex:RCA_relatedHamacher rdf:type           amt:RoleChainAxiom ;
+                       amt:antecedents    ( skos:relatedMatch skos:relatedMatch
+                                            skos:relatedMatch ) ;
+                       amt:consequent     ex:questionableMatch ;
+                       amt:logic          amt:HamacherProduct ;
+                       amt:logicParameter "2.0"^^xsd:decimal .
+
+# =============================================================================
+# INVERSE AXIOMS — broadMatch and narrowMatch are inverse
+# =============================================================================
+
+ex:IA_broadNarrow rdf:type      amt:InverseAxiom ;
+                  amt:antecedent skos:broadMatch ;
+                  amt:inverse    skos:narrowMatch .
+
+# =============================================================================
+# INTEGRITY AXIOMS — sanity checks against the reasoned graph
+# =============================================================================
+
+# A questionableMatch should not loop back to its own subject. If reasoning
+# produces a self-edge via questionableMatch, that signals a circular chain
+# of mappings that is almost certainly an artefact rather than knowledge.
+ex:SDA_questionable rdf:type  amt:SelfDisjointAxiom ;
+                    amt:role  ex:questionableMatch .
+
+# exactMatch and questionableMatch must not both hold between the same two
+# concepts — if an exact mapping exists, no fuzzy fallback is needed and
+# their co-occurrence indicates a contradiction in the source data.
+ex:DA_exactVsQuestionable rdf:type   amt:DisjointAxiom ;
+                          amt:role1  skos:exactMatch ;
+                          amt:role2  ex:questionableMatch .
+
+# =============================================================================
+# REAL DATA: archaeology concepts from multiple vocabularies
+# =============================================================================
+#
+# Scenario: We are aligning four roughly-related concepts about Roman fibulae
+# (brooches) from three different vocabularies:
+#   - Getty AAT          : "fibulae (costume accessories)"  -> AAT 300209277
+#   - Wikidata           : "fibula (brooch)"                -> Q1083956
+#   - Local thesaurus A  : "Roman brooch"
+#   - Local thesaurus B  : "ancient garment fastener"
+#
+# The mappings between them have varying confidence, modelling the fact that
+# different vocabularies agree to different degrees on what counts as the
+# "same" concept.
+
+# ── Instances ────────────────────────────────────────────────────────────────
+aat:300209277 amt:instanceOf ex:Concept ;
+              rdfs:label     "fibulae (costume accessories)" .
+
+wd:Q1083956   amt:instanceOf ex:Concept ;
+              rdfs:label     "fibula (brooch)" .
+
+ex:RomanBrooch amt:instanceOf ex:Concept ;
+               rdfs:label    "Roman brooch" .
+
+ex:GarmentFastener amt:instanceOf ex:Concept ;
+                   rdfs:label    "ancient garment fastener" .
+
+# ── Asserted mappings ────────────────────────────────────────────────────────
+# AAT and Wikidata agree exactly (high-confidence curated alignment)
+_:m1 rdf:subject   aat:300209277 ;
+     rdf:predicate skos:exactMatch ;
+     rdf:object    wd:Q1083956 ;
+     amt:weight    "1.00"^^xsd:decimal .
+
+# Wikidata and the local "Roman brooch" thesaurus are close but not exact
+# (the local term is more specific in scope)
+_:m2 rdf:subject   wd:Q1083956 ;
+     rdf:predicate skos:closeMatch ;
+     rdf:object    ex:RomanBrooch ;
+     amt:weight    "0.85"^^xsd:decimal .
+
+# Roman brooch and "ancient garment fastener" are also closely matched
+# (the latter is more abstract but in the same conceptual space)
+_:m3 rdf:subject   ex:RomanBrooch ;
+     rdf:predicate skos:closeMatch ;
+     rdf:object    ex:GarmentFastener ;
+     amt:weight    "0.80"^^xsd:decimal .
+
+# AAT and Roman brooch: declared as relatedMatch with medium confidence
+# (catalogers were unsure whether to call it close or related)
+_:m4 rdf:subject   aat:300209277 ;
+     rdf:predicate skos:relatedMatch ;
+     rdf:object    ex:RomanBrooch ;
+     amt:weight    "0.65"^^xsd:decimal .
+
+# Roman brooch -> garment fastener as relatedMatch (parallel evidence to m3)
+_:m5 rdf:subject   ex:RomanBrooch ;
+     rdf:predicate skos:relatedMatch ;
+     rdf:object    ex:GarmentFastener ;
+     amt:weight    "0.70"^^xsd:decimal .
+
+# Garment fastener -> something further: a relatedMatch back to Wikidata
+# This creates a 3-step relatedMatch chain that exercises the Hamacher axiom.
+_:m6 rdf:subject   ex:GarmentFastener ;
+     rdf:predicate skos:relatedMatch ;
+     rdf:object    wd:Q1083956 ;
+     amt:weight    "0.60"^^xsd:decimal .
+
+# A broadMatch from RomanBrooch to GarmentFastener — exercises the
+# InverseAxiom (will produce a narrowMatch in the opposite direction).
+_:m7 rdf:subject   ex:RomanBrooch ;
+     rdf:predicate skos:broadMatch ;
+     rdf:object    ex:GarmentFastener ;
+     amt:weight    "0.75"^^xsd:decimal .

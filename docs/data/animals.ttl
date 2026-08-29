@@ -1,0 +1,297 @@
+@prefix amt:  <http://academic-meta-tool.xyz/vocab#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <http://github.com/n4o-rse/amt-explore/> .
+
+# =============================================================================
+# AMT data file: animals — taxonomy + family tree
+# =============================================================================
+#
+# This example demonstrates how AMT.engine reasons over two intertwined
+# domains: a biological taxonomy (Tiger isSubclassOf Cat isSubclassOf
+# Mammal isSubclassOf Animal) and a real family tree of individual animals
+# (Bagheera the tiger is the great-great-grandfather of Mowgli).
+#
+# The interesting bit is the cross-over: an `isInstanceOf` edge composed
+# with an `isSubclassOf` edge yields a new `isInstanceOf` edge. So once
+# we know "Mowgli isInstanceOf Tiger" and "Tiger isSubclassOf Cat", the
+# engine derives "Mowgli isInstanceOf Cat" automatically.
+#
+# Four logic operators are used, each chosen for what it actually means
+# in the domain:
+#
+#   * Goedel    — taxonomy transitivity (the chain is only as confident
+#                 as its weakest link; classification facts compose
+#                 without confidence loss when both are certain)
+#   * Product   — grandparenthood (two independent parent observations
+#                 multiply: a 0.95 belief and a 0.92 belief give ~0.87)
+#   * GeoMean   — long ancestry chains (n=4); product would dampen
+#                 this far too aggressively, geometric mean keeps signal
+#   * Goedel    — class cross-over: Mowgli is a Tiger, Tiger is a Cat,
+#                 therefore Mowgli is a Cat. The result is bounded by
+#                 the weakest of the two facts.
+#
+# The companion file `animals.md` contains the family-tree diagram and
+# a table of expected inferences with their derivations.
+
+# ── Concepts ────────────────────────────────────────────────────────────────
+ex:Species rdf:type        amt:Concept ;
+           rdfs:label      "Species" ;
+           amt:placeholder "Species name" .
+
+ex:Individual rdf:type        amt:Concept ;
+              rdfs:label      "Individual" ;
+              amt:placeholder "Animal name" .
+
+# ── Roles ───────────────────────────────────────────────────────────────────
+# Taxonomy roles
+ex:isInstanceOf  rdf:type     amt:Role ;
+                 rdfs:label   "isInstanceOf" ;
+                 rdfs:domain  ex:Individual ;
+                 rdfs:range   ex:Species .
+
+ex:isSubclassOf  rdf:type     amt:Role ;
+                 rdfs:label   "isSubclassOf" ;
+                 rdfs:domain  ex:Species ;
+                 rdfs:range   ex:Species .
+
+ex:hasSubclass   rdf:type     amt:Role ;
+                 rdfs:label   "hasSubclass" ;
+                 rdfs:domain  ex:Species ;
+                 rdfs:range   ex:Species .
+
+# Family roles
+ex:isParentOf    rdf:type     amt:Role ;
+                 rdfs:label   "isParentOf" ;
+                 rdfs:domain  ex:Individual ;
+                 rdfs:range   ex:Individual .
+
+ex:isAncestorOf  rdf:type     amt:Role ;
+                 rdfs:label   "isAncestorOf" ;
+                 rdfs:domain  ex:Individual ;
+                 rdfs:range   ex:Individual .
+
+ex:isDescendantOf rdf:type    amt:Role ;
+                  rdfs:label  "isDescendantOf" ;
+                  rdfs:domain ex:Individual ;
+                  rdfs:range  ex:Individual .
+
+ex:isSiblingOf   rdf:type     amt:Role ;
+                 rdfs:label   "isSiblingOf" ;
+                 rdfs:domain  ex:Individual ;
+                 rdfs:range   ex:Individual .
+
+# =============================================================================
+# AXIOMS
+# =============================================================================
+
+# ── Taxonomy transitivity (Goedel, n=2) ─────────────────────────────────────
+# Tiger isSubclassOf Cat, Cat isSubclassOf Mammal => Tiger isSubclassOf Mammal.
+# Goedel takes the minimum of the link weights — a classification chain is
+# only as confident as the weakest classification fact in it.
+ex:RCA_classTrans rdf:type        amt:RoleChainAxiom ;
+                  amt:antecedents ( ex:isSubclassOf ex:isSubclassOf ) ;
+                  amt:consequent  ex:isSubclassOf ;
+                  amt:logic       amt:GoedelLogic .
+
+# ── Class membership cross-over (Goedel, n=2) ───────────────────────────────
+# Mowgli isInstanceOf Tiger, Tiger isSubclassOf Cat => Mowgli isInstanceOf Cat.
+# Crosses the role boundary between individual-class and class-class
+# relations. Goedel again — bounded by the weakest classification belief.
+ex:RCA_classCrossover rdf:type        amt:RoleChainAxiom ;
+                      amt:antecedents ( ex:isInstanceOf ex:isSubclassOf ) ;
+                      amt:consequent  ex:isInstanceOf ;
+                      amt:logic       amt:GoedelLogic .
+
+# ── Grandparenthood (Product, n=2) ──────────────────────────────────────────
+# isParentOf composed with isParentOf yields isAncestorOf. Product applies
+# because two independent parent observations enter the result
+# multiplicatively: a 0.95 belief and a 0.92 belief give 0.874.
+ex:RCA_grandparent rdf:type        amt:RoleChainAxiom ;
+                   amt:antecedents ( ex:isParentOf ex:isParentOf ) ;
+                   amt:consequent  ex:isAncestorOf ;
+                   amt:logic       amt:ProductLogic .
+
+# ── Long ancestry (Geometric Mean, n=4) ─────────────────────────────────────
+# Four-step parent chain (great-great-grandparent). Product would dampen
+# this too aggressively (0.92 * 0.95 * 0.97 * 0.97 ≈ 0.82). Geometric mean
+# treats every link symmetrically and keeps more signal:
+# (0.92 * 0.95 * 0.97 * 0.97) ^ (1/4) ≈ 0.95.
+ex:RCA_longAncestry rdf:type        amt:RoleChainAxiom ;
+                    amt:antecedents ( ex:isParentOf ex:isParentOf
+                                      ex:isParentOf ex:isParentOf ) ;
+                    amt:consequent  ex:isAncestorOf ;
+                    amt:logic       amt:GeometricMean .
+
+# ── Inverse axioms ──────────────────────────────────────────────────────────
+# Taxonomy: a hasSubclass edge is the reverse of an isSubclassOf edge.
+ex:IA_subclassReverse rdf:type      amt:InverseAxiom ;
+                      amt:antecedent ex:isSubclassOf ;
+                      amt:inverse    ex:hasSubclass .
+
+# Family: every isAncestorOf edge implies a reverse isDescendantOf edge.
+ex:IA_ancestorReverse rdf:type      amt:InverseAxiom ;
+                      amt:antecedent ex:isAncestorOf ;
+                      amt:inverse    ex:isDescendantOf .
+
+# Sibling is symmetric — its inverse is itself.
+ex:IA_siblingSym rdf:type      amt:InverseAxiom ;
+                 amt:antecedent ex:isSiblingOf ;
+                 amt:inverse    ex:isSiblingOf .
+
+# =============================================================================
+# DATA: Species (taxonomy)
+# =============================================================================
+
+ex:Animal amt:instanceOf ex:Species ; rdfs:label "Animal" .
+ex:Mammal amt:instanceOf ex:Species ; rdfs:label "Mammal" .
+ex:Cat    amt:instanceOf ex:Species ; rdfs:label "Cat" .
+ex:Dog    amt:instanceOf ex:Species ; rdfs:label "Dog" .
+ex:Wolf   amt:instanceOf ex:Species ; rdfs:label "Wolf" .
+ex:Tiger  amt:instanceOf ex:Species ; rdfs:label "Tiger" .
+ex:Pet    amt:instanceOf ex:Species ; rdfs:label "Pet" .
+
+# Subclass edges — biological lines are certain (1.0); the cultural
+# category Pet is fuzzier.
+_:s1  rdf:subject ex:Mammal ; rdf:predicate ex:isSubclassOf ; rdf:object ex:Animal ; amt:weight "1.00"^^xsd:decimal .
+_:s2  rdf:subject ex:Cat    ; rdf:predicate ex:isSubclassOf ; rdf:object ex:Mammal ; amt:weight "1.00"^^xsd:decimal .
+_:s3  rdf:subject ex:Dog    ; rdf:predicate ex:isSubclassOf ; rdf:object ex:Mammal ; amt:weight "1.00"^^xsd:decimal .
+_:s4  rdf:subject ex:Wolf   ; rdf:predicate ex:isSubclassOf ; rdf:object ex:Mammal ; amt:weight "1.00"^^xsd:decimal .
+_:s5  rdf:subject ex:Tiger  ; rdf:predicate ex:isSubclassOf ; rdf:object ex:Cat    ; amt:weight "1.00"^^xsd:decimal .
+_:s6  rdf:subject ex:Dog    ; rdf:predicate ex:isSubclassOf ; rdf:object ex:Pet    ; amt:weight "0.85"^^xsd:decimal .
+_:s7  rdf:subject ex:Cat    ; rdf:predicate ex:isSubclassOf ; rdf:object ex:Pet    ; amt:weight "0.70"^^xsd:decimal .
+
+# =============================================================================
+# DATA: Individuals
+# =============================================================================
+
+# ── Tiger family (5 generations: Sher_Singh, Sita → Bagheera, Kaa →
+#                                 Shere_Khan, Sariska → Raja, Padmini → Mowgli)
+ex:Sher_Singh amt:instanceOf ex:Individual ; rdfs:label "Sher Singh" .
+ex:Sita       amt:instanceOf ex:Individual ; rdfs:label "Sita"       .
+ex:Bagheera   amt:instanceOf ex:Individual ; rdfs:label "Bagheera"   .
+ex:Kaa        amt:instanceOf ex:Individual ; rdfs:label "Kaa"        .
+ex:Shere_Khan amt:instanceOf ex:Individual ; rdfs:label "Shere Khan" .
+ex:Sariska    amt:instanceOf ex:Individual ; rdfs:label "Sariska"    .
+ex:Raja       amt:instanceOf ex:Individual ; rdfs:label "Raja"       .
+ex:Padmini    amt:instanceOf ex:Individual ; rdfs:label "Padmini"    .
+ex:Mowgli     amt:instanceOf ex:Individual ; rdfs:label "Mowgli"     .
+
+# ── Dog family (3 generations: Rex, Bella → Buddy, Daisy → Cooper) ──────
+ex:Rex    amt:instanceOf ex:Individual ; rdfs:label "Rex"    .
+ex:Bella  amt:instanceOf ex:Individual ; rdfs:label "Bella"  .
+ex:Buddy  amt:instanceOf ex:Individual ; rdfs:label "Buddy"  .
+ex:Daisy  amt:instanceOf ex:Individual ; rdfs:label "Daisy"  .
+ex:Cooper amt:instanceOf ex:Individual ; rdfs:label "Cooper" .
+
+# ── Wolf family (3 generations: Lupa, Greybeard → Akela, Romulus → Lyra)
+ex:Lupa      amt:instanceOf ex:Individual ; rdfs:label "Lupa"      .
+ex:Greybeard amt:instanceOf ex:Individual ; rdfs:label "Greybeard" .
+ex:Akela     amt:instanceOf ex:Individual ; rdfs:label "Akela"     .
+ex:Romulus   amt:instanceOf ex:Individual ; rdfs:label "Romulus"   .
+ex:Lyra      amt:instanceOf ex:Individual ; rdfs:label "Lyra"      .
+
+# ── isInstanceOf edges — every individual to its species (all 1.0) ──────
+_:i00a rdf:subject ex:Sher_Singh ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Tiger ; amt:weight "1.00"^^xsd:decimal .
+_:i00b rdf:subject ex:Sita       ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Tiger ; amt:weight "1.00"^^xsd:decimal .
+_:i01 rdf:subject ex:Bagheera   ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Tiger ; amt:weight "1.00"^^xsd:decimal .
+_:i02 rdf:subject ex:Kaa        ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Tiger ; amt:weight "1.00"^^xsd:decimal .
+_:i03 rdf:subject ex:Shere_Khan ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Tiger ; amt:weight "1.00"^^xsd:decimal .
+_:i04 rdf:subject ex:Sariska    ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Tiger ; amt:weight "1.00"^^xsd:decimal .
+_:i05 rdf:subject ex:Raja       ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Tiger ; amt:weight "1.00"^^xsd:decimal .
+_:i06 rdf:subject ex:Padmini    ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Tiger ; amt:weight "1.00"^^xsd:decimal .
+_:i07 rdf:subject ex:Mowgli     ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Tiger ; amt:weight "1.00"^^xsd:decimal .
+
+_:i08 rdf:subject ex:Rex    ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Dog ; amt:weight "1.00"^^xsd:decimal .
+_:i09 rdf:subject ex:Bella  ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Dog ; amt:weight "1.00"^^xsd:decimal .
+_:i10 rdf:subject ex:Buddy  ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Dog ; amt:weight "1.00"^^xsd:decimal .
+_:i11 rdf:subject ex:Daisy  ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Dog ; amt:weight "1.00"^^xsd:decimal .
+_:i12 rdf:subject ex:Cooper ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Dog ; amt:weight "1.00"^^xsd:decimal .
+
+_:i13 rdf:subject ex:Lupa      ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Wolf ; amt:weight "1.00"^^xsd:decimal .
+_:i14 rdf:subject ex:Greybeard ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Wolf ; amt:weight "1.00"^^xsd:decimal .
+_:i15 rdf:subject ex:Akela     ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Wolf ; amt:weight "1.00"^^xsd:decimal .
+_:i16 rdf:subject ex:Romulus   ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Wolf ; amt:weight "1.00"^^xsd:decimal .
+_:i17 rdf:subject ex:Lyra      ; rdf:predicate ex:isInstanceOf ; rdf:object ex:Wolf ; amt:weight "1.00"^^xsd:decimal .
+
+# ── isParentOf edges — Tiger family (5 generations, weights 0.92–0.97) ─
+# Slightly less certain than dog/wolf: tigers are observed less often,
+# paternity in particular is harder to pin down without DNA tests.
+_:p00a rdf:subject ex:Sher_Singh ; rdf:predicate ex:isParentOf ; rdf:object ex:Bagheera   ; amt:weight "0.92"^^xsd:decimal .
+_:p00b rdf:subject ex:Sita       ; rdf:predicate ex:isParentOf ; rdf:object ex:Bagheera   ; amt:weight "0.95"^^xsd:decimal .
+_:p01 rdf:subject ex:Bagheera   ; rdf:predicate ex:isParentOf ; rdf:object ex:Shere_Khan ; amt:weight "0.92"^^xsd:decimal .
+_:p02 rdf:subject ex:Kaa        ; rdf:predicate ex:isParentOf ; rdf:object ex:Shere_Khan ; amt:weight "0.95"^^xsd:decimal .
+_:p03 rdf:subject ex:Shere_Khan ; rdf:predicate ex:isParentOf ; rdf:object ex:Raja       ; amt:weight "0.95"^^xsd:decimal .
+_:p04 rdf:subject ex:Sariska    ; rdf:predicate ex:isParentOf ; rdf:object ex:Raja       ; amt:weight "0.97"^^xsd:decimal .
+_:p05 rdf:subject ex:Raja       ; rdf:predicate ex:isParentOf ; rdf:object ex:Mowgli     ; amt:weight "0.97"^^xsd:decimal .
+_:p06 rdf:subject ex:Padmini    ; rdf:predicate ex:isParentOf ; rdf:object ex:Mowgli     ; amt:weight "0.97"^^xsd:decimal .
+
+# ── isParentOf edges — Dog family (3 generations, weights 0.95–0.98) ──
+# Domestic dogs: pedigree records make most edges very certain.
+_:p07 rdf:subject ex:Rex   ; rdf:predicate ex:isParentOf ; rdf:object ex:Buddy  ; amt:weight "0.98"^^xsd:decimal .
+_:p08 rdf:subject ex:Bella ; rdf:predicate ex:isParentOf ; rdf:object ex:Buddy  ; amt:weight "0.98"^^xsd:decimal .
+_:p09 rdf:subject ex:Rex   ; rdf:predicate ex:isParentOf ; rdf:object ex:Daisy  ; amt:weight "0.98"^^xsd:decimal .
+_:p10 rdf:subject ex:Bella ; rdf:predicate ex:isParentOf ; rdf:object ex:Daisy  ; amt:weight "0.98"^^xsd:decimal .
+_:p11 rdf:subject ex:Daisy ; rdf:predicate ex:isParentOf ; rdf:object ex:Cooper ; amt:weight "0.95"^^xsd:decimal .
+
+# ── isParentOf edges — Wolf family (3 generations, weights 0.85–0.92) ─
+# Wild wolves: paternity is harder to confirm, so weights are lower —
+# this is what makes the logic differences visible in the output.
+_:p12 rdf:subject ex:Lupa      ; rdf:predicate ex:isParentOf ; rdf:object ex:Akela   ; amt:weight "0.92"^^xsd:decimal .
+_:p13 rdf:subject ex:Greybeard ; rdf:predicate ex:isParentOf ; rdf:object ex:Akela   ; amt:weight "0.85"^^xsd:decimal .
+_:p14 rdf:subject ex:Lupa      ; rdf:predicate ex:isParentOf ; rdf:object ex:Romulus ; amt:weight "0.92"^^xsd:decimal .
+_:p15 rdf:subject ex:Greybeard ; rdf:predicate ex:isParentOf ; rdf:object ex:Romulus ; amt:weight "0.85"^^xsd:decimal .
+_:p16 rdf:subject ex:Akela     ; rdf:predicate ex:isParentOf ; rdf:object ex:Lyra    ; amt:weight "0.90"^^xsd:decimal .
+
+# ── Sibling edges — explicit, observed at 1.0 (same litter) ────────────
+_:b01 rdf:subject ex:Buddy   ; rdf:predicate ex:isSiblingOf ; rdf:object ex:Daisy   ; amt:weight "1.00"^^xsd:decimal .
+_:b02 rdf:subject ex:Akela   ; rdf:predicate ex:isSiblingOf ; rdf:object ex:Romulus ; amt:weight "1.00"^^xsd:decimal .
+
+# =============================================================================
+# Expected inferences (sanity check — produced by `amt-runner`)
+# =============================================================================
+#
+# Goedel (RCA_classTrans, taxonomy transitivity):
+#   Tiger -> Mammal           weight 1.00      via Tiger->Cat (1.0), Cat->Mammal (1.0)
+#   Tiger -> Animal           weight 1.00      after Tiger->Mammal is established
+#   Cat   -> Animal           weight 1.00
+#   Dog   -> Animal           weight 1.00
+#   Wolf  -> Animal           weight 1.00
+#
+# Goedel (RCA_classCrossover, individual to higher class):
+#   Mowgli   -> Cat            weight 1.00     Mowgli->Tiger, Tiger->Cat
+#   Mowgli   -> Mammal         weight 1.00     after Tiger->Mammal exists
+#   Mowgli   -> Animal         weight 1.00
+#   Buddy    -> Mammal         weight 1.00
+#   Buddy    -> Animal         weight 1.00
+#   Buddy    -> Pet            weight 0.85     min(1.0, 0.85) — Buddy is a Dog,
+#                                              Dog isSubclassOf Pet (0.85)
+#   Akela    -> Mammal         weight 1.00
+#   Akela    -> Animal         weight 1.00
+#   (No Akela -> Pet — Wolf has no isSubclassOf Pet edge)
+#
+# Product (RCA_grandparent):
+#   Bagheera -> Raja           weight 0.92*0.95 = 0.874
+#   Kaa      -> Raja           weight 0.95*0.95 = 0.9025
+#   Bagheera -> Mowgli         (computed via grandparent rule from intermediate
+#                              isAncestorOf — but the chain is asserted as
+#                              isParentOf; see GeoMean for the 4-step result)
+#   Rex      -> Cooper         weight 0.98*0.95 = 0.931
+#   Bella    -> Cooper         weight 0.98*0.95 = 0.931
+#   Lupa     -> Lyra           weight 0.92*0.90 = 0.828
+#   Greybeard-> Lyra           weight 0.85*0.90 = 0.765
+#
+# Geometric Mean (RCA_longAncestry, 4-step chains):
+#   Sher_Singh -> Mowgli       weight (0.92*0.92*0.95*0.97)^(1/4) ≈ 0.940
+#   Sita       -> Mowgli       weight (0.95*0.92*0.95*0.97)^(1/4) ≈ 0.948
+#                              For comparison, ProductLogic on the same chain
+#                              would give 0.92*0.92*0.95*0.97 ≈ 0.78.
+#                              GeoMean keeps substantially more signal at n=4.
+#
+# Inverse axioms produce the reverse for every isAncestorOf edge
+# (isDescendantOf), every isSubclassOf edge (hasSubclass), and the
+# symmetric closure of isSiblingOf (Daisy isSiblingOf Buddy etc.).
+#
+# Consistency check should pass — no integrity axioms are defined, so
+# the data has nothing it could violate.
