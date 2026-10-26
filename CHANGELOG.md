@@ -30,6 +30,12 @@ introduced the version number in `pyproject.toml`.
 
 ### Changed
 
+- `requirements.txt` now also lists `pytest`; `requirements-dev.txt` is gone, so
+  the repository has a single requirements file. `pip install -e ".[dev]"` is
+  unchanged. amt-runner installs this file when it clones the engine, so it
+  now installs `pytest` as well.
+- The CI workflow uses `actions/checkout@v5`, `actions/setup-python@v6` and
+  `actions/upload-artifact@v5`, which run on Node 24.
 - `pyproject.toml`: the package authors are Florian Thiery and Allard W. Mees
   instead of "AMT contributors".
 - `LICENSE`: the copyright holder reads "Florian Thiery | LEIZA | Research

@@ -71,8 +71,7 @@ PRIMER.md                   work plan and decisions (German)
 CHANGELOG.md                what changed in which version
 CITATION.cff                how to cite this software
 pyproject.toml              build config + entry points
-requirements.txt            runtime dependencies (mirrors pyproject)
-requirements-dev.txt        the above plus pytest
+requirements.txt            dependencies: runtime (mirrors pyproject) plus pytest
 .github/workflows/          ci.yml (pipeline on push and pull request), sync-examples-to-docs.yml
 ```
 
@@ -95,10 +94,10 @@ pytest tests/ -q                       # all green
 
 If you vendor the source tree instead of installing it — a CI image, a
 Docker layer, a wrapper such as `amt.runner` that clones the repository —
-use the requirements files instead:
+use the requirements file instead (it includes pytest):
 
 ```bash
-pip install -r requirements-dev.txt
+pip install -r requirements.txt
 ```
 
 Then run the bundled animals example through the full pipeline:

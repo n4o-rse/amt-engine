@@ -66,7 +66,7 @@ Eigenschaften, die das Repo haben muss:
 - Änderungen an `amt/` oder `ontology/` brauchen einen Eintrag im `CHANGELOG.md` und, wenn sie Verhalten ändern, einen Test.
 - `requirements.txt` ändert nur, wer den Runner mitdenkt: `amt-runner` installiert daraus.
 - `PATCH-README.md` begleitet ein Patch-ZIP und gehört nicht ins Repo; sie steht seit `b42b27b` in `.gitignore`.
-- Pro Repo genau eine `requirements.txt`, ohne `requirements-dev.txt`; Entwicklungspakete stehen in derselben Datei, mit Kommentar. Dieses Repo hat noch zwei Dateien (S6).
+- Pro Repo genau eine `requirements.txt`, ohne `requirements-dev.txt`; Entwicklungspakete stehen in derselben Datei, mit Kommentar. Seit S6 gilt das auch hier.
 
 ### A4 Beschlusslage
 
@@ -81,7 +81,9 @@ Eigenschaften, die das Repo haben muss:
 | Zeilenenden in `docs-sync` | Vergleich mit normalisierten Zeilenenden (CRLF = LF); kein `.gitattributes` | 2026-10-26 |
 | `skos-mapping-example.ttl` | die zwei Konsistenzverletzungen sind gewollt (Demo für `DisjointAxiom` und `SelfDisjointAxiom`) | 2026-10-26 |
 | Exit-Code des Runners bei Konsistenzverletzungen | bleibt 0; eine Änderung wäre ein Verhaltenswechsel der Produkt-CLI und braucht einen eigenen Schritt samt Version | 2026-10-26 |
-| Anzahl der requirements-Dateien | familienweit genau eine `requirements.txt` pro Repo; `amt-engine` fasst `requirements-dev.txt` später ein (S6) | 2026-10-26 |
+| Anzahl der requirements-Dateien | familienweit genau eine `requirements.txt` pro Repo; `amt-engine` hat `requirements-dev.txt` in S6 eingefasst (`pytest` steht mit Kommentar in `requirements.txt`) | 2026-10-26 |
+| `pytest` beim Runner | darf mitkommen: der Runner installiert die `requirements.txt` der Engine samt `pytest`; kein zweiter Satz Laufzeitpakete | 2026-10-26 |
+| Versionen der GitHub Actions | Hauptversionen mit Node 24: `checkout@v5`, `setup-python@v6`, `upload-artifact@v5`; bei der nächsten Node-Warnung erneut prüfen | 2026-10-26 |
 | Standard-Ref des Runners | `amt-runner` zeigt weiter auf `main`; ein Pin auf Tags kommt erst nach S5 | 2026-10-26 |
 | Autoren in `CITATION.cff` und `pyproject.toml` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
 | Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, in beiden Repos gleich; `docs/LICENSE` und `docs/js/LICENSE` bleiben unverändert (Dritt- und Altbestand) | 2026-10-26 |
@@ -122,9 +124,9 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S3 | `CITATION.cff` klären: Autorenliste, ORCID, Rolle von Unold und Mees | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-engine | S1 | erledigt 2026-10-26 |
 | S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Releases, Zenodo-DOI | amt-engine | S3 | offen |
-| S6 | `requirements-dev.txt` in `requirements.txt` einfassen; Folge für den Runner prüfen (er installiert aus dieser Datei) | amt-engine | S1, S2 | offen |
+| S6 | `requirements-dev.txt` in `requirements.txt` einfassen; Folge für den Runner prüfen (er installiert aus dieser Datei) | amt-engine | S1, S2 | erledigt 2026-10-26 |
 
-Unabhängig voneinander laufen können S3, S4 und S6; nur S5 wartet auf die Autorenliste aus S3. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
+S3, S4 und S6 sind erledigt; S5 steht als Letztes an (Reihenfolge am 2026-10-26: S5 zuletzt, damit der eingefrorene Stand fertig ist). Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
 Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie umnummeriert.
 
@@ -179,7 +181,7 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 ### Erledigt 2026-10-26
 
 - Details, Befunde und Beschlüsse stehen im Primer von `amt-runner`. Für dieses Repo folgen daraus zwei Beschlüsse (A4): eine `requirements.txt` pro Repo und `main` als Standard-Ref des Runners.
-- Der Runner installiert die Pakete aus `requirements.txt` dieses Repos. Fasst S6 `requirements-dev.txt` dort ein, installiert der Runner künftig auch `pytest`; das ist harmlos, aber unnötig groß und gehört in die Entscheidung von S6.
+- Der Runner installiert die Pakete aus `requirements.txt` dieses Repos. Fasst S6 `requirements-dev.txt` dort ein, installiert der Runner künftig auch `pytest`. Entschieden in S6: darf mitkommen.
 
 ## S3 – Autoren, ORCID und Rechteinhaber klären
 
@@ -217,11 +219,16 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 **Ziel:** Dieses Repo hat genau eine `requirements.txt`, wie A3 es verlangt.
 
-**Uploads:** Bundle aus A5.
+**Uploads:** Bundle aus A5; die Antworten kamen aus einem Gespräch (`pytest` beim Runner: darf mitkommen; Actions-Versionen im selben Patch).
 
-**Inhalt:** `pytest>=7.0` wandert mit Kommentar in `requirements.txt`; `requirements-dev.txt` entfällt (Löschung als manueller Schritt, ein ZIP kann sie nicht transportieren); README, `pyproject.toml` (`[project.optional-dependencies] dev`) und `.github/workflows/ci.yml` (installiert heute `requirements-dev.txt`) prüfen. Vorher klären, ob der Runner weiter nur die Laufzeitpakete bekommen soll, etwa über einen Kommentarblock, den er ignoriert, oder über eine zweite Zeile im Runner.
+**Inhalt:** `pytest>=7.0` steht mit Kommentar in `requirements.txt`; `requirements-dev.txt` entfällt (Löschung als manueller Schritt: `git rm requirements-dev.txt`, ein ZIP kann sie nicht transportieren); README (Layout und Hinweis zum Vendoring) und `ci.yml` verweisen auf die eine Datei; `[project.optional-dependencies] dev` in `pyproject.toml` bleibt, damit `pip install -e ".[dev]"` weiter geht. In beiden `ci.yml` steigen die Actions auf `checkout@v5`, `setup-python@v6` und `upload-artifact@v5` (Node 24).
 
-**Abnahme:** `pip install -r requirements.txt` in einer neuen virtuellen Umgebung, danach `python main.py --strict` grün; `python run_amt.py animals.ttl` im Runner läuft weiter durch; `git status` sauber.
+**Abnahme:** `pip install -r requirements.txt` in einer neuen virtuellen Umgebung, danach `python main.py --strict` grün; `python run_amt.py animals.ttl` im Runner läuft weiter durch (und installiert jetzt `pytest` mit); nach dem Push zeigt „Actions“ vier grüne Jobs je Repo ohne die Node-20-Warnung; `git status` sauber.
+
+### Erledigt 2026-10-26
+
+- Siehe Abnahme; was auf Actions passiert, zeigt erst der Lauf nach dem Push.
+- Der Runner liest zur Laufzeit die `requirements.txt` aus dem geklonten Engine-Stand (`main`), nicht aus diesem Commit: Solange der Patch nicht gepusht ist, installiert er weiter ohne `pytest`.
 
 ---
 
@@ -229,7 +236,8 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 - **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.
 - **D2** Wo wird `http://academic-meta-tool.xyz/vocab#` aufgelöst, und liegt die Ontologie dort in derselben Fassung wie `ontology/amt.ttl`?
-- **D3** Die rund 83 700 rdflib-Warnungen im Testlauf: Ursache klären (eigener Code oder Bibliothek) und, falls eigener Code, beheben.
+- **D3** Die rund 83 700 rdflib-Warnungen im Testlauf (Linux, Python 3.13; auf Windows mit Python 3.10 sind es 15 006): Ursache klären (eigener Code oder Bibliothek) und, falls eigener Code, beheben.
+- **D7** Die Reihenfolge der vier Verstöße in der Konsolenausgabe des Ontologie-Schritts (`example-invalid.ttl`) ist bei jedem Lauf anders (pyshacl). Die geprüften Ausgabedateien sind davon nicht betroffen, der Determinismus-Schritt ist grün. Sortieren wäre ein kleiner eigener Schritt.
 - **D4** Verhältnis zu `amt-explore`: Der Verlauf ist seit 2026-05-04 hier eingemergt. Wird das separate Repo weitergepflegt, oder ist `docs/` hier jetzt maßgeblich?
 - **D5** Ob der Runner künftig auf Tags statt auf `main` pinnt, hängt an S5. Bis dahin bleibt `main` (A4).
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.
