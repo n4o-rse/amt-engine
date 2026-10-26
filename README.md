@@ -35,7 +35,7 @@ the resulting graph as RDF, Cypher, CSV or interactive HTML.
 ![AMT architecture](AMT_architecture.png)
 
 The Mermaid source for this diagram is at
-[`docs/architecture.mmd`](docs/architecture.mmd). Re-render with
+[`amt/architecture.mmd`](amt/architecture.mmd). Re-render with
 [mermaid.live](https://mermaid.live) or any local `mmdc` install.
 
 ## Layout
@@ -52,7 +52,8 @@ amt/                        pip-installable package
 ├── export.py               export_ttl, export_cypher, export_csv
 ├── viz.py                  pyvis HTML visualisation
 ├── cli.py                  the `amt` command
-└── runner.py               the `amt-runner` command (full pipeline)
+├── runner.py               the `amt-runner` command (full pipeline)
+└── architecture.mmd        Mermaid source for the diagram above
 
 ontology/                   formal AMT specification
 ├── amt.ttl                 vocabulary
@@ -60,11 +61,15 @@ ontology/                   formal AMT specification
 ├── examples/               valid + invalid example data files
 └── validate_examples.py    standalone validation demo
 
-docs/                       documentation source
-└── architecture.mmd        Mermaid source for the diagram above
-
+docs/                       webviewer (GitHub Pages) and its sample data
 examples/                   sample TTL inputs to play with
 tests/                      pytest test suite
+
+main.py                     development pipeline (see "Development")
+py/                         the steps behind main.py
+PRIMER.md                   work plan and decisions (German)
+CHANGELOG.md                what changed in which version
+CITATION.cff                how to cite this software
 pyproject.toml              build config + entry points
 requirements.txt            runtime dependencies (mirrors pyproject)
 requirements-dev.txt        the above plus pytest
@@ -299,6 +304,28 @@ on those files alone.
 | `examples/animals.ttl` | Taxonomy meets family tree: seven species, three animal families across 5/3/3 generations, four `RoleChainAxiom`s using Goedel, Product and Geometric Mean. The companion file [`examples/animals.md`](examples/animals.md) documents the family-tree diagrams and lists every expected derivation. |
 | `ontology/examples/example-valid.ttl` | Smallest possible file that passes SHACL validation. |
 | `ontology/examples/example-invalid.ttl` | Deliberately broken file used in the validation tests; produces exactly four expected SHACL violations. |
+
+## Development
+
+`python main.py` runs the maintenance pipeline: it checks that version,
+date and changelog agree, validates the bundled SHACL examples, runs the test
+suite, pushes every example through the full pipeline, confirms that two runs
+under different hash seeds produce identical bytes, and syncs `examples/*.ttl`
+to `docs/data/`.
+
+```bash
+python main.py                     # all steps
+python main.py --list              # show the steps
+python main.py --only tests        # one step
+python main.py --from examples     # this step and everything after
+python main.py --dry-run           # print the plan, run nothing
+python main.py --strict            # warnings become errors (use this in CI)
+```
+
+The combined output is written to `build/pipeline_report.txt`. The product
+commands `amt` and `amt-runner` are independent of `main.py`. Changes are
+recorded in [`CHANGELOG.md`](CHANGELOG.md); `PRIMER.md` holds the (German)
+work plan and the decisions behind the repository.
 
 ## Acknowledgements
 

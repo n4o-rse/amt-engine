@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "AMT.engine: Academic Meta Tool reasoning engine"
+abstract: >-
+  AMT.engine is a pure-Python reasoner for the Academic Meta Tool ontology.
+  It reads a Turtle file with concepts, roles and weighted assertions, applies
+  n-ary role-chain inference with six fuzzy-logic operators and role
+  subsumption, validates the input with SHACL and exports the result as
+  RDF/Turtle, Neo4J Cypher, CSV and an interactive HTML graph.
+type: software
+authors:
+  - family-names: Thiery
+    given-names: Florian
+    affiliation: "Leibniz-Zentrum für Archäologie (LEIZA)"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO: insert ORCID
+license: MIT
+version: "0.3.0"
+date-released: "2026-08-29"
+repository-code: "https://github.com/n4o-rse/amt-engine"
+# doi: "10.5281/zenodo.XXXXXXX"  # TODO: add Zenodo DOI once minted
+keywords:
+  - Academic Meta Tool
+  - fuzzy logic
+  - Linked Data
+  - RDF
+  - SHACL
+  - knowledge graph
+  - NFDI4Objects
