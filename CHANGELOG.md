@@ -13,6 +13,12 @@ Zenodo.
 
 ## [Unreleased]
 
+### Added
+
+- The Zenodo DOI `10.5281/zenodo.23669466` (all versions) in `CITATION.cff`,
+  and a "Citation" section with the DOI badge in `README.md`. Release 0.3.1
+  itself is archived as `10.5281/zenodo.23669467`.
+
 ## [0.3.1] - 2026-10-26
 
 0.3.1 changes no behaviour of the reasoner or the commands `amt` and

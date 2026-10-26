@@ -331,6 +331,20 @@ commands `amt` and `amt-runner` are independent of `main.py`. Changes are
 recorded in [`CHANGELOG.md`](CHANGELOG.md); `PRIMER.md` holds the (German)
 work plan and the decisions behind the repository.
 
+## Citation
+
+If you use AMT.engine in your work, please cite it. The citation metadata are in
+[`CITATION.cff`](CITATION.cff); GitHub offers them under "Cite this repository".
+Every release is archived on Zenodo.
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23669466.svg)](https://doi.org/10.5281/zenodo.23669466)
+
+- All versions (always resolves to the latest): <https://doi.org/10.5281/zenodo.23669466>
+- Version 0.3.1: <https://doi.org/10.5281/zenodo.23669467>
+
+Use the version DOI when you need to name the exact release your results
+came from.
+
 ## Acknowledgements
 
 AMT.engine is developed within

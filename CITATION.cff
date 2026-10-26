@@ -21,7 +21,7 @@ license: MIT
 version: "0.3.1"
 date-released: "2026-10-26"
 repository-code: "https://github.com/n4o-rse/amt-engine"
-# doi: "10.5281/zenodo.XXXXXXX"  # TODO: add Zenodo DOI once minted
+doi: "10.5281/zenodo.23669466"  # concept DOI: stands for all versions and resolves to the latest
 references:
   - type: software
     title: "Academic Meta Tool (AMT)"

@@ -91,6 +91,7 @@ Eigenschaften, die das Repo haben muss:
 | Rolle von Unold | kein Autor von AMT.engine; das ursprüngliche Academic Meta Tool (Unold, Thiery, 2017) steht unter `references` in `CITATION.cff`, ohne erfundene DOI | 2026-10-26 |
 | Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version gesetzt hat (0.3.0: 2026-08-29, 0.3.1: 2026-10-26) | 2026-10-26 |
 | Tags und Releases | `v0.1.0` bis `v0.3.0` als annotierte Tags auf den Commits aus dem CHANGELOG, ohne GitHub-Release; `v0.3.1` ist das erste Release (Version 0.3.1: keine Verhaltensänderung, nur Metadaten, Tooling, CI) | 2026-10-26 |
+| DOI | Concept-DOI `10.5281/zenodo.23669466` steht in `CITATION.cff` und README; Version 0.3.1 trägt `10.5281/zenodo.23669467` | 2026-10-26 |
 | Zenodo | GitHub-Zenodo-Anbindung ist für beide Repos eingeschaltet; jedes GitHub-Release erzeugt eine Version mit DOI, ein bloßer Tag nicht; deshalb keine Releases für alte Versionen | 2026-10-26 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
@@ -125,10 +126,10 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S2 | `amt-runner` auf das Muster: `PRIMER.md`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, Dev-Pipeline (im Runner-Primer als S1 geführt) | amt-runner | S1 | erledigt 2026-10-26 |
 | S3 | `CITATION.cff` klären: Autorenliste, ORCID, Rolle von Unold und Mees | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-engine | S1 | erledigt 2026-10-26 |
-| S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Release 0.3.1, Zenodo-DOI | amt-engine | S3, S4, S6 | offen (5a erledigt 2026-10-26) |
+| S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Release 0.3.1, Zenodo-DOI | amt-engine | S3, S4, S6 | erledigt 2026-10-26 |
 | S6 | `requirements-dev.txt` in `requirements.txt` einfassen; Folge für den Runner prüfen (er installiert aus dieser Datei) | amt-engine | S1, S2 | erledigt 2026-10-26 |
 
-S3, S4 und S6 sind erledigt; S5 ist der letzte Schritt und läuft in drei Teilen (5a Version 0.3.1 im Repo, 5b Tags und Release, 5c DOI eintragen). Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
+S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
 Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie umnummeriert.
 
@@ -199,7 +200,7 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 - Entscheidungen stehen in A4. D1 ist damit geklärt.
 - Der Runner-Primer wurde im selben Patch nachgezogen (Rechteinhaber, Autoren, Windows-Befund).
-- Offen bleibt die Zenodo-DOI (S5); der Kommentar dazu in `CITATION.cff` bleibt stehen.
+- Die Zenodo-DOI kam in S5 (5c); der Kommentar in `CITATION.cff` ist ersetzt.
 
 ## S4 – CI mit GitHub Actions
 
@@ -231,6 +232,14 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 **Abnahme:** `python main.py --strict` grün; `git tag` zeigt vier Tags; die Seite „Releases“ zeigt `v0.3.1`; auf zenodo.org steht eine Version mit den Autoren aus `CITATION.cff`; nach 5c nennt `CITATION.cff` die DOI.
 
+### Erledigt 2026-10-26
+
+- 5a: Commit `359b29f` (Version 0.3.1); Windows-Lauf von `python main.py --strict` grün (34,9 s).
+- 5b: Tags `v0.1.0` bis `v0.3.1` gesetzt und gepusht, GitHub-Release `v0.3.1` angelegt.
+- Zenodo hat das Release archiviert: Version `10.5281/zenodo.23669467`, Concept-DOI `10.5281/zenodo.23669466` (Seite „Cite all versions“). Titel, Beschreibung und beide Autoren mit ORCID stammen aus `CITATION.cff`.
+- 5c: DOI in `CITATION.cff`, Abschnitt „Citation“ im README, CHANGELOG unter `[Unreleased]`. Zenodo archiviert nur Releases; dieser Commit löst nichts aus.
+- Der nächste Release (0.3.2 oder 0.4.0) bekommt eine eigene Versions-DOI; die Concept-DOI bleibt gleich.
+
 ## S6 – requirements-dev.txt einfassen
 
 **Ziel:** Dieses Repo hat genau eine `requirements.txt`, wie A3 es verlangt.
@@ -255,5 +264,5 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D3** Die rund 83 700 rdflib-Warnungen im Testlauf (Linux, Python 3.13; auf Windows mit Python 3.10 sind es 15 006): Ursache klären (eigener Code oder Bibliothek) und, falls eigener Code, beheben.
 - **D7** Die Reihenfolge der vier Verstöße in der Konsolenausgabe des Ontologie-Schritts (`example-invalid.ttl`) ist bei jedem Lauf anders (pyshacl). Die geprüften Ausgabedateien sind davon nicht betroffen, der Determinismus-Schritt ist grün. Sortieren wäre ein kleiner eigener Schritt.
 - **D4** Verhältnis zu `amt-explore`: Der Verlauf ist seit 2026-05-04 hier eingemergt. Wird das separate Repo weitergepflegt, oder ist `docs/` hier jetzt maßgeblich?
-- **D5** Ob der Runner künftig auf Tags statt auf `main` pinnt, hängt an S5. Bis dahin bleibt `main` (A4). Mit `v0.3.1` ist ein Tag da; die Entscheidung kann danach fallen.
+- **D5** Ob der Runner künftig auf Tags statt auf `main` pinnt: mit `v0.3.1` gibt es jetzt einen Tag, die Entscheidung kann fallen. Bis dahin bleibt `main` (A4).
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.
