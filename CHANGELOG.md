@@ -15,6 +15,16 @@ Zenodo.
 
 ### Changed
 
+- Explorer: the reasoning switch is a labelled button ("Reasoning: off/on"),
+  grey when off and red, the colour of the inferred edges, when on (it was blue
+  and red without a meaning). The logos moved from the bar into a box at the
+  bottom right that names the origin: a mainzed project of i3mainz and the RGZM
+  (today LEIZA), developed further in NFDI4Objects, funded by the DFG, project
+  number 501836407. The same sentence is now in the footer of every generated page.
+- The order of `docs/data/examples.json` no longer depends on the platform:
+  `docs-sync` sorted `Path` objects, which Windows orders case-insensitively
+  and Linux does not, so the manifest and the test that compares it disagreed
+  on Windows. It is sorted by lower-case name now.
 - The Explorer reasons with `docs/js/amt-reasoner.js`, a port of the Python
   reasoner (`amt/reasoning.py`, `amt/logic.py`): n-ary role chains
   (`amt:antecedents`), subsumption, all six fuzzy logics and `amt:logicParameter`,

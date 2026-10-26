@@ -174,7 +174,7 @@ def test_start_page_texts_are_complete():
 
 def test_start_page_names_the_funding_and_the_origin():
     html = site_home.home_page()
-    assert html.count("501836407") == 2          # once per language
+    assert html.count("501836407") >= 2          # in both languages (and in the footer)
     for word in ("mainzed", "i3mainz", "RGZM", "LEIZA", "NFDI4Objects"):
         assert html.count(word) >= 2, word
 
@@ -225,7 +225,7 @@ import json
 
 def test_explorer_example_list_matches_the_examples():
     listed = json.loads((DOCS / "data" / "examples.json").read_text(encoding="utf-8"))
-    files = sorted(p.name for p in (ROOT / "examples").glob("*.ttl"))
+    files = sorted((p.name for p in (ROOT / "examples").glob("*.ttl")), key=lambda n: (n.lower(), n))
     assert [e["file"] for e in listed] == files
     assert all(e["title"] for e in listed)
     for name in files:

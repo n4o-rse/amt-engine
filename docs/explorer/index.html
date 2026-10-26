@@ -51,10 +51,18 @@
       #status { font-size: 0.9em; margin-left: 10px; }
       .legend { font-size: 0.85em; opacity: 0.9; white-space: nowrap; }
       .legend b { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin: 0 4px 0 8px; }
-      #bar img { height: 36px; background: #fff; padding: 2px 4px; border-radius: 2px; }
+      #r-but { background: #78909c; color: #fff; border-radius: 18px; text-transform: none; font-weight: 600; padding: 0 14px; white-space: nowrap; }
+      #r-but.on { background: #e53935; }
+      #origin {
+        position: fixed; right: 12px; bottom: 12px; z-index: 5; max-width: 340px;
+        background: #fff; border: 1px solid #4f628b; border-radius: 4px; padding: 8px 10px;
+        font-size: 12px; line-height: 1.4; color: #222; box-shadow: 0 1px 4px rgba(0,0,0,.25);
+      }
+      #origin img { display: block; width: 100%; max-width: 150px; margin: 0 auto 6px; }
+      #origin a { color: #2a4a8a; }
       #graph { flex: 1; min-height: 0; }
       .modal { max-height: 80% !important; width: 90% !important; }
-      @media (max-width: 700px) { .legend, #bar img { display: none; } }
+      @media (max-width: 700px) { .legend, #origin img { display: none; } }
     </style>
   </head>
 
@@ -65,12 +73,19 @@
       <span class="grow"></span>
       <span class="legend"><b style="background:#000"></b>asserted<b style="background:red"></b>inferred</span>
       <a class="btn-floating blue" onclick="openGraphPropModal()" title="choose an example or load a Turtle file"><i class="material-icons">folder_open</i></a>
-      <a class="btn-floating red" id="r-but" onclick="toggleReasoning()" title="reasoning on/off"><i class="material-icons">bubble_chart</i></a>
+      <a class="btn-small" id="r-but" onclick="toggleReasoning()" title="reasoning on/off">Reasoning: off</a>
       <a class="btn-floating teal" onclick="exportTTL()" title="download Turtle (including inferred statements)"><i class="material-icons">file_download</i></a>
       <a class="btn-floating purple" onclick="exportCypher()" title="download Cypher for Neo4j"><i class="material-icons">device_hub</i></a>
-      <a href="http://academic-meta-tool.xyz" target="_blank" rel="noopener"><img src="../amt_logos.png" alt="Academic Meta Tool, mainzed, i3mainz, LEIZA" /></a>
     </div>
     <div id="graph"></div>
+
+    <div id="origin">
+      <a href="../"><img src="../amt_logos.png" alt="Academic Meta Tool, mainzed, i3mainz, LEIZA" /></a>
+      The Academic Meta Tool is a <b>mainzed</b> project of <b>i3mainz</b> (Hochschule Mainz) and the
+      <b>RGZM</b> (today <b>LEIZA</b>), developed further in <b>NFDI4Objects</b>.
+      NFDI4Objects is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation)
+      &ndash; project number 501836407.
+    </div>
 
     <!-- Modal: dataset selector -->
     <div id="graphPropModal" class="modal">

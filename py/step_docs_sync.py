@@ -50,7 +50,10 @@ def example_title(path: Path) -> str:
 
 
 def example_list() -> list[dict]:
-    return [{"file": p.name, "title": example_title(p)} for p in sorted(EXAMPLES_DIR.glob("*.ttl"))]
+    # By name, case-insensitive, then case-sensitive: sorting Path objects would order
+    # differently on Windows (where paths compare case-insensitively) and on Linux.
+    paths = sorted(EXAMPLES_DIR.glob("*.ttl"), key=lambda p: (p.name.lower(), p.name))
+    return [{"file": p.name, "title": example_title(p)} for p in paths]
 
 
 def main() -> int:

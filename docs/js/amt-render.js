@@ -248,13 +248,8 @@ var loadLocalFile = function(input) {
 // UI handlers
 // ------------------------------------------------------------
 var toggleReasoning = function() {
-    if (_AMT.reasoning) {
-        _AMT.reasoning = false;
-        $("#r-but").removeClass("blue").addClass("red");
-    } else {
-        _AMT.reasoning = true;
-        $("#r-but").removeClass("red").addClass("blue");
-    }
+    _AMT.reasoning = !_AMT.reasoning;
+    $("#r-but").toggleClass("on", _AMT.reasoning).text(_AMT.reasoning ? "Reasoning: on" : "Reasoning: off");
     update();
 };
 

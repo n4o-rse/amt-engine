@@ -338,6 +338,11 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 **Nicht Teil:** der leiza-Playground (S11b).
 
+### Nachtrag 2026-10-26
+
+- CI rot nach dem Push von S11a: `docs-sync` sortierte `Path`-Objekte; unter Windows vergleichen Pfade ohne Groß/Kleinschreibung, unter Linux mit. Die Reihenfolge in `examples.json` war dadurch plattformabhängig (lokal grün, auf Windows und im CI rot). Jetzt nach `(name.lower(), name)`. Lehre: Pfade nie als Objekte sortieren, wenn die Reihenfolge in eine erzeugte Datei oder einen Test eingeht.
+- Der Explorer-Schalter ist beschriftet (aus grau, an rot) und ein Kasten unten rechts nennt Herkunft und Förderung (mainzed, i3mainz, RGZM/LEIZA, NFDI4Objects, DFG 501836407); derselbe Satz steht im Fuß aller erzeugten Seiten.
+
 ## S10 – Startseite und Explorer unter /explorer/
 
 **Ziel:** Eine Startseite am Root von `docs/`, die erklärt, was AMT ist, kann und nicht kann, woher es kommt und wie man es zitiert; der Explorer zieht nach `/explorer/` um.
