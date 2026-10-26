@@ -65,6 +65,8 @@ Eigenschaften, die das Repo haben muss:
 - Ein Thema pro Chat, ein Repo pro Chat.
 - Änderungen an `amt/` oder `ontology/` brauchen einen Eintrag im `CHANGELOG.md` und, wenn sie Verhalten ändern, einen Test.
 - `requirements.txt` ändert nur, wer den Runner mitdenkt: `amt-runner` installiert daraus.
+- `PATCH-README.md` begleitet ein Patch-ZIP und gehört nicht ins Repo; sie steht seit `b42b27b` in `.gitignore`.
+- Pro Repo genau eine `requirements.txt`, ohne `requirements-dev.txt`; Entwicklungspakete stehen in derselben Datei, mit Kommentar. Dieses Repo hat noch zwei Dateien (S6).
 
 ### A4 Beschlusslage
 
@@ -79,6 +81,8 @@ Eigenschaften, die das Repo haben muss:
 | Zeilenenden in `docs-sync` | Vergleich mit normalisierten Zeilenenden (CRLF = LF); kein `.gitattributes` | 2026-10-26 |
 | `skos-mapping-example.ttl` | die zwei Konsistenzverletzungen sind gewollt (Demo für `DisjointAxiom` und `SelfDisjointAxiom`) | 2026-10-26 |
 | Exit-Code des Runners bei Konsistenzverletzungen | bleibt 0; eine Änderung wäre ein Verhaltenswechsel der Produkt-CLI und braucht einen eigenen Schritt samt Version | 2026-10-26 |
+| Anzahl der requirements-Dateien | familienweit genau eine `requirements.txt` pro Repo; `amt-engine` fasst `requirements-dev.txt` später ein (S6) | 2026-10-26 |
+| Standard-Ref des Runners | `amt-runner` zeigt weiter auf `main`; ein Pin auf Tags kommt erst nach S5 | 2026-10-26 |
 | Autoren in `CITATION.cff` | nur Florian Thiery, ohne ORCID, bis die Liste geklärt ist | Vorschlag 2026-10-26 |
 | Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version gesetzt hat (0.3.0: 2026-08-29) | Vorschlag 2026-10-26 |
 
@@ -111,12 +115,13 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S0 | Festlegungen: Reihenfolge, Orchestrator, Uhr, CHANGELOG | amt-engine | – | erledigt 2026-10-26 |
 | S1 | Skeleton: `PRIMER.md`, `main.py`, `py/`, `CHANGELOG.md`, `CITATION.cff`, README | amt-engine | S0 | erledigt 2026-10-26 |
 | S1a | Nachbesserung nach dem Windows-Lauf: `docs-sync` und Zeilenenden, Primer-Befunde | amt-engine | S1 | erledigt 2026-10-26 |
-| S2 | `amt-runner` auf das Muster: `PRIMER.md`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, Dev-Pipeline | amt-runner | S1 | offen |
+| S2 | `amt-runner` auf das Muster: `PRIMER.md`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, Dev-Pipeline (im Runner-Primer als S1 geführt) | amt-runner | S1 | erledigt 2026-10-26 |
 | S3 | `CITATION.cff` klären: Autorenliste, ORCID, Rolle von Unold und Mees | amt-engine, amt-runner | S1 | offen |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-engine | S1 | offen |
 | S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Releases, Zenodo-DOI | amt-engine | S3 | offen |
+| S6 | `requirements-dev.txt` in `requirements.txt` einfassen; Folge für den Runner prüfen (er installiert aus dieser Datei) | amt-engine | S1, S2 | offen |
 
-Unabhängig voneinander laufen können S2, S3 und S4; nur S5 wartet auf die Autorenliste aus S3. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
+Unabhängig voneinander laufen können S3, S4 und S6; nur S5 wartet auf die Autorenliste aus S3. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
 Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie umnummeriert.
 
@@ -158,7 +163,30 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 ### Erledigt 2026-10-26
 
 - Gegenprobe unter Linux: `docs/data/*.ttl` in CRLF umgewandelt, danach kein `WARN` und keine Änderung der Dateien; Inhalt einer Datei verändert, danach `WARN updated`, mit `--strict` Exit-Code 1.
-- Offen bleibt nur, dass Windows den Fix noch nicht gesehen hat. Erster Lauf dort: `python main.py --strict`, danach `git status --short`.
+- Windows bestätigt am 2026-10-26 (Commit `41620dd`): `python main.py --strict` endet grün in 31,8 s, `docs-sync` meldet `6 file(s) already in sync` ohne `WARN`.
+
+## S2 – amt-runner auf das Muster
+
+**Ziel:** `amt-runner` trägt Plan, Dev-Pipeline, Tests, Änderungsprotokoll und Zitierangabe, ohne dass sich das Verhalten von `run_amt.py` ändert.
+
+**Uploads:** `PRIMER.md` aus diesem Repo; der Runner wurde über den GitHub-Klon gelesen.
+
+**Abnahme:** siehe `PRIMER.md` im Repo `amt-runner`, Schritt S1.
+
+### Erledigt 2026-10-26
+
+- Details, Befunde und Beschlüsse stehen im Primer von `amt-runner`. Für dieses Repo folgen daraus zwei Beschlüsse (A4): eine `requirements.txt` pro Repo und `main` als Standard-Ref des Runners.
+- Der Runner installiert die Pakete aus `requirements.txt` dieses Repos. Fasst S6 `requirements-dev.txt` dort ein, installiert der Runner künftig auch `pytest`; das ist harmlos, aber unnötig groß und gehört in die Entscheidung von S6.
+
+## S6 – requirements-dev.txt einfassen
+
+**Ziel:** Dieses Repo hat genau eine `requirements.txt`, wie A3 es verlangt.
+
+**Uploads:** Bundle aus A5.
+
+**Inhalt:** `pytest>=7.0` wandert mit Kommentar in `requirements.txt`; `requirements-dev.txt` entfällt (Löschung als manueller Schritt, ein ZIP kann sie nicht transportieren); README und `pyproject.toml` (`[project.optional-dependencies] dev`) prüfen. Vorher klären, ob der Runner weiter nur die Laufzeitpakete bekommen soll, etwa über einen Kommentarblock, den er ignoriert, oder über eine zweite Zeile im Runner.
+
+**Abnahme:** `pip install -r requirements.txt` in einer neuen virtuellen Umgebung, danach `python main.py --strict` grün; `python run_amt.py animals.ttl` im Runner läuft weiter durch; `git status` sauber.
 
 ---
 
@@ -168,5 +196,5 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D2** Wo wird `http://academic-meta-tool.xyz/vocab#` aufgelöst, und liegt die Ontologie dort in derselben Fassung wie `ontology/amt.ttl`?
 - **D3** Die rund 83 700 rdflib-Warnungen im Testlauf: Ursache klären (eigener Code oder Bibliothek) und, falls eigener Code, beheben.
 - **D4** Verhältnis zu `amt-explore`: Der Verlauf ist seit 2026-05-04 hier eingemergt. Wird das separate Repo weitergepflegt, oder ist `docs/` hier jetzt maßgeblich?
-- **D5** Ob der Runner künftig auf Tags statt auf `main` pinnt, hängt an S5.
+- **D5** Ob der Runner künftig auf Tags statt auf `main` pinnt, hängt an S5. Bis dahin bleibt `main` (A4).
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.
