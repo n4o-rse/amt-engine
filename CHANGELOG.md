@@ -13,6 +13,12 @@ Zenodo.
 
 ## [Unreleased]
 
+### Notes
+
+- `docs/js/amt-reasoner.js` is also the source of the copy in
+  `leiza-rse/amt-playground`, which now reasons with it and no longer needs
+  a triplestore.
+
 ### Changed
 
 - Explorer: the reasoning switch is a labelled button ("Reasoning: off/on"),

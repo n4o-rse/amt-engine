@@ -149,7 +149,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S9 | Vokabular und Ontologie ins Repo: Seiten, `amt.rdf`, Abbildungen aus Code (Schritt `site`) | amt-engine | S7 | erledigt 2026-10-26 |
 | S10 | Startseite (Englisch und Deutsch, Hell/Dunkel, Was AMT kann und nicht kann, Geschichte), Explorer nach `/explorer/` | amt-engine, amt-runner | S9 | erledigt 2026-10-26 |
 | S11a | Gemeinsamer JS-Reasoner (Port der Python-Engine, Paritätstest), Explorer mit Beispielliste und „TTL laden“, schlankes Layout | amt-engine | S10 | erledigt 2026-10-26 |
-| S11b | Playground (`leiza-rse/amt-playground`): nur Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden, mit dem gemeinsamen Reasoner | amt-playground | S11a | offen |
+| S11b | Playground (`leiza-rse/amt-playground`): nur Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden, mit dem gemeinsamen Reasoner | amt-playground | S11a | Patch geliefert (`patch-s11b-playground.zip`), nach Push erledigt |
 | S12 | w3id-Eintrag und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | offen |
 | S13 | D6 (Exit-Code) und Release 0.4.0 samt Zenodo | amt-engine, amt-runner | S10 bis S12 | offen |
 
@@ -336,7 +336,7 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 **Abnahme:** `python main.py`, dann `--strict` zweimal grün; im Browser Beispiel wählen, Reasoning an (Potter: 8 rote Kanten, animals: 106, skos-mapping: Hinweis auf 2 Verletzungen), eigene Datei laden.
 
-**Nicht Teil:** der leiza-Playground (S11b).
+**Nicht Teil:** der leiza-Playground (S11b, eigener Patch; `docs/js/amt-reasoner.js` ist die Quelle, der Playground hält eine Kopie).
 
 ### Nachtrag 2026-10-26
 
@@ -369,4 +369,5 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D4** erledigt in S7: siehe A4 („Verhältnis zu `amt-explore`“).
 - **D5** erledigt in S7: Standard-Ref des Runners bleibt `main` (A4).
 - **D8** erledigt in S10: Ursache war `Dataset.contexts is deprecated` (rdflib 7.6, ausgelöst von pyshacl 0.26.0), jetzt gefiltert. Vorher: Unter Windows meldet `pytest` 63 Tests mit 204 Warnungen (Linux: keine). Offen: `python -m pytest tests -q -rw` in `C:\git\amt-engine` ausführen, die Warnungsarten ablesen und entscheiden, ob sie zu filtern oder zu beheben sind.
+- **D10** Gestaltung (angekündigt am 2026-10-26, noch nicht umgesetzt): eigene Farbwelt für das AMT, getrennt vom LEIZA-Forschungsblau (das beim leiza-Playground bleibt); neue Logos (auch das neue AMT-Logo) liefert der Autor für die Startseite; der Explorer startet mit dem Beispiel `animals.ttl`, das erleichtert das Erklären.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.
