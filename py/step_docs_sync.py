@@ -7,6 +7,11 @@ instead of only after it. The workflow only fires on pushes that touch
 ``examples/``; a file that was added while the workflow was not running
 stays missing until the next such push.
 
+Files are compared with line endings normalised (CRLF counts as LF). With
+``core.autocrlf`` on Windows the same blob appears as CRLF in one working tree
+and as LF in another; a byte comparison would report drift where the content
+is identical and rewrite files for nothing.
+
 A copy that changes something is reported as a warning. In ``--strict`` mode
 that fails the step, which turns it into a drift check for CI.
 
@@ -14,14 +19,19 @@ Standalone:  python py/step_docs_sync.py
 """
 from __future__ import annotations
 
-import filecmp
 import shutil
 import sys
+from pathlib import Path
 
 try:
     from amt_dev_utils import DOCS_DATA_DIR, EXAMPLES_DIR, ROOT, Report
 except ImportError:
     from py.amt_dev_utils import DOCS_DATA_DIR, EXAMPLES_DIR, ROOT, Report
+
+
+def _same_content(a: Path, b: Path) -> bool:
+    """True when both files hold the same text, ignoring CRLF versus LF."""
+    return a.read_bytes().replace(b"\r\n", b"\n") == b.read_bytes().replace(b"\r\n", b"\n")
 
 
 def main() -> int:
@@ -30,7 +40,7 @@ def main() -> int:
     unchanged = 0
     for src in sorted(EXAMPLES_DIR.glob("*.ttl")):
         dst = DOCS_DATA_DIR / src.name
-        if dst.exists() and filecmp.cmp(src, dst, shallow=False):
+        if dst.exists() and _same_content(src, dst):
             unchanged += 1
             continue
         verb = "updated" if dst.exists() else "created"

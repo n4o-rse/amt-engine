@@ -29,6 +29,9 @@ introduced the version number in `pyproject.toml`.
 
 ### Fixed
 
+- The `docs-sync` step compares files with line endings normalised. With
+  `core.autocrlf` on Windows, identical files differed byte for byte and were
+  reported as changed.
 - `README.md` pointed to `docs/architecture.mmd`; the Mermaid source lives in
   `amt/architecture.mmd`.
 - `docs/data/subsumption-demo.ttl` was missing, although the sync workflow is

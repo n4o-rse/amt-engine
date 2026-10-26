@@ -27,6 +27,9 @@ Arbeitsplan für das Repo `amt-engine` (Academic Meta Tool, Python-Reasoner). Wi
 - `.gitignore` schließt `dist/` aus (setuptools-Ausgabe). Das Primer-Muster legt Produkte sonst in `dist/` ab; hier geht das nicht, siehe A4.
 - Die Historie hat 30 Commits und keine Tags. Die Versionen stehen nur in `pyproject.toml`: 0.1.0 (2026-04-28), 0.2.0 (2026-05-05), 0.3.0 (2026-08-29).
 - Commit `db1db2d` (2026-05-04) führt den Verlauf von `amt-explore` in dieses Repo zusammen. Der Webviewer in `docs/` stammt von dort.
+- Windows-Lauf von `python main.py` (2026-10-26, `C:\git\amt-engine`): alle sechs Schritte `ok`, 62 Tests grün in 16,4 s, Gesamtlauf 38,1 s. Der Determinismus-Test besteht auch dort. Die Warnungszahl im Testlauf liegt mit 15 006 weit unter dem Linux-Wert (rdflib- und Python-Version, siehe D3).
+- `docs-sync` meldete auf Windows fünf Dateien als `updated`, obwohl die Blobs in `examples/` und `docs/data/` identisch sind und überall nur LF enthalten (geprüft an `9a0e8b7`). Ursache: `core.autocrlf` macht im Working Tree CRLF daraus; der Byte-Vergleich sah Unterschiede, wo keine sind. Behoben in S1a.
+- `examples/skos-mapping-example.ttl` meldet beim Konsistenzcheck zwei Verletzungen (`exactMatch` und `questionableMatch` zum selben Ziel; Selbstschleife über `questionableMatch`). Das ist als Demo gewollt (A4). Der Runner beendet sich trotzdem mit Exit-Code 0, deshalb bleibt der Schritt `examples` auf `ok`.
 - `pyproject.toml` nennt als Autor „AMT contributors"; `LICENSE` nennt Florian Thiery | LEIZA | NFDI4Objects; `docs/index.htm` nennt Thiery und Unold (Software) sowie Thiery und Mees (Datenkonzept).
 
 ### A2 Zielbild
@@ -73,6 +76,9 @@ Eigenschaften, die das Repo haben muss:
 | CHANGELOG | Keep a Changelog, rückwirkend aus der Historie rekonstruiert (0.1.0 bis 0.3.0); Datum = Commit, der die Versionsnummer gesetzt hat; keine Tags vorhanden | 2026-10-26 |
 | Ort des Pipeline-Reports | `build/pipeline_report.txt`, nicht `dist/`: `dist/` ist hier setuptools-Ausgabe und ignoriert (Abweichung vom Muster, mit Grund) | 2026-10-26 |
 | Verhalten von `docs-sync` | kopiert immer; mit `--strict` schlägt der Schritt fehl, wenn etwas kopiert werden musste (Drift-Prüfung für CI) | 2026-10-26 |
+| Zeilenenden in `docs-sync` | Vergleich mit normalisierten Zeilenenden (CRLF = LF); kein `.gitattributes` | 2026-10-26 |
+| `skos-mapping-example.ttl` | die zwei Konsistenzverletzungen sind gewollt (Demo für `DisjointAxiom` und `SelfDisjointAxiom`) | 2026-10-26 |
+| Exit-Code des Runners bei Konsistenzverletzungen | bleibt 0; eine Änderung wäre ein Verhaltenswechsel der Produkt-CLI und braucht einen eigenen Schritt samt Version | 2026-10-26 |
 | Autoren in `CITATION.cff` | nur Florian Thiery, ohne ORCID, bis die Liste geklärt ist | Vorschlag 2026-10-26 |
 | Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version gesetzt hat (0.3.0: 2026-08-29) | Vorschlag 2026-10-26 |
 
@@ -104,6 +110,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 |---|---|---|---|---|
 | S0 | Festlegungen: Reihenfolge, Orchestrator, Uhr, CHANGELOG | amt-engine | – | erledigt 2026-10-26 |
 | S1 | Skeleton: `PRIMER.md`, `main.py`, `py/`, `CHANGELOG.md`, `CITATION.cff`, README | amt-engine | S0 | erledigt 2026-10-26 |
+| S1a | Nachbesserung nach dem Windows-Lauf: `docs-sync` und Zeilenenden, Primer-Befunde | amt-engine | S1 | erledigt 2026-10-26 |
 | S2 | `amt-runner` auf das Muster: `PRIMER.md`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, Dev-Pipeline | amt-runner | S1 | offen |
 | S3 | `CITATION.cff` klären: Autorenliste, ORCID, Rolle von Unold und Mees | amt-engine, amt-runner | S1 | offen |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-engine | S1 | offen |
@@ -138,7 +145,20 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - `docs-sync` hat beim ersten Lauf `docs/data/subsumption-demo.ttl` angelegt (siehe Befund in A1); diese Datei gehört in den Commit, wird aber vom Lauf erzeugt, nicht mit dem Patch geliefert.
 - Der Determinismus-Test läuft ohne Abweichung; er vergleicht fünf Dateien je Beispiel und schließt `*.report.md` aus (A4).
 - Gegenprobe: `docs/data/subsumption-demo.ttl` gelöscht, dann `python main.py --strict --only docs-sync` endet mit Exit-Code 1; `__version__` auf 0.3.1 gesetzt, dann bricht `meta` mit Exit-Code 1 ab. Beide Prüfungen schlagen also an, wenn sie sollen.
-- Verifiziert gegen einen frischen Klon von `a50822c` in einer neuen virtuellen Umgebung (Linux, Python 3.13); Windows ist noch nicht geprüft und bleibt Aufgabe des ersten Laufs bei dir.
+- Verifiziert gegen einen frischen Klon von `a50822c` in einer neuen virtuellen Umgebung (Linux, Python 3.13). Am selben Tag hast du den Patch auf Windows angewendet und committet (`9a0e8b7`); der Lauf dort ist in A1 festgehalten.
+
+## S1a – Nachbesserung nach dem Windows-Lauf
+
+**Ziel:** `python main.py --strict` besteht auf Windows und Linux gleichermaßen, und der Primer hält fest, was der Windows-Lauf gezeigt hat.
+
+**Uploads:** `PRIMER.md`, `py/step_docs_sync.py`, Terminal-Ausgabe des Windows-Laufs.
+
+**Abnahme:** In einem Checkout, dessen `docs/data/` inhaltlich synchron ist, meldet `python main.py --only docs-sync` kein `WARN`, auch wenn die Dateien in einem Verzeichnis CRLF und im anderen LF haben; `python main.py --strict` endet mit Exit-Code 0; eine echte inhaltliche Abweichung führt weiterhin zu `WARN` und mit `--strict` zu Exit-Code 1.
+
+### Erledigt 2026-10-26
+
+- Gegenprobe unter Linux: `docs/data/*.ttl` in CRLF umgewandelt, danach kein `WARN` und keine Änderung der Dateien; Inhalt einer Datei verändert, danach `WARN updated`, mit `--strict` Exit-Code 1.
+- Offen bleibt nur, dass Windows den Fix noch nicht gesehen hat. Erster Lauf dort: `python main.py --strict`, danach `git status --short`.
 
 ---
 
@@ -149,3 +169,4 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D3** Die rund 83 700 rdflib-Warnungen im Testlauf: Ursache klären (eigener Code oder Bibliothek) und, falls eigener Code, beheben.
 - **D4** Verhältnis zu `amt-explore`: Der Verlauf ist seit 2026-05-04 hier eingemergt. Wird das separate Repo weitergepflegt, oder ist `docs/` hier jetzt maßgeblich?
 - **D5** Ob der Runner künftig auf Tags statt auf `main` pinnt, hängt an S5.
+- **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.
