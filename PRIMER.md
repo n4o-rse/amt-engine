@@ -39,11 +39,11 @@ amt/  ontology/  examples/  tests/  pyproject.toml  CHANGELOG.md  CITATION.cff
         │
         ▼
 python main.py
-  meta ─► ontology ─► tests ─► examples ─► determinism ─► docs-sync ─► site
+  meta ─► ontology ─► site ─► tests ─► examples ─► determinism ─► docs-sync
         │
         ▼
 build/pipeline_report.txt        docs/data/*.ttl (Spiegel von examples/)
-                                 docs/vocab, docs/ontology, docs/assets (erzeugt aus ontology/amt.ttl)
+                                 docs/index.html, docs/vocab, docs/ontology, docs/assets (erzeugt aus ontology/amt.ttl)
 ```
 
 Eigenschaften, die das Repo haben muss:
@@ -104,6 +104,8 @@ Eigenschaften, die das Repo haben muss:
 | Hell/Dunkel | alle Seiten folgen dem System und haben einen Umschalter (`docs/assets/site.js`); Abbildungen sind eingebettetes SVG und folgen über CSS-Variablen | 2026-10-26 |
 | Geplante Reihenfolge bis 0.4.0 | S9 Vokabular/Ontologie, S10 Startseite (Englisch und Deutsch, Explorer nach `/explorer/`, DFG-Verweis Projektnummer 501836407), S11 Playground, S12 w3id und Umleitung des FTP, S13 D6 und Release 0.4.0 | 2026-10-26 |
 | Playground | maßgeblich ist `leiza-rse/amt-playground` (Original zum ZfdG-Artikel); es muss mit dem neuen AMT wieder interaktiv Graphen erzeugen; eigener Schritt S11 | 2026-10-26 |
+| Playground-Ziel | `leiza-rse/amt-playground` wird gepatcht (läuft ohne HTTP-Triplestore komplett im Browser) und als Hauptplayground nach `docs/playground/` gespiegelt | 2026-10-26 |
+| Startseite | `docs/index.html` aus `py/site_home.py`; Englisch bevorzugt, Deutsch umschaltbar, Hell/Dunkel; Explorer unter `/explorer/`, `docs/index.htm` leitet weiter; DFG-Projektnummer 501836407 bestätigt | 2026-10-26 |
 | Release 0.4.0 | erst am Ende (nach S13); die ungereleasten Änderungen aus S7 bis S13 gehören dazu | 2026-10-26 |
 | Zenodo | GitHub-Zenodo-Anbindung ist für beide Repos eingeschaltet; jedes GitHub-Release erzeugt eine Version mit DOI, ein bloßer Tag nicht; deshalb keine Releases für alte Versionen | 2026-10-26 |
 
@@ -144,8 +146,8 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S7 | Offene Punkte aufräumen: D3 (Warnungen), D7 (Reihenfolge), D4 und D5 (Beschlüsse), D2 (Befund) | amt-engine, amt-runner | S5 | erledigt 2026-10-26 |
 | S8 | Node-24-Korrektur: `upload-artifact@v5` auf `@v6` | amt-engine, amt-runner | S7 | erledigt 2026-10-26 |
 | S9 | Vokabular und Ontologie ins Repo: Seiten, `amt.rdf`, Abbildungen aus Code (Schritt `site`) | amt-engine | S7 | erledigt 2026-10-26 |
-| S10 | Startseite (Englisch und Deutsch, Hell/Dunkel, Was AMT kann und nicht kann, Geschichte), Explorer nach `/explorer/` | amt-engine | S9 | offen |
-| S11 | Playground (`leiza-rse/amt-playground`) mit dem neuen AMT lauffähig machen | amt-playground | S9 | offen |
+| S10 | Startseite (Englisch und Deutsch, Hell/Dunkel, Was AMT kann und nicht kann, Geschichte), Explorer nach `/explorer/` | amt-engine, amt-runner | S9 | erledigt 2026-10-26 |
+| S11 | Playground: `leiza-rse/amt-playground` patchen (läuft im Browser, ohne HTTP-Triplestore) und als Hauptplayground nach `docs/playground/` spiegeln | amt-playground, amt-engine | S10 | offen |
 | S12 | w3id-Eintrag und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | offen |
 | S13 | D6 (Exit-Code) und Release 0.4.0 samt Zenodo | amt-engine, amt-runner | S10 bis S12 | offen |
 
@@ -322,6 +324,20 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - `amt.rdf` wird als Graph verglichen, nicht byteweise: die Byte-Reihenfolge des Serialisierers kann sich zwischen rdflib-Versionen ändern, der Inhalt nicht.
 - Nicht Teil von S9: Startseite (S10), Playground (S11), Umleitung und w3id (S12). Der Link „Explorer“ zeigt bis S10 auf `index.htm`.
 
+## S10 – Startseite und Explorer unter /explorer/
+
+**Ziel:** Eine Startseite am Root von `docs/`, die erklärt, was AMT ist, kann und nicht kann, woher es kommt und wie man es zitiert; der Explorer zieht nach `/explorer/` um.
+
+**Inhalt:** `py/site_home.py` erzeugt `docs/index.html` (Englisch bevorzugt, Deutsch umschaltbar, Hell/Dunkel; beide Sprachen im selben Dokument, `data-lang` an `<html>`, Wahl in `localStorage`). `docs/explorer/index.html` ist der bisherige Explorer; `docs/index.htm` ist nur noch eine Weiterleitung, die `?ttl=…` und `#…` mitnimmt; `docs/js/amt.js` sucht relative `?ttl=`-Pfade eine Ebene höher (`../data/…`). Schritt `site` läuft jetzt vor `tests`, damit der Link-Test die frisch erzeugten Seiten sieht. D8 geschlossen: `pyproject.toml` filtert `Dataset.contexts is deprecated`. Runner: Link im README auf `/explorer/`.
+
+**Abnahme:** `python main.py` (erster Lauf erzeugt Dateien), danach `python main.py --strict` zweimal grün; Startseite in Hell und Dunkel, Englisch und Deutsch ansehen; `https://n4o-rse.github.io/amt-engine/index.htm?ttl=data/animals.ttl` landet im Explorer.
+
+### Erledigt 2026-10-26
+
+- Der Explorer-Code deckt nur den Stand von 2018 ab (drei Logiken, Ketten aus zwei Schritten, Inverse, disjunkt); Subsumtion, `antecedents` und Einstein/Geometric/Hamacher fehlen. Die Startseite sagt das offen; ob der Explorer nachgezogen wird, entscheidet sich in S11 mit dem Playground.
+- Die Namensgeschichte steht als Entwurf auf der Seite (D9): bitte im Wortlaut prüfen.
+- Das Logo kommt als zweiter Schritt, sobald es vorliegt.
+
 ---
 
 ## Teil D – Offene Punkte
@@ -333,5 +349,5 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D7** erledigt in S7: Verstöße sind sortiert.
 - **D4** erledigt in S7: siehe A4 („Verhältnis zu `amt-explore`“).
 - **D5** erledigt in S7: Standard-Ref des Runners bleibt `main` (A4).
-- **D8** Unter Windows meldet `pytest` 63 Tests mit 204 Warnungen (Linux: keine). Offen: `python -m pytest tests -q -rw` in `C:\git\amt-engine` ausführen, die Warnungsarten ablesen und entscheiden, ob sie zu filtern oder zu beheben sind.
+- **D8** erledigt in S10: Ursache war `Dataset.contexts is deprecated` (rdflib 7.6, ausgelöst von pyshacl 0.26.0), jetzt gefiltert. Vorher: Unter Windows meldet `pytest` 63 Tests mit 204 Warnungen (Linux: keine). Offen: `python -m pytest tests -q -rw` in `C:\git\amt-engine` ausführen, die Warnungsarten ablesen und entscheiden, ob sie zu filtern oder zu beheben sind.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.

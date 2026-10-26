@@ -61,7 +61,7 @@ ontology/                   formal AMT specification
 ├── examples/               valid + invalid example data files
 └── validate_examples.py    standalone validation demo
 
-docs/                       webviewer, vocabulary and ontology pages (GitHub Pages) and their data
+docs/                       start page, explorer (docs/explorer/), vocabulary and ontology pages (GitHub Pages) and their data
 examples/                   sample TTL inputs to play with
 tests/                      pytest test suite
 
@@ -308,11 +308,11 @@ on those files alone.
 ## Development
 
 `python main.py` runs the maintenance pipeline: it checks that version,
-date and changelog agree, validates the bundled SHACL examples, runs the test
-suite, pushes every example through the full pipeline, confirms that two runs
-under different hash seeds produce identical bytes, syncs `examples/*.ttl`
-to `docs/data/`, and generates the vocabulary and ontology pages, `amt.rdf` and
-the figures in `docs/` from `ontology/amt.ttl`. Those generated files are
+date and changelog agree, validates the bundled SHACL examples, generates the
+start, vocabulary and ontology pages, `amt.rdf` and the figures in `docs/` from
+`ontology/amt.ttl`, runs the test suite, pushes every example through the full
+pipeline, confirms that two runs under different hash seeds produce identical
+bytes, and syncs `examples/*.ttl` to `docs/data/`. The generated files are
 committed; with `--strict` a stale one fails the run.
 
 ```bash

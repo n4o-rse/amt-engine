@@ -29,7 +29,7 @@ amt examples/PotterAttributionExample.ttl --reason \
 cd docs && python -m http.server 8000
 
 # 3. Open in browser
-#    http://localhost:8000/index.htm?ttl=data/my-export.ttl
+#    http://localhost:8000/explorer/?ttl=data/my-export.ttl
 ```
 
 ## GitHub Pages
@@ -37,7 +37,7 @@ cd docs && python -m http.server 8000
 In the repository settings, enable Pages with **Source: `main` branch,
 Folder: `/docs`**. The viewer will then be available at
 `https://<user>.github.io/<repo>/`, and you can link to specific datasets
-with `…/index.htm?ttl=data/<your-file>.ttl`.
+with `…/explorer/?ttl=data/<your-file>.ttl`.
 
 ## Notes on round-tripping
 

@@ -1,8 +1,9 @@
 """
-Step ``site`` — generate the vocabulary and ontology pages from ``ontology/amt.ttl``.
+Step ``site`` — generate the start, vocabulary and ontology pages from ``ontology/amt.ttl``.
 
 Writes, below ``docs/``:
 
+    index.html                the start page (English and German, light and dark)
     vocab/index.html          the vocabulary page (every term of amt.ttl)
     vocab/amt.ttl             a copy of ontology/amt.ttl
     vocab/amt.rdf             the same graph as RDF/XML
@@ -44,10 +45,12 @@ try:
     from amt_dev_utils import DOCS_DIR, ONTOLOGY_DIR, ROOT, Report
     import site_figures as figs
     import site_pages as pages
+    from site_home import home_page
 except ImportError:  # imported as py.step_site from the repository root
     from py.amt_dev_utils import DOCS_DIR, ONTOLOGY_DIR, ROOT, Report
     from py import site_figures as figs
     from py import site_pages as pages
+    from py.site_home import home_page
 
 MANIFEST = DOCS_DIR / "assets" / "figures.json"
 
@@ -121,6 +124,7 @@ def main() -> int:
 
     # 3. pages and ontology files
     inline = {name: svg[name] for name in figs.SMALL_FIGURES}
+    _write_text(rep, DOCS_DIR / "index.html", home_page(), counts)
     _write_text(rep, DOCS_DIR / "vocab" / "index.html", pages.vocab_page(g, svg["overview"]), counts)
     _write_text(rep, DOCS_DIR / "ontology" / "index.html", pages.ontology_page(g, inline), counts)
     _write_text(rep, DOCS_DIR / "vocab" / "amt.ttl", ttl_path.read_text(encoding="utf-8"), counts)

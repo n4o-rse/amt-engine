@@ -95,8 +95,28 @@ figcaption { color: var(--muted); font-size: .9em; margin-top: .3rem; }
 ul.toc { columns: 2 14rem; padding-left: 1.1rem; }
 footer.site { max-width: 62rem; margin: 0 auto; padding: 1rem 16px 2rem; color: var(--muted); font-size: .9em; border-top: 1px solid var(--line); }
 @media (max-width: 40rem) { dl.meta, .term dl { grid-template-columns: 1fr; } h1 { font-size: 1.6rem; } }
-button.theme { font: inherit; font-size: .85rem; color: var(--bar-fg); background: transparent; border: 1px solid #555; border-radius: 99px; padding: .1rem .7rem; cursor: pointer; margin-left: auto; }
+button.theme { font: inherit; font-size: .85rem; color: var(--bar-fg); background: transparent; border: 1px solid #555; border-radius: 99px; padding: .1rem .7rem; cursor: pointer; margin-left: .5rem; }
+button.theme.push { margin-left: auto; }
 button.theme:hover { border-color: var(--accent); }
 figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
 figure.fig { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: .6rem; }
 figure.fig figcaption a { margin-right: .8rem; }
+
+/* language: English unless the visitor picked German (site.js sets data-lang on <html>) */
+html:not([data-lang="de"]) [data-l="de"], html[data-lang="de"] [data-l="en"] { display: none; }
+/* start page */
+.hero { padding: 1.2rem 0 .4rem; }
+.hero h1 { font-size: 2.6rem; margin-bottom: .2rem; }
+.hero .tag { font-size: 1.3rem; font-weight: 600; color: var(--accent-strong); margin: 0 0 .6rem; }
+.btns { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.2rem 0 .4rem; }
+.btn { display: inline-block; padding: .5rem 1.1rem; border-radius: 6px; border: 2px solid var(--accent-strong); color: var(--fg); text-decoration: none; font-weight: 600; background: var(--card); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #1b1b18; }
+.btn:hover { border-color: var(--fg); }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.cols .term { margin: .4rem 0; }
+.cols ul, .term ul { padding-left: 1.2rem; margin: .4rem 0; }
+.cols li, .term li { margin: .35rem 0; }
+.term.no { border-left-color: var(--fig-red); }
+pre.flow { font-size: .92em; }
+.note { color: var(--muted); font-size: .9em; }
+@media (max-width: 40rem) { .cols { grid-template-columns: 1fr; } .hero h1 { font-size: 2rem; } }

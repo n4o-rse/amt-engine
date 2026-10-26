@@ -40,6 +40,7 @@ amt-runner = "amt.runner:main"
 filterwarnings = [
     "ignore:Dataset.identifier is deprecated:DeprecationWarning",
     "ignore:Dataset.default_context is deprecated:DeprecationWarning",
+    "ignore:Dataset.contexts is deprecated:DeprecationWarning",
 ]
 
 [tool.setuptools]

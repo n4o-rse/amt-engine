@@ -191,11 +191,14 @@ var AMT = function () {
   var P_ROLE2 = AMT_NS + "role2";
   var P_ROLE = AMT_NS + "role";
 
-  // Path to the TTL data file (relative to docs/index.htm).
-  // Override via URL parameter:  index.htm?ttl=data/my-export.ttl
+  // Path to the TTL data file. The Explorer lives in docs/explorer/, the data in
+  // docs/data/, so a plain relative path is looked up one level up.
+  // Override via URL parameter:  explorer/?ttl=data/my-export.ttl
   var TTL_PATH = (function () {
     var params = new URLSearchParams(window.location.search);
-    return params.get("ttl") || "data/PotterAttributionExample.ttl";
+    var p = params.get("ttl") || "data/PotterAttributionExample.ttl";
+    if (!/^(https?:|\.\.\/|\/)/.test(p)) p = "../" + p;
+    return p;
   })();
 
   // --------------------------------------------------------

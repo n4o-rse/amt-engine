@@ -16,17 +16,17 @@ try:
 except ImportError:
     from py.amt_dev_utils import RELEASE
 
-# (label, path relative to docs/, key). The Explorer is still ``index.htm``;
-# a later step moves it and updates this list.
+# (label, path relative to docs/, key).
 NAV = [
+    ("Home", "index.html", "home"),
     ("Vocabulary", "vocab/", "vocab"),
-    ("Ontology", "ontology/", "ontology"),
-    ("Explorer", "index.htm", "explorer"),
+    ("Data model", "ontology/", "ontology"),
+    ("Explorer", "explorer/", "explorer"),
     ("GitHub", "https://github.com/n4o-rse/amt-engine", "github"),
 ]
 
 
-def page(*, title: str, body: str, depth: int, current: str, description: str = "") -> str:
+def page(*, title: str, body: str, depth: int, current: str, description: str = "", lang_switch: bool = False) -> str:
     """Wrap ``body`` into a complete HTML page. Output uses LF line ends only."""
     up = "../" * depth
     nav = "".join(
@@ -37,6 +37,9 @@ def page(*, title: str, body: str, depth: int, current: str, description: str = 
         )
         for t, p, k in NAV
     )
+    lang_btn = ('<button type="button" class="theme push" id="lang-toggle" '
+                'aria-label="Switch language: English or German">Deutsch</button>') if lang_switch else ""
+    theme_extra = "" if lang_switch else " push"
     desc = f'<meta name="description" content="{escape(description, quote=True)}">\n' if description else ""
     return f"""<!doctype html>
 <html lang="en">
@@ -49,9 +52,9 @@ def page(*, title: str, body: str, depth: int, current: str, description: str = 
 </head>
 <body>
 <header class="site"><div class="in">
-<a class="brand" href="{up}index.htm">Academic Meta Tool</a>
+<a class="brand" href="{up}index.html">Academic Meta Tool</a>
 <nav>{nav}</nav>
-<button type="button" class="theme" id="theme-toggle" aria-label="Switch between light and dark mode">Dark mode</button>
+{lang_btn}<button type="button" class="theme{theme_extra}" id="theme-toggle" aria-label="Switch between light and dark mode">Dark mode</button>
 </div></header>
 <main>
 {body}

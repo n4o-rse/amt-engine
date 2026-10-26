@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Academic Meta Tool</title>
+<meta name="description" content="Reasoning with vague knowledge: weighted relations and rules that derive new relations. Developed at mainzed, continued in NFDI4Objects.">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<header class="site"><div class="in">
+<a class="brand" href="index.html">Academic Meta Tool</a>
+<nav><a href="index.html" aria-current="page">Home</a><a href="vocab/">Vocabulary</a><a href="ontology/">Data model</a><a href="explorer/">Explorer</a><a href="https://github.com/n4o-rse/amt-engine">GitHub</a></nav>
+<button type="button" class="theme push" id="lang-toggle" aria-label="Switch language: English or German">Deutsch</button><button type="button" class="theme" id="theme-toggle" aria-label="Switch between light and dark mode">Dark mode</button>
+</div></header>
+<main>
+<div data-l="en" lang="en">
+<section class="hero">
+<h1>Academic Meta Tool</h1>
+<p class="tag">Reasoning with vague knowledge</p>
+<p class="lead">AMT models relations that hold only to a degree and derives new relations from them by rules. It works on RDF graphs, in Python and in the browser.</p>
+<div class="btns"><a class="btn primary" href="explorer/">Open the Explorer</a><a class="btn" href="vocab/">Vocabulary</a><a class="btn" href="ontology/">Data model</a><a class="btn" href="https://github.com/n4o-rse/amt-engine">Source code</a></div>
+</section>
+
+<h2>An example in three lines</h2>
+<p>Every relation carries a weight between 0 and 1. A rule says how weights combine along a chain of relations. AMT applies the rules until nothing new follows, and marks what it inferred.</p>
+<pre class="flow"><code>Rex  --isInstanceOf (1.00)--&gt;  Dog
+Dog  --isSubclassOf (0.85)--&gt;  Pet
+
+  inferred:  Rex  --isInstanceOf (0.85)--&gt;  Pet      Goedel logic: min(1.00, 0.85)</code></pre>
+
+<div class="cols">
+<div class="term"><h3>What AMT can do</h3><ul><li>Weighted relations between concepts, in plain RDF (Turtle).</li><li>Rule-based inference to a fixed point: role chains of any length, inverse roles and role subsumption.</li><li>Consistency checks: roles that exclude each other, roles that must not point back at their own node.</li><li>Six fuzzy logics to combine weights: Gödel, product, Łukasiewicz, Einstein, geometric mean and Hamacher.</li><li>Provenance: every inferred relation records the axioms it follows from.</li><li>SHACL validation of the input before anything is inferred.</li><li>Output as Turtle, Cypher (Neo4j), CSV and an interactive HTML graph, with a Markdown report of each run.</li><li>Deterministic results: the same input gives the same bytes, on any machine.</li></ul></div>
+<div class="term no"><h3>What AMT does not do</h3><ul><li>It does not learn weights from data. The weights are degrees you assign, such as confidence or plausibility; AMT only combines them.</li><li>Weights are not probabilities by default. The product logic treats them as independent evidence; which operator fits is a modelling decision (the vocabulary gives a hint for each).</li><li>It is not a full OWL or description-logic reasoner. It knows five kinds of axioms (role chain, inverse, subsumption, disjoint, self-disjoint) and no class expressions, negation or quantifiers.</li><li>It reports inconsistencies; it does not repair them.</li><li>The browser Explorer is still at the 2018 stage: three logics, role chains of two steps, inverse and disjoint axioms. Subsumption, longer chains and the other operators need the Python engine.</li></ul></div>
+</div>
+
+<h2>Try it</h2>
+<p>The Explorer runs in your browser: load a Turtle file, look at the graph, switch the reasoning on and export the result. For everything else, install the Python engine:</p>
+<pre><code>git clone https://github.com/n4o-rse/amt-engine
+cd amt-engine
+pip install -e .
+amt-runner examples/animals.ttl</code></pre>
+<div class="btns"><a class="btn primary" href="explorer/">Open the Explorer</a></div>
+
+<h2>Where it comes from</h2>
+<p>AMT was developed at <strong>mainzed</strong>, the Mainz Centre for Digitality in the Humanities and Cultural Studies, by <strong>i3mainz</strong> (Institute for Spatial Information and Surveying Technology, Hochschule Mainz University of Applied Sciences) together with the <strong>RGZM</strong> (Römisch-Germanisches Zentralmuseum Mainz, today LEIZA). The vocabulary appeared in 2018; the method is described by Unold, Thiery and Mees (2019).</p>
+<p>Today AMT is developed further in <strong>NFDI4Objects</strong>, the consortium for the material remains of human history within the National Research Data Infrastructure.</p>
+<p class="note">NFDI4Objects is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) &ndash; project number 501836407.</p>
+
+<h2>A name that only works in German</h2>
+<p><em>Amt</em> is the German word for an office or authority, and the cliché of the civil servant is that nothing seems to happen there. At mainzed we invented an AMT that, without doing anything itself, generates new knowledge by rules: semantic reasoning, or symbolic AI.</p>
+
+<h2>Cite</h2>
+<p>Software: <a href="https://doi.org/10.5281/zenodo.23669466">doi:10.5281/zenodo.23669466</a> (all versions). Method: Unold, M., Thiery, F. and Mees, A. (2019), <a href="https://doi.org/10.17175/sb004_004">Academic Meta Tool. Ein Web-Tool zur Modellierung von Vagheit</a>, Zeitschrift f&uuml;r digitale Geisteswissenschaften, Sonderband 4.</p>
+</div>
+<div data-l="de" lang="de">
+<section class="hero">
+<h1>Academic Meta Tool</h1>
+<p class="tag">Schlussfolgern mit unscharfem Wissen</p>
+<p class="lead">AMT modelliert Beziehungen, die nur bis zu einem gewissen Grad gelten, und leitet daraus regelbasiert neue Beziehungen ab. Es arbeitet auf RDF-Graphen, in Python und im Browser.</p>
+<div class="btns"><a class="btn primary" href="explorer/">Explorer öffnen</a><a class="btn" href="vocab/">Vokabular</a><a class="btn" href="ontology/">Datenmodell</a><a class="btn" href="https://github.com/n4o-rse/amt-engine">Quellcode</a></div>
+</section>
+
+<h2>Ein Beispiel in drei Zeilen</h2>
+<p>Jede Beziehung trägt ein Gewicht zwischen 0 und 1. Eine Regel legt fest, wie sich Gewichte entlang einer Kette von Beziehungen verbinden. AMT wendet die Regeln an, bis nichts Neues mehr folgt, und kennzeichnet, was es abgeleitet hat.</p>
+<pre class="flow"><code>Rex  --isInstanceOf (1.00)--&gt;  Dog
+Dog  --isSubclassOf (0.85)--&gt;  Pet
+
+  inferred:  Rex  --isInstanceOf (0.85)--&gt;  Pet      Goedel logic: min(1.00, 0.85)</code></pre>
+
+<div class="cols">
+<div class="term"><h3>Was AMT kann</h3><ul><li>Gewichtete Beziehungen zwischen Konzepten, in schlichtem RDF (Turtle).</li><li>Regelbasiertes Ableiten bis zum Fixpunkt: Rollenketten beliebiger Länge, inverse Rollen und Rollen-Subsumtion.</li><li>Konsistenzprüfungen: Rollen, die sich ausschließen, und Rollen, die nicht auf den eigenen Knoten zurückzeigen dürfen.</li><li>Sechs Fuzzy-Logiken zum Verbinden der Gewichte: Gödel, Produkt, Łukasiewicz, Einstein, geometrisches Mittel und Hamacher.</li><li>Herkunft: Jede abgeleitete Beziehung nennt die Axiome, aus denen sie folgt.</li><li>SHACL-Prüfung der Eingabe, bevor etwas abgeleitet wird.</li><li>Ausgabe als Turtle, Cypher (Neo4j), CSV und interaktiver HTML-Graph, dazu ein Markdown-Bericht je Lauf.</li><li>Reproduzierbare Ergebnisse: gleiche Eingabe, gleiche Bytes, auf jedem Rechner.</li></ul></div>
+<div class="term no"><h3>Was AMT nicht kann</h3><ul><li>Es lernt keine Gewichte aus Daten. Die Gewichte sind Grade, die Sie vergeben, etwa Sicherheit oder Plausibilität; AMT verbindet sie nur.</li><li>Gewichte sind standardmäßig keine Wahrscheinlichkeiten. Die Produkt-Logik behandelt sie als unabhängige Belege; welcher Operator passt, ist eine Modellierungsentscheidung (das Vokabular gibt je einen Hinweis).</li><li>Es ist kein vollständiger OWL- oder Beschreibungslogik-Reasoner. Es kennt fünf Axiomarten (Rollenkette, Inverse, Subsumtion, disjunkt, selbst-disjunkt) und keine Klassenausdrücke, Negation oder Quantoren.</li><li>Es meldet Widersprüche; es behebt sie nicht.</li><li>Der Explorer im Browser steht noch auf dem Stand von 2018: drei Logiken, Rollenketten aus zwei Schritten, inverse und disjunkte Axiome. Subsumtion, längere Ketten und die weiteren Operatoren brauchen die Python-Engine.</li></ul></div>
+</div>
+
+<h2>Ausprobieren</h2>
+<p>Der Explorer läuft in Ihrem Browser: eine Turtle-Datei laden, den Graphen ansehen, das Schlussfolgern einschalten und das Ergebnis exportieren. Für alles Weitere installieren Sie die Python-Engine:</p>
+<pre><code>git clone https://github.com/n4o-rse/amt-engine
+cd amt-engine
+pip install -e .
+amt-runner examples/animals.ttl</code></pre>
+<div class="btns"><a class="btn primary" href="explorer/">Explorer öffnen</a></div>
+
+<h2>Woher es kommt</h2>
+<p>AMT wurde am <strong>mainzed</strong>, dem Mainzer Zentrum für Digitalität in den Geistes- und Kulturwissenschaften, entwickelt: vom <strong>i3mainz</strong> (Institut für Raumbezogene Informations- und Messtechnik der Hochschule Mainz) gemeinsam mit dem <strong>RGZM</strong> (Römisch-Germanisches Zentralmuseum Mainz, heute LEIZA). Das Vokabular erschien 2018; die Methode beschreiben Unold, Thiery und Mees (2019).</p>
+<p>Heute wird AMT in <strong>NFDI4Objects</strong> weiterentwickelt, dem Konsortium für die materiellen Hinterlassenschaften der Menschheitsgeschichte in der Nationalen Forschungsdateninfrastruktur.</p>
+<p class="note">NFDI4Objects wird von der Deutschen Forschungsgemeinschaft (DFG) gefördert &ndash; Projektnummer 501836407.</p>
+
+<h2>Ein Name, der nur auf Deutsch funktioniert</h2>
+<p>Ein <em>Amt</em> ist eine Behörde, und das Klischee vom Beamten will, dass dort nichts zu passieren scheint. Im mainzed haben wir ein AMT erfunden, das &ndash; ohne selbst etwas zu tun &ndash; regelbasiert neues Wissen erzeugt: semantisches Schlussfolgern, also symbolische KI.</p>
+
+<h2>Zitieren</h2>
+<p>Software: <a href="https://doi.org/10.5281/zenodo.23669466">doi:10.5281/zenodo.23669466</a> (alle Versionen). Methode: Unold, M., Thiery, F. und Mees, A. (2019), <a href="https://doi.org/10.17175/sb004_004">Academic Meta Tool. Ein Web-Tool zur Modellierung von Vagheit</a>, Zeitschrift f&uuml;r digitale Geisteswissenschaften, Sonderband 4.</p>
+</div>
+</main>
+<footer class="site">
+Academic Meta Tool &middot; amt-engine 0.3.1 &middot;
+<a href="https://github.com/n4o-rse/amt-engine">source</a>
+</footer>
+</body>
+</html>
