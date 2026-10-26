@@ -308,12 +308,14 @@ on those files alone.
 ## Development
 
 `python main.py` runs the maintenance pipeline: it checks that version,
-date and changelog agree, validates the bundled SHACL examples, generates the
-start, vocabulary and ontology pages, `amt.rdf` and the figures in `docs/` from
-`ontology/amt.ttl`, runs the test suite, pushes every example through the full
-pipeline, confirms that two runs under different hash seeds produce identical
-bytes, and syncs `examples/*.ttl` to `docs/data/`. The generated files are
-committed; with `--strict` a stale one fails the run.
+date and changelog agree, validates the bundled SHACL examples, syncs
+`examples/*.ttl` to `docs/data/`, generates the start, vocabulary and ontology
+pages, `amt.rdf` and the figures in `docs/` from `ontology/amt.ttl`, runs the
+test suite, pushes every example through the full pipeline and confirms that two
+runs under different hash seeds produce identical bytes. The generated files
+are committed; with `--strict` a stale one fails the run. The tests that
+compare the JavaScript reasoner with the Python one need Node.js and are
+skipped without it.
 
 ```bash
 python main.py                     # all steps

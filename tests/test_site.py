@@ -216,3 +216,25 @@ def test_explorer_resolves_data_paths_one_level_up():
     js = (DOCS / "js" / "amt.js").read_text(encoding="utf-8")
     assert '"data/PotterAttributionExample.ttl"' in js and '"../" + p' in js
     assert (DOCS / "data" / "PotterAttributionExample.ttl").exists()
+
+
+# ---- Explorer: example list and script order (S11a) -------------------------
+
+import json
+
+
+def test_explorer_example_list_matches_the_examples():
+    listed = json.loads((DOCS / "data" / "examples.json").read_text(encoding="utf-8"))
+    files = sorted(p.name for p in (ROOT / "examples").glob("*.ttl"))
+    assert [e["file"] for e in listed] == files
+    assert all(e["title"] for e in listed)
+    for name in files:
+        assert (DOCS / "data" / name).exists(), name
+
+
+def test_explorer_loads_the_reasoner_before_amt_js():
+    html = (DOCS / "explorer" / "index.html").read_text(encoding="utf-8")
+    order = [html.index(f'src="../js/{n}.js"') for n in ("amt-reasoner", "amt", "amt-render", "amt-export")]
+    assert order == sorted(order)
+    for n in ("amt-reasoner", "amt", "amt-render", "amt-export"):
+        assert (DOCS / "js" / f"{n}.js").exists()

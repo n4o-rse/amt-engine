@@ -30,193 +30,75 @@
       rel="stylesheet" />
 
     <!-- AMT scripts (order matters: n3 -> amt -> amt-render -> amt-export) -->
+    <script src="../js/amt-reasoner.js"></script>
     <script src="../js/amt.js"></script>
     <script src="../js/amt-render.js"></script>
     <script src="../js/amt-export.js"></script>
 
     <style>
-      * {
-        margin: 0;
-        padding: 0;
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { height: 100%; }
+      body { display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+      #bar {
+        flex: none; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        padding: 6px 14px; background: #4f628b; color: #fff; min-height: 52px;
       }
-
-      body {
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        overflow: hidden;
-        display: flex;
-        min-height: 100vh;
-        flex-direction: column;
-      }
-
-      #footer {
-        height: 100px;
-        color: white;
-        background-color: #4f628b !important;
-      }
-
-      #graph {
-        height: calc(100% - 100px);
-      }
-
-      .modal {
-        width: 90% !important;
-        height: 100% !important;
-      }
-
-      div.info {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        border: 1px dashed grey;
-        background: #4f628b;
-        padding: 0 15px 15px 15px;
-        color: white !important;
-      }
-
-      div.logos {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-      }
+      #bar a.home { color: #fff; font-weight: 600; text-decoration: none; margin-right: 6px; }
+      #bar .btn-floating { width: 36px; height: 36px; line-height: 36px; }
+      #bar .btn-floating i { line-height: 36px; font-size: 20px; }
+      #bar .grow { flex: 1; min-width: 0; }
+      #title { font-weight: 600; }
+      #status { font-size: 0.9em; margin-left: 10px; }
+      .legend { font-size: 0.85em; opacity: 0.9; white-space: nowrap; }
+      .legend b { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin: 0 4px 0 8px; }
+      #bar img { height: 36px; background: #fff; padding: 2px 4px; border-radius: 2px; }
+      #graph { flex: 1; min-height: 0; }
+      .modal { max-height: 80% !important; width: 90% !important; }
+      @media (max-width: 700px) { .legend, #bar img { display: none; } }
     </style>
   </head>
 
   <body>
-    <!-- Graph canvas -->
-    <div id="graph" class="col s12"></div>
-
-    <!-- Footer toolbar -->
-    <div id="footer" class="page-footer col s12 orange lighten-3">
-      <div class="container">
-        <div class="row">
-          <div id="props" class="col s5 left-align">
-            <a
-              class="btn-floating btn-large teal"
-              onclick="exportTTL()"
-              title="download TTL (incl. reasoning)"
-              ><i class="material-icons">file_download</i></a
-            >
-            <a
-              class="btn-floating btn-large purple"
-              onclick="exportCypher()"
-              title="download Cypher for Neo4J"
-              ><i class="material-icons">device_hub</i></a
-            >
-            <!--<a
-              class="btn-floating btn-large blue"
-              onclick="openGraphPropModal()"
-              title="change dataset"
-              ><i class="material-icons">sync</i></a
-            >
-            <a
-              class="btn-floating btn-large brown"
-              onclick="exportRDF()"
-              title="export RDF"
-              ><i class="material-icons">share</i></a
-            >-->
-          </div>
-          <div id="buttons" class="col s7 left-align">
-            <a
-              class="btn-floating btn-large red"
-              id="r-but"
-              onclick="toggleReasoning()"
-              title="reasoning on/off"
-              ><i class="material-icons">bubble_chart</i></a
-            >
-            <span style="padding-left: 30px; font-weight: bold" id="title"
-              >loading...</span
-            >
-          </div>
-        </div>
-      </div>
+    <div id="bar">
+      <a class="home" href="../" title="AMT start page">&larr; AMT</a>
+      <span id="title">loading...</span><span id="status"></span>
+      <span class="grow"></span>
+      <span class="legend"><b style="background:#000"></b>asserted<b style="background:red"></b>inferred</span>
+      <a class="btn-floating blue" onclick="openGraphPropModal()" title="choose an example or load a Turtle file"><i class="material-icons">folder_open</i></a>
+      <a class="btn-floating red" id="r-but" onclick="toggleReasoning()" title="reasoning on/off"><i class="material-icons">bubble_chart</i></a>
+      <a class="btn-floating teal" onclick="exportTTL()" title="download Turtle (including inferred statements)"><i class="material-icons">file_download</i></a>
+      <a class="btn-floating purple" onclick="exportCypher()" title="download Cypher for Neo4j"><i class="material-icons">device_hub</i></a>
+      <a href="http://academic-meta-tool.xyz" target="_blank" rel="noopener"><img src="../amt_logos.png" alt="Academic Meta Tool, mainzed, i3mainz, LEIZA" /></a>
     </div>
+    <div id="graph"></div>
 
     <!-- Modal: dataset selector -->
     <div id="graphPropModal" class="modal">
       <div class="modal-content">
-        <h4>Please choose a dataset:</h4>
-        <br />
+        <h5>Choose an example</h5>
         <div class="row">
-          <div class="input-field col s11">
-            <select id="amt-viz">
-              <option value="potter" selected>
-                Reasoning on/off
-              </option>
-            </select>
-            <label>dataset</label>
+          <div class="input-field col s10">
+            <select id="amt-viz"></select>
+            <label>Example</label>
           </div>
-          <div class="col s1">
-            <a
-              class="btn-floating btn-large green"
-              onclick="reloadGraphWithProperties()"
-              title="load"
-              ><i class="material-icons">check</i></a
-            >
+          <div class="col s2">
+            <a class="btn-floating green" onclick="reloadGraphWithProperties()" title="load"><i class="material-icons">check</i></a>
           </div>
         </div>
+        <h5>or load your own Turtle file</h5>
+        <p>The file stays in your browser, nothing is uploaded. It needs concepts, roles, nodes, weighted statements and axioms in the AMT vocabulary, like the examples.</p>
+        <br />
+        <input type="file" accept=".ttl,text/turtle" onchange="loadLocalFile(this)" />
       </div>
     </div>
 
     <!-- Modal: RDF export -->
     <div id="rdfModal" class="modal">
-      <div
-        class="modal-content"
-        style="
-          border: 1px black solid;
-          width: 100%;
-          height: 100%;
-          padding: 20px;
-          margin: 0;
-        ">
-        <textarea
-          id="rdf"
-          style="
-            width: 100%;
-            height: 100%;
-            font-family: &quot;Courier New&quot;;
-            font-size: 14px;
-          "></textarea>
+      <div class="modal-content" style="height: 100%; padding: 20px; margin: 0">
+        <textarea id="rdf" style="width: 100%; height: 100%; font-family: monospace; font-size: 14px"></textarea>
       </div>
     </div>
 
-    <!-- Hidden clipboard helper -->
     <span id="hiddenclipboard" style="display: none"></span>
-
-    <!-- Info panel -->
-    <div class="info">
-      <h4>AMT Explorer</h4>
-      Software by Florian Thiery (LEIZA) and Martin Unold (i3mainz).
-      <br />Data concept by Florian Thiery / A.W. Mees (LEIZA). <br /><br />
-      <a class="btn-floating btn-small red"
-        ><i class="material-icons">bubble_chart</i></a
-      >&nbsp;<i>no reasoning</i>
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <a class="btn-floating btn-small blue"
-        ><i class="material-icons">bubble_chart</i></a
-      >&nbsp;<i>reasoning</i> <br /><br />
-      <!--<a class="btn-floating btn-small blue"
-        ><i class="material-icons">sync</i></a
-      >&nbsp;<i>change dataset</i>
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <a class="btn-floating btn-small brown"
-        ><i class="material-icons">share</i></a
-      >&nbsp;<i>export RDF</i>-->
-      <a class="btn-floating btn-small teal"
-        ><i class="material-icons">file_download</i></a
-      >&nbsp;<i>download TTL</i>
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <a class="btn-floating btn-small purple"
-        ><i class="material-icons">device_hub</i></a
-      >&nbsp;<i>download Cypher</i>
-    </div>
-
-    <!-- Logo panel -->
-    <div class="logos">
-      <a href="http://academic-meta-tool.xyz" target="_blank"
-        ><img src="../amt_logos.png" height="300"
-      /></a>
-    </div>
   </body>
 </html>

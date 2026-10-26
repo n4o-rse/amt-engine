@@ -1,0 +1,26 @@
+[
+  {
+    "file": "animals.ttl",
+    "title": "animals — taxonomy + family tree"
+  },
+  {
+    "file": "chain-test.ttl",
+    "title": "chain-test"
+  },
+  {
+    "file": "PotterAttributionExample.ttl",
+    "title": "Potter Attribution — typological dating chain"
+  },
+  {
+    "file": "skos-mapping-example.ttl",
+    "title": "SKOS concept mappings across archaeological vocabularies"
+  },
+  {
+    "file": "SKOSconceptExample.ttl",
+    "title": "SKOS concept matching with custom MatchStar role"
+  },
+  {
+    "file": "subsumption-demo.ttl",
+    "title": "subsumption-demo — coarse and fine temporal relations"
+  }
+]

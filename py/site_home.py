@@ -64,12 +64,12 @@ TEXT = {
             "It is not a full OWL or description-logic reasoner. It knows five kinds of axioms (role chain, inverse, "
             "subsumption, disjoint, self-disjoint) and no class expressions, negation or quantifiers.",
             "It reports inconsistencies; it does not repair them.",
-            "The browser Explorer is still at the 2018 stage: three logics, role chains of two steps, inverse and "
-            "disjoint axioms. Subsumption, longer chains and the other operators need the Python engine.",
+            "The browser Explorer reasons exactly like the engine, but it does not validate the input with SHACL "
+            "and writes no report; for that, use the Python engine.",
         ],
         "try_h": "Try it",
-        "try_p": "The Explorer runs in your browser: load a Turtle file, look at the graph, switch the reasoning on and "
-                 "export the result. For everything else, install the Python engine:",
+        "try_p": "The Explorer runs in your browser: pick an example or load your own Turtle file, look at the graph, switch "
+                 "the reasoning on and export the result. For everything else, install the Python engine:",
         "try_btn": "Open the Explorer",
         "hist_h": "Where it comes from",
         "hist_p1": "AMT was developed at <strong>mainzed</strong>, the Mainz Centre for Digitality in the Humanities and "
@@ -126,12 +126,12 @@ TEXT = {
             "(Rollenkette, Inverse, Subsumtion, disjunkt, selbst-disjunkt) und keine Klassenausdrücke, Negation "
             "oder Quantoren.",
             "Es meldet Widersprüche; es behebt sie nicht.",
-            "Der Explorer im Browser steht noch auf dem Stand von 2018: drei Logiken, Rollenketten aus zwei "
-            "Schritten, inverse und disjunkte Axiome. Subsumtion, längere Ketten und die weiteren Operatoren "
-            "brauchen die Python-Engine.",
+            "Der Explorer im Browser schließt genau wie die Engine, prüft die Eingabe aber nicht mit SHACL und "
+            "schreibt keinen Bericht; dafür nehmen Sie die Python-Engine.",
         ],
         "try_h": "Ausprobieren",
-        "try_p": "Der Explorer läuft in Ihrem Browser: eine Turtle-Datei laden, den Graphen ansehen, das Schlussfolgern "
+        "try_p": "Der Explorer läuft in Ihrem Browser: ein Beispiel wählen oder eine eigene Turtle-Datei laden, den Graphen "
+                 "ansehen, das Schlussfolgern "
                  "einschalten und das Ergebnis exportieren. Für alles Weitere installieren Sie die Python-Engine:",
         "try_btn": "Explorer öffnen",
         "hist_h": "Woher es kommt",

@@ -36,11 +36,11 @@ REPORT = ROOT / "build" / "pipeline_report.txt"
 STEPS: list[tuple[str, str, str]] = [
     ("meta",        "step_meta.py",        "version, date and changelog agree across all files"),
     ("ontology",    "step_ontology.py",    "bundled SHACL examples validate as documented"),
+    ("docs-sync",   "step_docs_sync.py",   "examples/*.ttl copied to docs/data/ (a change fails with --strict)"),
     ("site",        "step_site.py",        "start, vocabulary and ontology pages, amt.rdf and figures generated from ontology/amt.ttl"),
     ("tests",       "step_tests.py",       "pytest suite in tests/"),
     ("examples",    "step_examples.py",    "every examples/*.ttl runs through the full pipeline"),
     ("determinism", "step_determinism.py", "two runs under different hash seeds give identical bytes"),
-    ("docs-sync",   "step_docs_sync.py",   "examples/*.ttl copied to docs/data/ (a change fails with --strict)"),
 ]
 NAMES = [s[0] for s in STEPS]
 

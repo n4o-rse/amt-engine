@@ -49,56 +49,61 @@ var LocalStore = (function () {
     return value;
   }
 
-  // Load the TTL file and parse with N3.js
-  function load(ttlPath, callback) {
-    fetch(ttlPath)
+  // Parse Turtle text with N3.js into the store.
+  function parseText(text, callback) {
+    var parser = new N3.Parser();
+    var triples = [];
+    var finished = false;
+    parser.parse(text, function (error, quad, prefixes) {
+      if (finished) return;
+      if (error) {
+        finished = true;
+        callback(error);
+        return;
+      }
+      if (quad) {
+        triples.push({
+          subject: quad.subject.value,
+          predicate: quad.predicate.value,
+          object: quad.object.value,
+        });
+        return;
+      }
+      // quad === null: parsing is done, the prefix map comes with it
+      finished = true;
+      _triples = triples;
+      window._AMT = window._AMT || {};
+      window._AMT.prefixes = {};
+      for (var p in prefixes || {}) {
+        var ns = prefixes[p];
+        window._AMT.prefixes[p] = ns && ns.value ? ns.value : ns;
+      }
+      _loaded = true;
+      callback(null);
+    });
+  }
+
+  // `source` is a URL (string) or { text: "...turtle...", name: "..." }.
+  function load(source, callback) {
+    if (source && typeof source === "object" && typeof source.text === "string") {
+      try {
+        parseText(source.text, callback);
+      } catch (err) {
+        callback(err);
+      }
+      return;
+    }
+    fetch(source)
       .then(function (response) {
         if (!response.ok)
-          throw new Error(
-            "Failed to load TTL: " +
-              ttlPath +
-              " (HTTP " +
-              response.status +
-              ")",
-          );
+          throw new Error("Failed to load TTL: " + source + " (HTTP " + response.status + ")");
         return response.text();
       })
       .then(function (text) {
-        var parser = new N3.Parser();
-        _triples = [];
-        parser.parse(text, function (error, quad, prefixes) {
-          if (error) {
-            console.error("N3 parse error:", error);
-            callback(error);
-            return;
-          }
-          if (quad) {
-            _triples.push({
-              subject: quad.subject.value,
-              predicate: quad.predicate.value,
-              object: quad.object.value,
-            });
-          } else {
-            // quad === null means parsing is done
-            // N3.js passes the prefix map here as the third argument
-            if (prefixes && typeof window !== "undefined") {
-              window._AMT = window._AMT || {};
-              window._AMT.prefixes = {};
-              for (var p in prefixes) {
-                // N3 wraps namespaces as NamedNode objects; .value gives the IRI
-                var ns = prefixes[p];
-                window._AMT.prefixes[p] = (ns && ns.value) ? ns.value : ns;
-              }
-              console.log("TTL prefixes:", window._AMT.prefixes);
-            }
-            _loaded = true;
-            console.log("TTL loaded:", _triples.length, "triples");
-            callback(null);
-          }
-        });
+        parseText(text, callback);
       })
       .catch(function (err) {
-        console.error("Fetch error:", err);
+        console.error("Load error:", err);
         callback(err);
       });
   }
@@ -155,6 +160,7 @@ var AMT = function () {
     edited: { nodes: [], edges: [] },
   };
   var AXIOMS = [];
+  var LOAD_ERROR = null;
 
   // Vocabulary IRIs
   var PREFIX = "http://academic-meta-tool.xyz/vocab#";
@@ -184,6 +190,7 @@ var AMT = function () {
   var P_ANTECEDENT1 = AMT_NS + "antecedent1";
   var P_ANTECEDENT2 = AMT_NS + "antecedent2";
   var P_ANTECEDENT = AMT_NS + "antecedent";
+  var P_ANTECEDENTS = AMT_NS + "antecedents";
   var P_CONSEQUENT = AMT_NS + "consequent";
   var P_LOGIC = AMT_NS + "logic";
   var P_INVERSE = AMT_NS + "inverse";
@@ -191,26 +198,34 @@ var AMT = function () {
   var P_ROLE2 = AMT_NS + "role2";
   var P_ROLE = AMT_NS + "role";
 
-  // Path to the TTL data file. The Explorer lives in docs/explorer/, the data in
-  // docs/data/, so a plain relative path is looked up one level up.
+  // Where the data comes from. A page can set window.AMT_SOURCE to a URL or to
+  // { text, name } (a file the visitor loaded). Otherwise the ?ttl= parameter
+  // is used; the Explorer lives in docs/explorer/ and the data in docs/data/,
+  // so a plain relative path is looked up one level up.
   // Override via URL parameter:  explorer/?ttl=data/my-export.ttl
-  var TTL_PATH = (function () {
+  var currentSource = function () {
+    if (window.AMT_SOURCE) return window.AMT_SOURCE;
     var params = new URLSearchParams(window.location.search);
     var p = params.get("ttl") || "data/PotterAttributionExample.ttl";
     if (!/^(https?:|\.\.\/|\/)/.test(p)) p = "../" + p;
     return p;
-  })();
+  };
 
   // --------------------------------------------------------
   // loadGraph: replaces the 5 SPARQL queryStore() calls
   // --------------------------------------------------------
   var loadGraph = function (callback) {
-    LocalStore.load(TTL_PATH, function (err) {
+    LocalStore.load(currentSource(), function (err) {
       if (err) {
         console.error("Could not load TTL:", err);
+        LOAD_ERROR = String(err && err.message ? err.message : err);
+        CONCEPTS = [];
+        ROLES = [];
+        AXIOMS = [];
         callback({ nodes: [], edges: [] });
         return;
       }
+      LOAD_ERROR = null;
 
       var graph = {};
 
@@ -282,6 +297,22 @@ var AMT = function () {
 
       // Filter by mode (mirrors original example1-6 logic)
       graph.nodes = filterNodes(allNodes);
+
+      // The namespace most of the instances live in: used to shorten IRIs in
+      // labels and exports, and as the namespace of nodes added in the editor.
+      var counts = {};
+      var best = "";
+      allNodes.forEach(function (n) {
+        var cut = Math.max(n.id.lastIndexOf("/"), n.id.lastIndexOf("#")) + 1;
+        var ns = n.id.substring(0, cut);
+        counts[ns] = (counts[ns] || 0) + 1;
+        if (counts[ns] > (counts[best] || 0)) best = ns;
+      });
+      if (best) {
+        PREFIX_INSTANCES = best;
+        window._AMT = window._AMT || {};
+        window._AMT.prefix = best;
+      }
       console.log("NODES", graph.nodes);
 
       // ---- 4. EDGES -----------------------------------
@@ -318,39 +349,58 @@ var AMT = function () {
       //     ?axiom ?p ?o . }
       AXIOMS = [];
 
-      // Collect all classes that are (direct or indirect) subclasses of amt:Axiom
-      var axiomSubclasses = LocalStore.subjectsOf(P_SUBCLASSOF, C_AXIOM);
-      // also indirect (e.g. RoleChainAxiom -> InferenceAxiom -> Axiom)
-      var allAxiomTypes = new Set();
-      axiomSubclasses.forEach(function (cls) {
+      // Axiom classes: the five the engine knows, plus every class declared
+      // (directly or indirectly) as a subclass of amt:Axiom in the file.
+      var allAxiomTypes = new Set(
+        ["RoleChainAxiom", "InverseAxiom", "SubsumptionAxiom", "DisjointAxiom", "SelfDisjointAxiom"].map(
+          function (n) { return PREFIX + n; }
+        )
+      );
+      LocalStore.subjectsOf(P_SUBCLASSOF, C_AXIOM).forEach(function (cls) {
         allAxiomTypes.add(cls);
-        var sub2 = LocalStore.subjectsOf(P_SUBCLASSOF, cls);
-        sub2.forEach(function (c2) {
+        LocalStore.subjectsOf(P_SUBCLASSOF, cls).forEach(function (c2) {
           allAxiomTypes.add(c2);
         });
       });
 
-      allAxiomTypes.forEach(function (axiomType) {
-        var axiomInstances = LocalStore.subjectsOf(P_TYPE, axiomType);
-        axiomInstances.forEach(function (axiom) {
-          var entry = {};
-          // type shortname (strip PREFIX)
-          entry.type = axiomType.startsWith(PREFIX)
-            ? axiomType.substr(PREFIX.length)
-            : axiomType;
+      // The items of an RDF list, as an array of IRIs.
+      var readList = function (head) {
+        var items = [];
+        var seen = {};
+        while (head && head !== RDF + "nil" && !seen[head]) {
+          seen[head] = true;
+          var first = LocalStore.objectOf(head, RDF + "first");
+          if (first !== null) items.push(first);
+          head = LocalStore.objectOf(head, RDF + "rest");
+        }
+        return items;
+      };
 
-          // collect all predicates for this axiom
-          var allProps = LocalStore.match(axiom, null, null);
-          allProps.forEach(function (t) {
-            if (t.predicate === P_TYPE) return; // already handled
-            var key = t.predicate.startsWith(PREFIX)
-              ? t.predicate.substr(PREFIX.length)
-              : t.predicate;
+      var raw = [];
+      var seenAxioms = {};
+      allAxiomTypes.forEach(function (axiomType) {
+        LocalStore.subjectsOf(P_TYPE, axiomType).forEach(function (axiom) {
+          if (seenAxioms[axiom + axiomType]) return;
+          seenAxioms[axiom + axiomType] = true;
+          var entry = {
+            iri: axiom,
+            type: axiomType.startsWith(PREFIX) ? axiomType.substr(PREFIX.length) : axiomType,
+          };
+          LocalStore.match(axiom, null, null).forEach(function (t) {
+            if (t.predicate === P_TYPE) return;
+            if (t.predicate === P_ANTECEDENTS) {
+              entry.antecedents = readList(t.object);
+              return;
+            }
+            var key = t.predicate.startsWith(PREFIX) ? t.predicate.substr(PREFIX.length) : t.predicate;
             entry[key] = t.object;
           });
-          AXIOMS.push(entry);
+          raw.push(entry);
         });
       });
+      // Same order as the Python loader (type, then IRI): it fixes the order
+      // of the provenance lists.
+      AXIOMS = AMTReasoner.normaliseAxioms(raw);
       console.log("AXIOMS", AXIOMS);
 
       callback(graph);
@@ -423,128 +473,62 @@ var AMT = function () {
     return -1;
   };
 
-  var updateReasoning = function (edges, role, from, to, width) {
-    var k = search(edges, role, from, to);
-    if (k >= 0 && edges[k].width < width) {
-      edges[k].width = width;
-      return true;
-    }
-    if (k < 0 && width > 0) {
-      if (width > 1.0) width = 1.0;
-      else {
-        width = parseFloat(width);
-        width = width.toFixed(2);
-      }
-      edges.push({
-        role: role,
-        from: from,
-        to: to,
-        width: width,
-        label: role.replace(_AMT.prefix, "") + ":" + width,
-        font: { align: "middle", size: 16, color: "red", face: "monospace" },
-      });
-      return true;
-    }
-    return false;
+  // Reasoning is done by amt-reasoner.js, the port of the Python engine. The
+  // edges of the graph carry their weight as `width` (vis.js naming); inferred
+  // edges are appended after the asserted ones, as in the Python result.
+  var toEngineEdges = function (edges) {
+    return edges.map(function (e) {
+      var w = parseFloat(e.width);
+      return {
+        role: e.role,
+        from: e.from,
+        to: e.to,
+        weight: isNaN(w) ? 0 : Math.min(w, 1.0),
+        inferred: false,
+        provenance: [],
+      };
+    });
   };
 
-  var conjunction = function (x, y, logic) {
-    if (logic == PREFIX + "LukasiewiczLogic") return Math.max(x + y - 1, 0);
-    if (logic == PREFIX + "ProductLogic") return x * y;
-    if (logic == PREFIX + "GoedelLogic") return Math.min(x, y);
-    return 0;
+  var runReasoner = function (graph) {
+    var reasoned = AMTReasoner.reason(toEngineEdges(graph.edges), AXIOMS).edges;
+    return reasoned;
   };
 
   var doReasoning = function (graph) {
-    var change = true;
-    while (change) {
-      change = false;
-      for (var i in AXIOMS) {
-        var a = AXIOMS[i];
-
-        if (a.type == "RoleChainAxiom") {
-          for (var j1 in graph.edges) {
-            for (var j2 in graph.edges) {
-              if (
-                graph.edges[j1].to == graph.edges[j2].from &&
-                graph.edges[j1].role == a.antecedent1 &&
-                graph.edges[j2].role == a.antecedent2
-              ) {
-                var c = conjunction(
-                  graph.edges[j1].width,
-                  graph.edges[j2].width,
-                  a.logic,
-                );
-                if (
-                  updateReasoning(
-                    graph.edges,
-                    a.consequent,
-                    graph.edges[j1].from,
-                    graph.edges[j2].to,
-                    c,
-                  )
-                )
-                  change = true;
-              }
-            }
-          }
-        }
-
-        if (a.type == "InverseAxiom") {
-          for (var j in graph.edges) {
-            if (graph.edges[j].role == a.antecedent) {
-              var c = graph.edges[j].width;
-              if (
-                updateReasoning(
-                  graph.edges,
-                  a.inverse,
-                  graph.edges[j].to,
-                  graph.edges[j].from,
-                  c,
-                )
-              )
-                change = true;
-            }
-          }
-        }
-      }
+    var n = graph.edges.length;
+    var reasoned = runReasoner(graph);
+    for (var i = 0; i < n; i++) {
+      graph.edges[i].provenance = reasoned[i].provenance;
+    }
+    for (var j = n; j < reasoned.length; j++) {
+      var e = reasoned[j];
+      graph.edges.push({
+        role: e.role,
+        from: e.from,
+        to: e.to,
+        width: e.weight,
+        label: e.role.replace(_AMT.prefix, "") + ":" + e.weight,
+        inferred: true,
+        provenance: e.provenance,
+        font: { align: "middle", size: 16, color: "red", face: "monospace" },
+      });
     }
     return graph;
   };
 
+  // Violations of the integrity axioms in the reasoned graph (strings, as in
+  // the Python engine). An empty list means consistent.
+  var violations = function (graph) {
+    var asserted = toEngineEdges(graph.edges);
+    var reasoned = AMTReasoner.reason(asserted, AXIOMS).edges;
+    return AMTReasoner.checkConsistency(asserted, AXIOMS, reasoned).violations;
+  };
+
   var consistent = function () {
-    var graph = doReasoning(copy(GRAPH.edited));
-    for (var i in AXIOMS) {
-      var a = AXIOMS[i];
-      if (a.type == "DisjointAxiom") {
-        for (var j in graph.edges) {
-          if (
-            graph.edges[j].role == a.role1 &&
-            search(
-              graph.edges,
-              a.role2,
-              graph.edges[j].from,
-              graph.edges[j].to,
-            ) >= 0
-          ) {
-            console.info("!consistent -> DisjointAxiom");
-            return false;
-          }
-        }
-      }
-      if (a.type == "SelfDisjointAxiom") {
-        for (var k in graph.edges) {
-          if (
-            graph.edges[k].role == a.role &&
-            graph.edges[k].from == graph.edges[k].to
-          ) {
-            console.info("!consistent -> SelfDisjointAxiom");
-            return false;
-          }
-        }
-      }
-    }
-    return true;
+    var v = violations(GRAPH.edited);
+    if (v.length) console.info("!consistent ->", v);
+    return v.length === 0;
   };
 
   this.addIndividual = function (label, concept) {
@@ -609,6 +593,15 @@ var AMT = function () {
   };
   this.cancel = function () {
     GRAPH.edited = copy(GRAPH.original);
+  };
+  this.getError = function () {
+    return LOAD_ERROR;
+  };
+  this.getAxioms = function () {
+    return AXIOMS;
+  };
+  this.getViolations = function (edited) {
+    return violations(edited === false ? GRAPH.original : GRAPH.edited);
   };
   this.getConcepts = function () {
     return CONCEPTS;

@@ -39,7 +39,7 @@ amt/  ontology/  examples/  tests/  pyproject.toml  CHANGELOG.md  CITATION.cff
         │
         ▼
 python main.py
-  meta ─► ontology ─► site ─► tests ─► examples ─► determinism ─► docs-sync
+  meta ─► ontology ─► docs-sync ─► site ─► tests ─► examples ─► determinism
         │
         ▼
 build/pipeline_report.txt        docs/data/*.ttl (Spiegel von examples/)
@@ -104,7 +104,8 @@ Eigenschaften, die das Repo haben muss:
 | Hell/Dunkel | alle Seiten folgen dem System und haben einen Umschalter (`docs/assets/site.js`); Abbildungen sind eingebettetes SVG und folgen über CSS-Variablen | 2026-10-26 |
 | Geplante Reihenfolge bis 0.4.0 | S9 Vokabular/Ontologie, S10 Startseite (Englisch und Deutsch, Explorer nach `/explorer/`, DFG-Verweis Projektnummer 501836407), S11 Playground, S12 w3id und Umleitung des FTP, S13 D6 und Release 0.4.0 | 2026-10-26 |
 | Playground | maßgeblich ist `leiza-rse/amt-playground` (Original zum ZfdG-Artikel); es muss mit dem neuen AMT wieder interaktiv Graphen erzeugen; eigener Schritt S11 | 2026-10-26 |
-| Playground-Ziel | `leiza-rse/amt-playground` wird gepatcht (läuft ohne HTTP-Triplestore komplett im Browser) und als Hauptplayground nach `docs/playground/` gespiegelt | 2026-10-26 |
+| Playground-Ziel | in der Engine heißt die Anwendung weiter **Explorer** (`/explorer/`, kein eigenes `/playground/`), mit allen Beispielen aus `docs/data/` und „TTL laden“; `leiza-rse/amt-playground` bleibt der **Playground** mit nur dem Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden; beide nutzen denselben JS-Reasoner (Engine ist Quelle, der Playground bekommt eine Kopie) | 2026-10-26 |
+| JS-Reasoner | `docs/js/amt-reasoner.js` ist ein Port von `amt/reasoning.py` und `amt/logic.py` (Entailment-Lesart, ohne `minimal`); `tests/test_js_reasoner.py` vergleicht beide auf allen Beispielen (Node nötig, sonst übersprungen); Änderungen an der Python-Logik ziehen den JS-Port nach | 2026-10-26 |
 | Startseite | `docs/index.html` aus `py/site_home.py`; Englisch bevorzugt, Deutsch umschaltbar, Hell/Dunkel; Explorer unter `/explorer/`, `docs/index.htm` leitet weiter; DFG-Projektnummer 501836407 bestätigt | 2026-10-26 |
 | Release 0.4.0 | erst am Ende (nach S13); die ungereleasten Änderungen aus S7 bis S13 gehören dazu | 2026-10-26 |
 | Zenodo | GitHub-Zenodo-Anbindung ist für beide Repos eingeschaltet; jedes GitHub-Release erzeugt eine Version mit DOI, ein bloßer Tag nicht; deshalb keine Releases für alte Versionen | 2026-10-26 |
@@ -147,7 +148,8 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S8 | Node-24-Korrektur: `upload-artifact@v5` auf `@v6` | amt-engine, amt-runner | S7 | erledigt 2026-10-26 |
 | S9 | Vokabular und Ontologie ins Repo: Seiten, `amt.rdf`, Abbildungen aus Code (Schritt `site`) | amt-engine | S7 | erledigt 2026-10-26 |
 | S10 | Startseite (Englisch und Deutsch, Hell/Dunkel, Was AMT kann und nicht kann, Geschichte), Explorer nach `/explorer/` | amt-engine, amt-runner | S9 | erledigt 2026-10-26 |
-| S11 | Playground: `leiza-rse/amt-playground` patchen (läuft im Browser, ohne HTTP-Triplestore) und als Hauptplayground nach `docs/playground/` spiegeln | amt-playground, amt-engine | S10 | offen |
+| S11a | Gemeinsamer JS-Reasoner (Port der Python-Engine, Paritätstest), Explorer mit Beispielliste und „TTL laden“, schlankes Layout | amt-engine | S10 | erledigt 2026-10-26 |
+| S11b | Playground (`leiza-rse/amt-playground`): nur Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden, mit dem gemeinsamen Reasoner | amt-playground | S11a | offen |
 | S12 | w3id-Eintrag und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | offen |
 | S13 | D6 (Exit-Code) und Release 0.4.0 samt Zenodo | amt-engine, amt-runner | S10 bis S12 | offen |
 
@@ -324,6 +326,18 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - `amt.rdf` wird als Graph verglichen, nicht byteweise: die Byte-Reihenfolge des Serialisierers kann sich zwischen rdflib-Versionen ändern, der Inhalt nicht.
 - Nicht Teil von S9: Startseite (S10), Playground (S11), Umleitung und w3id (S12). Der Link „Explorer“ zeigt bis S10 auf `index.htm`.
 
+## S11a – Gemeinsamer JS-Reasoner und Explorer
+
+**Ziel:** Der Explorer rechnet wie die Python-Engine, zeigt alle Beispiele und lädt eine eigene TTL-Datei.
+
+**Inhalt:** `docs/js/amt-reasoner.js` (Port von `amt/reasoning.py` und `amt/logic.py`, ohne `minimal`-Modus, UMD für Browser und Node); `docs/js/amt.js` nutzt ihn, liest `amt:antecedents`-Listen, `SubsumptionAxiom`, `logicParameter` und kennt auch Dateien ohne Axiom-Hierarchie; Quelle wählbar (`window.AMT_SOURCE`: URL oder `{text, name}`); `docs/explorer/index.html` neu und schlank (eine Leiste), Beispielwahl aus `docs/data/examples.json` (erzeugt von `docs-sync`), TTL laden, Statuszeile mit Konsistenz; Exporte mit Listen und Provenienz; `tests/test_js_reasoner.py` (Parität mit Python, braucht Node, sonst übersprungen). Schritt `docs-sync` läuft jetzt vor `site` und `tests`.
+
+**Befund:** Der alte Explorer zeigte bei Reasoning an für das Potter-Beispiel nichts Neues (7 Kanten), weil es `amt:antecedents` nutzt, das der alte Code nicht las.
+
+**Abnahme:** `python main.py`, dann `--strict` zweimal grün; im Browser Beispiel wählen, Reasoning an (Potter: 8 rote Kanten, animals: 106, skos-mapping: Hinweis auf 2 Verletzungen), eigene Datei laden.
+
+**Nicht Teil:** der leiza-Playground (S11b).
+
 ## S10 – Startseite und Explorer unter /explorer/
 
 **Ziel:** Eine Startseite am Root von `docs/`, die erklärt, was AMT ist, kann und nicht kann, woher es kommt und wie man es zitiert; der Explorer zieht nach `/explorer/` um.
@@ -334,7 +348,7 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 ### Erledigt 2026-10-26
 
-- Der Explorer-Code deckt nur den Stand von 2018 ab (drei Logiken, Ketten aus zwei Schritten, Inverse, disjunkt); Subsumtion, `antecedents` und Einstein/Geometric/Hamacher fehlen. Die Startseite sagt das offen; ob der Explorer nachgezogen wird, entscheidet sich in S11 mit dem Playground.
+- Der Explorer-Code deckt nur den Stand von 2018 ab (drei Logiken, Ketten aus zwei Schritten, Inverse, disjunkt); Subsumtion, `antecedents` und Einstein/Geometric/Hamacher fehlen. Die Startseite sagt das offen; ob der Explorer nachgezogen wird, entscheidet sich in S11 mit dem Playground. Behoben in S11a: gemeinsamer JS-Reasoner.
 - Die Namensgeschichte steht als Entwurf auf der Seite (D9): bitte im Wortlaut prüfen.
 - Das Logo kommt als zweiter Schritt, sobald es vorliegt.
 

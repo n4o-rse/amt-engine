@@ -150,17 +150,15 @@ var exportTTL = function() {
     lines.push("    rdfs:subClassOf rdfs:Class .");
     sep();
 
-    lines.push("amt:LukasiewiczLogic");
-    lines.push("    rdf:type amt:Logic .");
+    lines.push("amt:SubsumptionAxiom");
+    lines.push("    rdfs:subClassOf amt:InferenceAxiom .");
     sep();
 
-    lines.push("amt:ProductLogic");
-    lines.push("    rdf:type amt:Logic .");
-    sep();
-
-    lines.push("amt:GoedelLogic");
-    lines.push("    rdf:type amt:Logic .");
-    sep();
+    ["GoedelLogic", "ProductLogic", "LukasiewiczLogic", "EinsteinProduct", "GeometricMean", "HamacherProduct"].forEach(function(l) {
+        lines.push("amt:" + l);
+        lines.push("    rdf:type amt:Logic .");
+        sep();
+    });
 
     // ── 3. Domain model from LocalStore ────────────────────────
     lines.push("# ── Domain Model ─────────────────────────────────────────");
@@ -227,40 +225,24 @@ var exportTTL = function() {
         sep();
     });
 
-    // 3c. Axioms – collect all axiom types
+    // 3c. Axioms, as the reasoner reads them (role chains as RDF lists)
     lines.push("# Axioms");
-    var C_AXIOM = AMT + "Axiom";
-    var axiomSubclasses = LocalStore.subjectsOf(P_SUBCLASSOF, C_AXIOM);
-    var allAxiomTypes = [];
-    axiomSubclasses.forEach(function(cls) {
-        allAxiomTypes.push(cls);
-        LocalStore.subjectsOf(P_SUBCLASSOF, cls).forEach(function(c2) {
-            if (allAxiomTypes.indexOf(c2) < 0) allAxiomTypes.push(c2);
+    var KEYS = ["antecedent", "inverse", "consequent", "logic", "logicParameter",
+                "subRole", "superRole", "role1", "role2", "role"];
+    _AMT.amt.getAxioms().forEach(function(a) {
+        var props = [];
+        props.push("    rdf:type          amt:" + a.type);
+        if (a.type === "RoleChainAxiom" && a.antecedents && a.antecedents.length) {
+            props.push("    amt:antecedents   ( " + a.antecedents.map(pfx).join(" ") + " )");
+        }
+        KEYS.forEach(function(k) {
+            if (a[k] === undefined) return;
+            if (k === "logicParameter") props.push("    amt:logicParameter " + ttlLiteral(a[k]) + "^^xsd:decimal");
+            else props.push("    amt:" + k + " ".repeat(Math.max(1, 17 - k.length)) + pfx(a[k]));
         });
-    });
-    allAxiomTypes.forEach(function(axiomType) {
-        LocalStore.subjectsOf(P_TYPE, axiomType).forEach(function(axiom) {
-            var ant1 = LocalStore.objectOf(axiom, P_ANT1);
-            var ant2 = LocalStore.objectOf(axiom, P_ANT2);
-            var ant  = LocalStore.objectOf(axiom, P_ANT);
-            var cons = LocalStore.objectOf(axiom, P_CONS);
-            var logic= LocalStore.objectOf(axiom, P_LOGIC);
-            var inv  = LocalStore.objectOf(axiom, P_INV);
-            var r1   = LocalStore.objectOf(axiom, P_ROLE1);
-            var r2   = LocalStore.objectOf(axiom, P_ROLE2);
-            lines.push(pfx(axiom));
-            lines.push("    rdf:type          " + pfx(axiomType) + " ;");
-            if (ant1)  lines.push("    amt:antecedent1   " + pfx(ant1)  + " ;");
-            if (ant2)  lines.push("    amt:antecedent2   " + pfx(ant2)  + " ;");
-            if (ant)   lines.push("    amt:antecedent    " + pfx(ant)   + " ;");
-            if (cons)  lines.push("    amt:consequent    " + pfx(cons)  + " ;");
-            if (logic) lines.push("    amt:logic         " + pfx(logic) + " ;");
-            if (inv)   lines.push("    amt:inverse       " + pfx(inv)   + " ;");
-            if (r1)    lines.push("    amt:role1         " + pfx(r1)    + " ;");
-            if (r2)    lines.push("    amt:role2         " + pfx(r2)    + " ;");
-            lines[lines.length - 1] = lines[lines.length - 1].replace(/ ;$/, " .");
-            sep();
-        });
+        lines.push(pfx(a.iri));
+        lines.push(props.join(" ;\r\n") + " .");
+        sep();
     });
 
     // ── 4. Instance data ───────────────────────────────────────
@@ -299,7 +281,12 @@ var exportTTL = function() {
             lines.push("    rdf:predicate  " + pfx(ei.role) + " ;");
             lines.push("    rdf:object     " + pfx(ei.to)   + " ;");
             lines.push("    amt:weight     " + ttlDouble(ei.width) + " ;");
-            lines.push('    amt:inferred   "true"^^xsd:boolean .');
+            if (ei.provenance && ei.provenance.length) {
+                lines.push('    amt:inferred   "true"^^xsd:boolean ;');
+                lines.push("    amt:provenance " + ei.provenance.map(pfx).join(", ") + " .");
+            } else {
+                lines.push('    amt:inferred   "true"^^xsd:boolean .');
+            }
             sep();
         }
     }
@@ -375,7 +362,8 @@ var exportCypher = function() {
             "MERGE (" + fromVar + ")-[:" + relType + " {" +
             "weight: " + w + ", " +
             "role: \"" + localName(e.role) + "\", " +
-            "inferred: " + (inferred ? "true" : "false") +
+            "inferred: " + (inferred ? "true" : "false") + ", " +
+            "provenance: \"" + (e.provenance || []).map(localName).join(";") + "\"" +
             "}]->(" + toVar + ")"
         );
     };

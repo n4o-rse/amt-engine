@@ -105,7 +105,7 @@ var shortenURI = function(uri) {
 // ------------------------------------------------------------
 var styleEdges = function(edges) {
     for (var i in edges) {
-        var isReasoned = edges[i].font && edges[i].font.color === "red";
+        var isReasoned = !!edges[i].inferred || (edges[i].font && edges[i].font.color === "red");
         var roleShort  = shortenURI(edges[i].role);
         var weightVal  = Math.round(edges[i].width * 1000) / 1000;
 
@@ -154,35 +154,94 @@ var AMT_VIS_OPTIONS = {
 // ------------------------------------------------------------
 // update: (re)load data and render the graph
 // ------------------------------------------------------------
+var _network = null;
+
+var showStatus = function(amt) {
+    var err = amt.getError();
+    var el  = $("#status");
+    if (err) {
+        el.text("Could not load the data: " + err).css("color", "#ffb3b3").attr("title", "");
+        return;
+    }
+    var v = amt.getViolations();
+    if (v.length === 0) {
+        el.text("consistent").css("color", "#b9f6ca").attr("title", "");
+    } else {
+        el.text(v.length + " consistency violation" + (v.length > 1 ? "s" : ""))
+          .css("color", "#ffd180").attr("title", v.join("\n"));
+    }
+};
+
 var update = function() {
-    _AMT.amt = new AMT();
-    _AMT.amt.load(function() {
-        var graph = _AMT.amt.getGraph(false, true);
+    var amt = new AMT();
+    _AMT.amt = amt;
+    $("#title").text("loading...");
+    amt.load(function() {
+        var graph = amt.getGraph(_AMT.reasoning, false);
+        graph.nodes = styleNodes(graph.nodes);
+        graph.edges = styleEdges(graph.edges);
+
         _AMT.graph.nodes = new vis.DataSet(graph.nodes);
         _AMT.graph.edges = new vis.DataSet(graph.edges);
-    });
-
-    setTimeout(function() {
-        new vis.Network(
+        if (_network) _network.destroy();
+        _network = new vis.Network(
             document.getElementById("graph"),
             { nodes: _AMT.graph.nodes, edges: _AMT.graph.edges },
             AMT_VIS_OPTIONS
         );
+        _AMT.thisNodes = graph.nodes;
+        _AMT.thisEdges = graph.edges;
 
-        var updated = _AMT.amt.getGraph(_AMT.reasoning, false);
-        _AMT.graph.edges.clear();
-        _AMT.graph.nodes.clear();
+        $("#title").text(_AMT.title || "");
+        showStatus(amt);
+    });
+};
 
-        updated.nodes = styleNodes(updated.nodes);
-        updated.edges = styleEdges(updated.edges);
+// ------------------------------------------------------------
+// Datasets: the examples listed in data/examples.json, and a file
+// from the visitor's computer
+// ------------------------------------------------------------
+var _examples = [];
 
-        _AMT.graph.nodes.update(updated.nodes);
-        _AMT.graph.edges.update(updated.edges);
-        _AMT.thisNodes = updated.nodes;
-        _AMT.thisEdges = updated.edges;
+var loadExampleList = function(done) {
+    fetch("../data/examples.json")
+        .then(function(r) { return r.ok ? r.json() : []; })
+        .catch(function() { return []; })
+        .then(function(list) {
+            _examples = list;
+            var sel = $("#amt-viz").empty();
+            list.forEach(function(ex) {
+                sel.append($("<option>").val(ex.file).text(ex.title));
+            });
+            if (done) done();
+        });
+};
 
-        $("#title").html($("#amt-viz option:selected").text());
-    }, 1000);
+var chooseExample = function(file, fallbackTitle) {
+    var title = fallbackTitle || file;
+    _examples.forEach(function(ex) { if (ex.file === file) title = ex.title; });
+    window.AMT_SOURCE = "../data/" + file;
+    _AMT.title = title;
+};
+
+var reloadGraphWithProperties = function() {
+    chooseExample($("#amt-viz").val());
+    update();
+    $("#graphPropModal").modal("close");
+};
+
+var loadLocalFile = function(input) {
+    var file = input.files && input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function() {
+        window.AMT_SOURCE = { text: String(reader.result), name: file.name };
+        _AMT.title = file.name;
+        update();
+        $("#graphPropModal").modal("close");
+        input.value = "";
+    };
+    reader.readAsText(file);
 };
 
 // ------------------------------------------------------------
@@ -208,12 +267,6 @@ var openGraphPropModal = function(close) {
 var openRdfModal = function(close) {
     if (close) $("#rdfModal").modal("close");
     else       $("#rdfModal").modal("open");
-};
-
-var reloadGraphWithProperties = function() {
-    _AMT.mode = $("#amt-viz").val();
-    update();
-    $("#graphPropModal").modal("close");
 };
 
 // ------------------------------------------------------------
@@ -257,12 +310,21 @@ var exportRDF = function() {
 // DOM ready
 // ------------------------------------------------------------
 $(function() {
-    update();
     $("#rdfModal").modal({
         complete: function() { openRdfModal(true); }
     });
     $("#graphPropModal").modal({
-        dismissible: false,
         complete: function() { openGraphPropModal(true); }
+    });
+    loadExampleList(function() {
+        // ?ttl=... or the default dataset; the title comes from the list when it is one of the examples
+        var ttl = new URLSearchParams(window.location.search).get("ttl") || "";
+        var file = ttl.replace(/^data\//, "");
+        if (ttl) _AMT.title = file;
+        else chooseExample("PotterAttributionExample.ttl");
+        _examples.forEach(function(ex) { if (ex.file === file) _AMT.title = ex.title; });
+        $("#amt-viz").val(file || "PotterAttributionExample.ttl");
+        $("#amt-viz").material_select();
+        update();
     });
 });
