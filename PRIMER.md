@@ -30,7 +30,7 @@ Arbeitsplan für das Repo `amt-engine` (Academic Meta Tool, Python-Reasoner). Wi
 - Windows-Lauf von `python main.py` (2026-10-26, `C:\git\amt-engine`): alle sechs Schritte `ok`, 62 Tests grün in 16,4 s, Gesamtlauf 38,1 s. Der Determinismus-Test besteht auch dort. Die Warnungszahl im Testlauf liegt mit 15 006 weit unter dem Linux-Wert (rdflib- und Python-Version, siehe D3).
 - `docs-sync` meldete auf Windows fünf Dateien als `updated`, obwohl die Blobs in `examples/` und `docs/data/` identisch sind und überall nur LF enthalten (geprüft an `9a0e8b7`). Ursache: `core.autocrlf` macht im Working Tree CRLF daraus; der Byte-Vergleich sah Unterschiede, wo keine sind. Behoben in S1a.
 - `examples/skos-mapping-example.ttl` meldet beim Konsistenzcheck zwei Verletzungen (`exactMatch` und `questionableMatch` zum selben Ziel; Selbstschleife über `questionableMatch`). Das ist als Demo gewollt (A4). Der Runner beendet sich trotzdem mit Exit-Code 0, deshalb bleibt der Schritt `examples` auf `ok`.
-- `pyproject.toml` nennt als Autor „AMT contributors"; `LICENSE` nennt Florian Thiery | LEIZA | NFDI4Objects; `docs/index.htm` nennt Thiery und Unold (Software) sowie Thiery und Mees (Datenkonzept).
+- `pyproject.toml` nannte als Autor „AMT contributors"; `LICENSE` nannte Florian Thiery | LEIZA | NFDI4Objects; `docs/index.htm` nennt Thiery und Unold (Software) sowie Thiery und Mees (Datenkonzept). Geklärt in S3 (A4).
 
 ### A2 Zielbild
 
@@ -83,7 +83,9 @@ Eigenschaften, die das Repo haben muss:
 | Exit-Code des Runners bei Konsistenzverletzungen | bleibt 0; eine Änderung wäre ein Verhaltenswechsel der Produkt-CLI und braucht einen eigenen Schritt samt Version | 2026-10-26 |
 | Anzahl der requirements-Dateien | familienweit genau eine `requirements.txt` pro Repo; `amt-engine` fasst `requirements-dev.txt` später ein (S6) | 2026-10-26 |
 | Standard-Ref des Runners | `amt-runner` zeigt weiter auf `main`; ein Pin auf Tags kommt erst nach S5 | 2026-10-26 |
-| Autoren in `CITATION.cff` | nur Florian Thiery, ohne ORCID, bis die Liste geklärt ist | Vorschlag 2026-10-26 |
+| Autoren in `CITATION.cff` und `pyproject.toml` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
+| Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, in beiden Repos gleich; `docs/LICENSE` und `docs/js/LICENSE` bleiben unverändert (Dritt- und Altbestand) | 2026-10-26 |
+| Rolle von Unold | kein Autor von AMT.engine; das ursprüngliche Academic Meta Tool (Unold, Thiery, 2017) steht unter `references` in `CITATION.cff`, ohne erfundene DOI | 2026-10-26 |
 | Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version gesetzt hat (0.3.0: 2026-08-29) | Vorschlag 2026-10-26 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
@@ -116,7 +118,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S1 | Skeleton: `PRIMER.md`, `main.py`, `py/`, `CHANGELOG.md`, `CITATION.cff`, README | amt-engine | S0 | erledigt 2026-10-26 |
 | S1a | Nachbesserung nach dem Windows-Lauf: `docs-sync` und Zeilenenden, Primer-Befunde | amt-engine | S1 | erledigt 2026-10-26 |
 | S2 | `amt-runner` auf das Muster: `PRIMER.md`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, Dev-Pipeline (im Runner-Primer als S1 geführt) | amt-runner | S1 | erledigt 2026-10-26 |
-| S3 | `CITATION.cff` klären: Autorenliste, ORCID, Rolle von Unold und Mees | amt-engine, amt-runner | S1 | offen |
+| S3 | `CITATION.cff` klären: Autorenliste, ORCID, Rolle von Unold und Mees | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-engine | S1 | offen |
 | S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Releases, Zenodo-DOI | amt-engine | S3 | offen |
 | S6 | `requirements-dev.txt` in `requirements.txt` einfassen; Folge für den Runner prüfen (er installiert aus dieser Datei) | amt-engine | S1, S2 | offen |
@@ -178,6 +180,22 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - Details, Befunde und Beschlüsse stehen im Primer von `amt-runner`. Für dieses Repo folgen daraus zwei Beschlüsse (A4): eine `requirements.txt` pro Repo und `main` als Standard-Ref des Runners.
 - Der Runner installiert die Pakete aus `requirements.txt` dieses Repos. Fasst S6 `requirements-dev.txt` dort ein, installiert der Runner künftig auch `pytest`; das ist harmlos, aber unnötig groß und gehört in die Entscheidung von S6.
 
+## S3 – Autoren, ORCID und Rechteinhaber klären
+
+**Ziel:** `CITATION.cff`, `pyproject.toml` und `LICENSE` nennen in beiden Repos dieselben Personen und denselben Rechteinhaber; S5 kann daraus eine Zenodo-Veröffentlichung ableiten.
+
+**Uploads:** `PRIMER.md`; die Antworten kamen aus einem Formular (Autoren, ORCID, Rechteinhaber, Metadaten).
+
+**Inhalt:** Autorenliste Thiery und Mees mit ORCID und Affiliation LEIZA in beiden `CITATION.cff`; `references` mit dem ursprünglichen Academic Meta Tool in der Engine; `pyproject.toml` der Engine mit denselben Autoren; Rechteinhaber in beiden `LICENSE`; CHANGELOG-Einträge.
+
+**Abnahme:** `python main.py --strict` grün, zweimal hintereinander, `git status` beim zweiten Mal sauber; `pip install -e .` funktioniert weiter und `pip show amt` nennt die beiden Autoren; `docs/LICENSE` und `docs/js/LICENSE` sind unverändert.
+
+### Erledigt 2026-10-26
+
+- Entscheidungen stehen in A4. D1 ist damit geklärt.
+- Der Runner-Primer wurde im selben Patch nachgezogen (Rechteinhaber, Autoren, Windows-Befund).
+- Offen bleibt die Zenodo-DOI (S5); der Kommentar dazu in `CITATION.cff` bleibt stehen.
+
 ## S6 – requirements-dev.txt einfassen
 
 **Ziel:** Dieses Repo hat genau eine `requirements.txt`, wie A3 es verlangt.
@@ -192,7 +210,7 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 ## Teil D – Offene Punkte
 
-- **D1** Autorenliste: Unold und Mees stehen im Webviewer, nicht in `pyproject.toml`. Entscheidung gehört in S3 und sollte als Formular gefragt werden.
+- **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.
 - **D2** Wo wird `http://academic-meta-tool.xyz/vocab#` aufgelöst, und liegt die Ontologie dort in derselben Fassung wie `ontology/amt.ttl`?
 - **D3** Die rund 83 700 rdflib-Warnungen im Testlauf: Ursache klären (eigener Code oder Bibliothek) und, falls eigener Code, beheben.
 - **D4** Verhältnis zu `amt-explore`: Der Verlauf ist seit 2026-05-04 hier eingemergt. Wird das separate Repo weitergepflegt, oder ist `docs/` hier jetzt maßgeblich?

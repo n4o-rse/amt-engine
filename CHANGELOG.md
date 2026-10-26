@@ -19,11 +19,19 @@ introduced the version number in `pyproject.toml`.
   `ontology`, `tests`, `examples`, `determinism` and `docs-sync`
   (`--list`, `--only`, `--from`, `--skip`, `--dry-run`, `--strict`). The
   product commands `amt` and `amt-runner` are unchanged.
-- `CITATION.cff` so the software can be cited.
+- `CITATION.cff` so the software can be cited. It names Florian Thiery and
+  Allard W. Mees as authors, with their ORCIDs, and lists the original
+  Academic Meta Tool (Martin Unold and Florian Thiery, 2017) under
+  `references`.
 - This changelog.
 
 ### Changed
 
+- `pyproject.toml`: the package authors are Florian Thiery and Allard W. Mees
+  instead of "AMT contributors".
+- `LICENSE`: the copyright holder reads "Florian Thiery | LEIZA | Research
+  Squirrel Engineers Network" (was "... | NFDI4Objects"). The licences in
+  `docs/` are third-party or historical and stay as they are.
 - `README.md`: describes the development pipeline and lists the new files in
   the layout.
 

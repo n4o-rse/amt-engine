@@ -11,13 +11,28 @@ type: software
 authors:
   - family-names: Thiery
     given-names: Florian
+    orcid: "https://orcid.org/0000-0002-3246-3531"
     affiliation: "Leibniz-Zentrum für Archäologie (LEIZA)"
-    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO: insert ORCID
+  - family-names: Mees
+    given-names: Allard W.
+    orcid: "https://orcid.org/0000-0002-7634-5342"
+    affiliation: "Leibniz-Zentrum für Archäologie (LEIZA)"
 license: MIT
 version: "0.3.0"
 date-released: "2026-08-29"
 repository-code: "https://github.com/n4o-rse/amt-engine"
 # doi: "10.5281/zenodo.XXXXXXX"  # TODO: add Zenodo DOI once minted
+references:
+  - type: software
+    title: "Academic Meta Tool (AMT)"
+    authors:
+      - family-names: Unold
+        given-names: Martin
+      - family-names: Thiery
+        given-names: Florian
+    year: 2017
+    url: "http://academic-meta-tool.xyz/"
+    notes: "The original Academic Meta Tool and its web viewer, from which the data model and the browser interface descend."
 keywords:
   - Academic Meta Tool
   - fuzzy logic

@@ -8,7 +8,10 @@ version = "0.3.0"
 description = "AMT.engine — Academic Meta Tool reasoning engine (n-ary role chains, six fuzzy logics, SHACL validation)"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "AMT contributors" }]
+authors = [
+    { name = "Florian Thiery" },
+    { name = "Allard W. Mees" },
+]
 license = { text = "MIT" }
 dependencies = [
     "rdflib>=7.0",
