@@ -18,8 +18,8 @@ authors:
     orcid: "https://orcid.org/0000-0002-7634-5342"
     affiliation: "Leibniz-Zentrum für Archäologie (LEIZA)"
 license: MIT
-version: "0.3.0"
-date-released: "2026-08-29"
+version: "0.3.1"
+date-released: "2026-10-26"
 repository-code: "https://github.com/n4o-rse/amt-engine"
 # doi: "10.5281/zenodo.XXXXXXX"  # TODO: add Zenodo DOI once minted
 references:

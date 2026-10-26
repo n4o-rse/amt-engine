@@ -5,11 +5,19 @@ All notable changes to AMT.engine are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/).
 
-The repository carries no git tags. The entries for 0.1.0 to 0.3.0 were
-reconstructed from the commit history; each date is that of the commit that
-introduced the version number in `pyproject.toml`.
+The entries for 0.1.0 to 0.3.0 were reconstructed from the commit history;
+each date is that of the commit that introduced the version number in
+`pyproject.toml`. The tags `v0.1.0` to `v0.3.0` were set afterwards on exactly
+those commits. 0.3.1 is the first release published on GitHub and archived on
+Zenodo.
 
 ## [Unreleased]
+
+## [0.3.1] - 2026-10-26
+
+0.3.1 changes no behaviour of the reasoner or the commands `amt` and
+`amt-runner`. It adds the development pipeline, citation metadata and
+continuous integration.
 
 ### Added
 
@@ -136,7 +144,8 @@ introduced the version number in `pyproject.toml`.
 - The formal ontology: `ontology/amt.ttl`, `ontology/amt-shapes.ttl`, valid and
   invalid example files, `validate_examples.py` and an ontology README.
 
-[Unreleased]: https://github.com/n4o-rse/amt-engine/compare/a50822c...HEAD
-[0.3.0]: https://github.com/n4o-rse/amt-engine/commit/03eb093
-[0.2.0]: https://github.com/n4o-rse/amt-engine/commit/5cc2fbf
+[Unreleased]: https://github.com/n4o-rse/amt-engine/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/n4o-rse/amt-engine/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/n4o-rse/amt-engine/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/n4o-rse/amt-engine/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/n4o-rse/amt-engine/commit/3357cde

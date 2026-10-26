@@ -25,7 +25,7 @@ Arbeitsplan für das Repo `amt-engine` (Academic Meta Tool, Python-Reasoner). Wi
 - Zwei Läufe der Pipeline auf `animals.ttl` und `subsumption-demo.ttl` unter `PYTHONHASHSEED=1` und `=2`: fünf der sechs Ausgabedateien sind byte-identisch, nur `*.report.md` unterscheidet sich (Start- und Endzeit). Die Reihenfolge-Korrektur aus 0.3.0 hält also.
 - `pytest` meldet 62 grüne Tests und rund 83 700 Warnungen (rdflib-Deprecation; die Zahl schwankt leicht zwischen Läufen); die Warnungen verdecken jede andere Meldung.
 - `.gitignore` schließt `dist/` aus (setuptools-Ausgabe). Das Primer-Muster legt Produkte sonst in `dist/` ab; hier geht das nicht, siehe A4.
-- Die Historie hat 30 Commits und keine Tags. Die Versionen stehen nur in `pyproject.toml`: 0.1.0 (2026-04-28), 0.2.0 (2026-05-05), 0.3.0 (2026-08-29).
+- Die Historie hatte 30 Commits und keine Tags. Die Versionen standen nur in `pyproject.toml`: 0.1.0 (2026-04-28), 0.2.0 (2026-05-05), 0.3.0 (2026-08-29). Seit S5 tragen die Commits `3357cde`, `5cc2fbf` und `03eb093` die Tags `v0.1.0` bis `v0.3.0`.
 - Commit `db1db2d` (2026-05-04) führt den Verlauf von `amt-explore` in dieses Repo zusammen. Der Webviewer in `docs/` stammt von dort.
 - Windows-Lauf von `python main.py` (2026-10-26, `C:\git\amt-engine`): alle sechs Schritte `ok`, 62 Tests grün in 16,4 s, Gesamtlauf 38,1 s. Der Determinismus-Test besteht auch dort. Die Warnungszahl im Testlauf liegt mit 15 006 weit unter dem Linux-Wert (rdflib- und Python-Version, siehe D3).
 - `docs-sync` meldete auf Windows fünf Dateien als `updated`, obwohl die Blobs in `examples/` und `docs/data/` identisch sind und überall nur LF enthalten (geprüft an `9a0e8b7`). Ursache: `core.autocrlf` macht im Working Tree CRLF daraus; der Byte-Vergleich sah Unterschiede, wo keine sind. Behoben in S1a.
@@ -89,7 +89,9 @@ Eigenschaften, die das Repo haben muss:
 | Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, in beiden Repos gleich; `docs/LICENSE` und `docs/js/LICENSE` bleiben unverändert (Dritt- und Altbestand) | 2026-10-26 |
 | CI-Matrix | Ubuntu und Windows, Python 3.10 und 3.13; Auslöser Push auf `main`, Pull Request und manuell; `python main.py --strict`; Report als Artefakt | 2026-10-26 |
 | Rolle von Unold | kein Autor von AMT.engine; das ursprüngliche Academic Meta Tool (Unold, Thiery, 2017) steht unter `references` in `CITATION.cff`, ohne erfundene DOI | 2026-10-26 |
-| Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version gesetzt hat (0.3.0: 2026-08-29) | Vorschlag 2026-10-26 |
+| Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version gesetzt hat (0.3.0: 2026-08-29, 0.3.1: 2026-10-26) | 2026-10-26 |
+| Tags und Releases | `v0.1.0` bis `v0.3.0` als annotierte Tags auf den Commits aus dem CHANGELOG, ohne GitHub-Release; `v0.3.1` ist das erste Release (Version 0.3.1: keine Verhaltensänderung, nur Metadaten, Tooling, CI) | 2026-10-26 |
+| Zenodo | GitHub-Zenodo-Anbindung ist für beide Repos eingeschaltet; jedes GitHub-Release erzeugt eine Version mit DOI, ein bloßer Tag nicht; deshalb keine Releases für alte Versionen | 2026-10-26 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
 
@@ -123,10 +125,10 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S2 | `amt-runner` auf das Muster: `PRIMER.md`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, Dev-Pipeline (im Runner-Primer als S1 geführt) | amt-runner | S1 | erledigt 2026-10-26 |
 | S3 | `CITATION.cff` klären: Autorenliste, ORCID, Rolle von Unold und Mees | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-engine | S1 | erledigt 2026-10-26 |
-| S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Releases, Zenodo-DOI | amt-engine | S3 | offen |
+| S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Release 0.3.1, Zenodo-DOI | amt-engine | S3, S4, S6 | offen (5a erledigt 2026-10-26) |
 | S6 | `requirements-dev.txt` in `requirements.txt` einfassen; Folge für den Runner prüfen (er installiert aus dieser Datei) | amt-engine | S1, S2 | erledigt 2026-10-26 |
 
-S3, S4 und S6 sind erledigt; S5 steht als Letztes an (Reihenfolge am 2026-10-26: S5 zuletzt, damit der eingefrorene Stand fertig ist). Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
+S3, S4 und S6 sind erledigt; S5 ist der letzte Schritt und läuft in drei Teilen (5a Version 0.3.1 im Repo, 5b Tags und Release, 5c DOI eintragen). Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
 Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie umnummeriert.
 
@@ -215,6 +217,20 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - Auf den Windows-Runnern checkt Git mit `core.autocrlf=true` aus; das ist derselbe Fall wie bei dir und seit S1a durch den normalisierten Vergleich in `docs-sync` abgedeckt.
 - `sync-examples-to-docs.yml` bleibt unverändert. Seine Commits tragen `[skip ci]`; der Workflow läuft nur bei Änderungen in `examples/**` und prüft nicht selbst.
 
+## S5 – Tags, Release 0.3.1 und Zenodo-DOI
+
+**Ziel:** Die Software ist zitierbar: Tags für die drei bisherigen Versionen, ein erstes GitHub-Release `v0.3.1` und eine Zenodo-DOI in `CITATION.cff` und README.
+
+**Uploads:** Zwei Patches (5a, 5c) und manuelle Befehle für die Tags (5b); die Antworten kamen aus einem Formular.
+
+**Teil 5a (Patch):** Version 0.3.1 in `pyproject.toml`, `amt/__init__.py`, `CITATION.cff`, `py/amt_dev_utils.py` und `CHANGELOG.md` (`[Unreleased]` wird `[0.3.1] - 2026-10-26`, Vergleichslinks auf Tags).
+
+**Teil 5b (manuell, nach dem Push von 5a):** annotierte Tags `v0.1.0` auf `3357cde`, `v0.2.0` auf `5cc2fbf`, `v0.3.0` auf `03eb093` und `v0.3.1` auf dem Commit von 5a; `git push origin --tags`; auf GitHub ein Release aus `v0.3.1` anlegen. Nur dieses Release löst bei Zenodo die Archivierung aus.
+
+**Teil 5c (Patch):** Zenodo-DOI (Concept-DOI) in `CITATION.cff` und README eintragen, `[Unreleased]` im CHANGELOG ergänzen. Das ist ein Patch nach dem Release, weil die DOI vorher nicht bekannt ist.
+
+**Abnahme:** `python main.py --strict` grün; `git tag` zeigt vier Tags; die Seite „Releases“ zeigt `v0.3.1`; auf zenodo.org steht eine Version mit den Autoren aus `CITATION.cff`; nach 5c nennt `CITATION.cff` die DOI.
+
 ## S6 – requirements-dev.txt einfassen
 
 **Ziel:** Dieses Repo hat genau eine `requirements.txt`, wie A3 es verlangt.
@@ -239,5 +255,5 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D3** Die rund 83 700 rdflib-Warnungen im Testlauf (Linux, Python 3.13; auf Windows mit Python 3.10 sind es 15 006): Ursache klären (eigener Code oder Bibliothek) und, falls eigener Code, beheben.
 - **D7** Die Reihenfolge der vier Verstöße in der Konsolenausgabe des Ontologie-Schritts (`example-invalid.ttl`) ist bei jedem Lauf anders (pyshacl). Die geprüften Ausgabedateien sind davon nicht betroffen, der Determinismus-Schritt ist grün. Sortieren wäre ein kleiner eigener Schritt.
 - **D4** Verhältnis zu `amt-explore`: Der Verlauf ist seit 2026-05-04 hier eingemergt. Wird das separate Repo weitergepflegt, oder ist `docs/` hier jetzt maßgeblich?
-- **D5** Ob der Runner künftig auf Tags statt auf `main` pinnt, hängt an S5. Bis dahin bleibt `main` (A4).
+- **D5** Ob der Runner künftig auf Tags statt auf `main` pinnt, hängt an S5. Bis dahin bleibt `main` (A4). Mit `v0.3.1` ist ein Tag da; die Entscheidung kann danach fallen.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.

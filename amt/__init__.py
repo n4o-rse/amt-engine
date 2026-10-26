@@ -65,7 +65,7 @@ from .viz import (
     show_in_notebook,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 __all__ = [
     # core
