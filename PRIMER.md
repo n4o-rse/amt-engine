@@ -83,7 +83,7 @@ Eigenschaften, die das Repo haben muss:
 | Exit-Code des Runners bei Konsistenzverletzungen | bleibt 0; eine Änderung wäre ein Verhaltenswechsel der Produkt-CLI und braucht einen eigenen Schritt samt Version | 2026-10-26 |
 | Anzahl der requirements-Dateien | familienweit genau eine `requirements.txt` pro Repo; `amt-engine` hat `requirements-dev.txt` in S6 eingefasst (`pytest` steht mit Kommentar in `requirements.txt`) | 2026-10-26 |
 | `pytest` beim Runner | darf mitkommen: der Runner installiert die `requirements.txt` der Engine samt `pytest`; kein zweiter Satz Laufzeitpakete | 2026-10-26 |
-| Versionen der GitHub Actions | Hauptversionen mit Node 24: `checkout@v5`, `setup-python@v6`, `upload-artifact@v5`; bei der nächsten Node-Warnung erneut prüfen | 2026-10-26 |
+| Versionen der GitHub Actions | Hauptversionen mit Node 24: `checkout@v5`, `setup-python@v6`, `upload-artifact@v6`; Node 24 geprüft an `action.yml` der Tags (`upload-artifact@v5` läuft noch auf Node 20, ab v6 Node 24); bei der nächsten Node-Warnung erneut prüfen | 2026-10-26 |
 | Standard-Ref des Runners | `amt-runner` zeigt weiter auf `main`; ein Pin auf Tags kommt erst nach S5 | 2026-10-26 |
 | Autoren in `CITATION.cff` und `pyproject.toml` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
 | Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, in beiden Repos gleich; `docs/LICENSE` und `docs/js/LICENSE` bleiben unverändert (Dritt- und Altbestand) | 2026-10-26 |
@@ -268,7 +268,7 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 
 **Inhalt:** D3: Ursache klären und die zwei Deprecation-Meldungen filtern. D7: Verstöße sortieren, mit Test. D4 und D5: Beschlüsse in A4. D2: Befund notieren.
 
-**Abnahme:** `python main.py --strict` grün, zweimal hintereinander; `pytest` meldet 63 Tests ohne Warnungen; fünf Läufe von `python ontology/validate_examples.py` unter verschiedenen `PYTHONHASHSEED` geben die Verstöße in derselben Reihenfolge aus; `git status` sauber.
+**Abnahme:** `python main.py --strict` grün, zweimal hintereinander; `pytest` meldet 63 Tests ohne Warnungen (unter Linux; unter Windows meldet der Lauf noch 204, siehe D8); fünf Läufe von `python ontology/validate_examples.py` unter verschiedenen `PYTHONHASHSEED` geben die Verstöße in derselben Reihenfolge aus; `git status` sauber.
 
 ### Erledigt 2026-10-26
 
@@ -288,4 +288,5 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D7** erledigt in S7: Verstöße sind sortiert.
 - **D4** erledigt in S7: siehe A4 („Verhältnis zu `amt-explore`“).
 - **D5** erledigt in S7: Standard-Ref des Runners bleibt `main` (A4).
+- **D8** Unter Windows meldet `pytest` 63 Tests mit 204 Warnungen (Linux: keine). Offen: `python -m pytest tests -q -rw` in `C:\git\amt-engine` ausführen, die Warnungsarten ablesen und entscheiden, ob sie zu filtern oder zu beheben sind.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.

@@ -22,6 +22,9 @@ Zenodo.
 - `pyproject.toml`: `[tool.pytest.ini_options]` silences two rdflib
   deprecation warnings that pyshacl triggers about 83 000 times per test run.
   Other warnings stay visible.
+- `actions/upload-artifact` goes from v5 to v6 in the workflow files. v5 still
+  runs on Node 20 and made every run print the Node 20 deprecation warning;
+  v6 runs on Node 24. The entry for 0.3.1 below names v5 wrongly.
 
 ### Added
 
