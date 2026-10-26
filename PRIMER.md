@@ -85,6 +85,7 @@ Eigenschaften, die das Repo haben muss:
 | Standard-Ref des Runners | `amt-runner` zeigt weiter auf `main`; ein Pin auf Tags kommt erst nach S5 | 2026-10-26 |
 | Autoren in `CITATION.cff` und `pyproject.toml` | Florian Thiery (ORCID 0000-0002-3246-3531) und Allard W. Mees (ORCID 0000-0002-7634-5342), beide LEIZA; ersetzt den Vorschlag „nur Thiery“ | 2026-10-26 |
 | Rechteinhaber in `LICENSE` | „Florian Thiery \| LEIZA \| Research Squirrel Engineers Network“, in beiden Repos gleich; `docs/LICENSE` und `docs/js/LICENSE` bleiben unverändert (Dritt- und Altbestand) | 2026-10-26 |
+| CI-Matrix | Ubuntu und Windows, Python 3.10 und 3.13; Auslöser Push auf `main`, Pull Request und manuell; `python main.py --strict`; Report als Artefakt | 2026-10-26 |
 | Rolle von Unold | kein Autor von AMT.engine; das ursprüngliche Academic Meta Tool (Unold, Thiery, 2017) steht unter `references` in `CITATION.cff`, ohne erfundene DOI | 2026-10-26 |
 | Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version gesetzt hat (0.3.0: 2026-08-29) | Vorschlag 2026-10-26 |
 
@@ -119,7 +120,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S1a | Nachbesserung nach dem Windows-Lauf: `docs-sync` und Zeilenenden, Primer-Befunde | amt-engine | S1 | erledigt 2026-10-26 |
 | S2 | `amt-runner` auf das Muster: `PRIMER.md`, `CHANGELOG.md`, `CITATION.cff`, `requirements.txt`, Dev-Pipeline (im Runner-Primer als S1 geführt) | amt-runner | S1 | erledigt 2026-10-26 |
 | S3 | `CITATION.cff` klären: Autorenliste, ORCID, Rolle von Unold und Mees | amt-engine, amt-runner | S1 | erledigt 2026-10-26 |
-| S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-engine | S1 | offen |
+| S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-engine | S1 | erledigt 2026-10-26 |
 | S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Releases, Zenodo-DOI | amt-engine | S3 | offen |
 | S6 | `requirements-dev.txt` in `requirements.txt` einfassen; Folge für den Runner prüfen (er installiert aus dieser Datei) | amt-engine | S1, S2 | offen |
 
@@ -196,13 +197,29 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - Der Runner-Primer wurde im selben Patch nachgezogen (Rechteinhaber, Autoren, Windows-Befund).
 - Offen bleibt die Zenodo-DOI (S5); der Kommentar dazu in `CITATION.cff` bleibt stehen.
 
+## S4 – CI mit GitHub Actions
+
+**Ziel:** Jeder Push auf `main` und jeder Pull Request läuft durch `python main.py --strict`, auf Linux und Windows.
+
+**Uploads:** `PRIMER.md`, `README.md`, `CHANGELOG.md`; die Antworten kamen aus einem Formular (Betriebssysteme, Python-Versionen, Auslöser).
+
+**Inhalt:** `.github/workflows/ci.yml` mit vier Jobs (Ubuntu und Windows, Python 3.10 und 3.13), `fail-fast: false`, nur Leserechte, laufende Läufe desselben Branches werden abgebrochen; Abhängigkeiten aus `requirements-dev.txt` (S6 stellt das auf `requirements.txt` um); Report je Job als Artefakt.
+
+**Abnahme:** Nach dem Push zeigt der Reiter „Actions“ den Lauf `CI` mit vier grünen Jobs. Der Commit des Sync-Workflows (`[skip ci]`) startet ihn nicht.
+
+### Erledigt 2026-10-26
+
+- Der Workflow ist mit `actionlint` geprüft; ein echter Lauf war hier nicht möglich (kein Zugriff auf Actions). Die erste Rückmeldung kommt aus dem Reiter „Actions“ nach deinem Push.
+- Auf den Windows-Runnern checkt Git mit `core.autocrlf=true` aus; das ist derselbe Fall wie bei dir und seit S1a durch den normalisierten Vergleich in `docs-sync` abgedeckt.
+- `sync-examples-to-docs.yml` bleibt unverändert. Seine Commits tragen `[skip ci]`; der Workflow läuft nur bei Änderungen in `examples/**` und prüft nicht selbst.
+
 ## S6 – requirements-dev.txt einfassen
 
 **Ziel:** Dieses Repo hat genau eine `requirements.txt`, wie A3 es verlangt.
 
 **Uploads:** Bundle aus A5.
 
-**Inhalt:** `pytest>=7.0` wandert mit Kommentar in `requirements.txt`; `requirements-dev.txt` entfällt (Löschung als manueller Schritt, ein ZIP kann sie nicht transportieren); README und `pyproject.toml` (`[project.optional-dependencies] dev`) prüfen. Vorher klären, ob der Runner weiter nur die Laufzeitpakete bekommen soll, etwa über einen Kommentarblock, den er ignoriert, oder über eine zweite Zeile im Runner.
+**Inhalt:** `pytest>=7.0` wandert mit Kommentar in `requirements.txt`; `requirements-dev.txt` entfällt (Löschung als manueller Schritt, ein ZIP kann sie nicht transportieren); README, `pyproject.toml` (`[project.optional-dependencies] dev`) und `.github/workflows/ci.yml` (installiert heute `requirements-dev.txt`) prüfen. Vorher klären, ob der Runner weiter nur die Laufzeitpakete bekommen soll, etwa über einen Kommentarblock, den er ignoriert, oder über eine zweite Zeile im Runner.
 
 **Abnahme:** `pip install -r requirements.txt` in einer neuen virtuellen Umgebung, danach `python main.py --strict` grün; `python run_amt.py animals.ttl` im Runner läuft weiter durch; `git status` sauber.
 

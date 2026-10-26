@@ -73,6 +73,7 @@ CITATION.cff                how to cite this software
 pyproject.toml              build config + entry points
 requirements.txt            runtime dependencies (mirrors pyproject)
 requirements-dev.txt        the above plus pytest
+.github/workflows/          ci.yml (pipeline on push and pull request), sync-examples-to-docs.yml
 ```
 
 `ontology/` stays at the repository root, where the ontology README, the
@@ -321,6 +322,10 @@ python main.py --from examples     # this step and everything after
 python main.py --dry-run           # print the plan, run nothing
 python main.py --strict            # warnings become errors (use this in CI)
 ```
+
+GitHub Actions runs `python main.py --strict` on every push to `main` and on
+every pull request (`.github/workflows/ci.yml`), on Linux and Windows with
+Python 3.10 and 3.13. The report of each job is kept as a workflow artefact.
 
 The combined output is written to `build/pipeline_report.txt`. The product
 commands `amt` and `amt-runner` are independent of `main.py`. Changes are

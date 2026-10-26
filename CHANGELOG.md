@@ -19,6 +19,9 @@ introduced the version number in `pyproject.toml`.
   `ontology`, `tests`, `examples`, `determinism` and `docs-sync`
   (`--list`, `--only`, `--from`, `--skip`, `--dry-run`, `--strict`). The
   product commands `amt` and `amt-runner` are unchanged.
+- `.github/workflows/ci.yml`: runs `python main.py --strict` on push to
+  `main` and on pull requests, on Ubuntu and Windows with Python 3.10 and 3.13,
+  and keeps `build/pipeline_report.txt` of each job as an artefact.
 - `CITATION.cff` so the software can be cited. It names Florian Thiery and
   Allard W. Mees as authors, with their ORCIDs, and lists the original
   Academic Meta Tool (Martin Unold and Florian Thiery, 2017) under
