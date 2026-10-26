@@ -31,7 +31,8 @@ RELEASE_DATE = "2026-10-26"
 # --------------------------------------------------------------------------- #
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES_DIR = ROOT / "examples"
-DOCS_DATA_DIR = ROOT / "docs" / "data"
+DOCS_DIR = ROOT / "docs"
+DOCS_DATA_DIR = DOCS_DIR / "data"
 ONTOLOGY_DIR = ROOT / "ontology"
 TESTS_DIR = ROOT / "tests"
 

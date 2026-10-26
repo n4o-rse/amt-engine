@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:amt="http://academic-meta-tool.xyz/vocab#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:dct="http://purl.org/dc/terms/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#subRole">
+    <rdfs:label xml:lang="en">sub-role</rdfs:label>
+    <rdfs:comment xml:lang="en">The finer role. Every edge carrying it also carries the super-role.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#SubsumptionAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#arity">
+    <rdfs:label xml:lang="en">arity</rdfs:label>
+    <rdfs:comment xml:lang="en">Either 'binary' (associative, can be applied pairwise) or 'n-ary' (must receive the full weight list at once).</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#Logic"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Property>
+  <amt:Logic rdf:about="http://academic-meta-tool.xyz/vocab#EinsteinProduct">
+    <rdfs:label xml:lang="en">Einstein product</rdfs:label>
+    <rdfs:comment xml:lang="en">Soft multiplication, lying between Gödel and Product. Stricter than Gödel, gentler than Product.</rdfs:comment>
+    <amt:formula>(x * y) / (2 - (x + y - x * y))</amt:formula>
+    <amt:arity>binary</amt:arity>
+    <amt:isParametrised rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</amt:isParametrised>
+    <amt:recommendedFor>Automatically generated mappings of medium confidence. Good middle ground for n=3 and n=4.</amt:recommendedFor>
+  </amt:Logic>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#role">
+    <rdfs:label xml:lang="en">role</rdfs:label>
+    <rdfs:comment xml:lang="en">Role declared as self-disjoint (irreflexive).</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#SelfDisjointAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#logicParameter">
+    <rdfs:label xml:lang="en">logic parameter</rdfs:label>
+    <rdfs:comment xml:lang="en">Numeric parameter for parametrised logics (e.g. gamma for Hamacher product).</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#InferenceAxiom"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#antecedent">
+    <rdfs:label xml:lang="en">antecedent</rdfs:label>
+    <rdfs:comment xml:lang="en">Role whose inverse is being declared.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#InverseAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <amt:Logic rdf:about="http://academic-meta-tool.xyz/vocab#GeometricMean">
+    <rdfs:label xml:lang="en">Geometric mean</rdfs:label>
+    <rdfs:comment xml:lang="en">Aggregation operator: n-th root of the product. Path-length neutral; expresses average link quality.</rdfs:comment>
+    <amt:formula>(x_1 * x_2 * ... * x_n)^(1/n)</amt:formula>
+    <amt:arity>n-ary</amt:arity>
+    <amt:isParametrised rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</amt:isParametrised>
+    <amt:recommendedFor>Comparing inferences across different chain lengths. Recommended default for n &gt;= 4. Note: not a t-norm in the strict sense.</amt:recommendedFor>
+  </amt:Logic>
+  <amt:Logic rdf:about="http://academic-meta-tool.xyz/vocab#HamacherProduct">
+    <rdfs:label xml:lang="en">Hamacher product</rdfs:label>
+    <rdfs:comment xml:lang="en">Parametrised t-norm family. Sensitivity to path length is controlled by a gamma parameter.</rdfs:comment>
+    <amt:formula>(x * y) / (gamma + (1 - gamma) * (x + y - x * y))</amt:formula>
+    <amt:arity>binary</amt:arity>
+    <amt:isParametrised rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</amt:isParametrised>
+    <amt:recommendedFor><![CDATA[Research applications where path-length sensitivity should be tuned empirically. gamma = 1 equals Product; gamma < 1 stricter; gamma > 1 softer.]]></amt:recommendedFor>
+  </amt:Logic>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#antecedent1">
+    <rdfs:label xml:lang="en">antecedent 1</rdfs:label>
+    <rdfs:comment xml:lang="en">First role in a 2-step role chain (legacy form). Use amt:antecedents for chains of length n != 2.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#RoleChainAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#role2">
+    <rdfs:label xml:lang="en">role 2</rdfs:label>
+    <rdfs:comment xml:lang="en">Second role in a disjointness assertion.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#DisjointAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <amt:Logic rdf:about="http://academic-meta-tool.xyz/vocab#GoedelLogic">
+    <rdfs:label xml:lang="en">Gödel logic</rdfs:label>
+    <rdfs:comment xml:lang="en">Bottleneck semantics: the chain is as strong as its weakest link. Path length is ignored.</rdfs:comment>
+    <amt:formula>min(x, y)</amt:formula>
+    <amt:arity>binary</amt:arity>
+    <amt:isParametrised rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</amt:isParametrised>
+    <amt:recommendedFor>Curated mappings; chains where path length should not penalise the result. Good default for n=2 and n=3.</amt:recommendedFor>
+  </amt:Logic>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#antecedents">
+    <rdfs:label xml:lang="en">antecedents</rdfs:label>
+    <rdfs:comment xml:lang="en">Ordered RDF list of n roles forming the chain. Generalises antecedent1/antecedent2 to arbitrary chain length.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#RoleChainAxiom"/>
+    <rdfs:range rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#List"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#placeholder">
+    <rdfs:label xml:lang="en">placeholder</rdfs:label>
+    <rdfs:comment xml:lang="en">Hint for the expected label format of instances of a Concept.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#Concept"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdf:Property>
+  <amt:ReasoningRule rdf:about="http://academic-meta-tool.xyz/vocab#DisjointRule">
+    <rdfs:label xml:lang="en">Disjoint Consistency Rule</rdfs:label>
+    <amt:appliesTo rdf:resource="http://academic-meta-tool.xyz/vocab#DisjointAxiom"/>
+    <amt:precondition>There exist edges (a -role1-&gt; b) and (a -role2-&gt; b) with weights &gt; 0.</amt:precondition>
+    <amt:effect>Report a consistency violation. Both edges contradict the disjointness assertion.</amt:effect>
+  </amt:ReasoningRule>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#formula">
+    <rdfs:label xml:lang="en">formula</rdfs:label>
+    <rdfs:comment xml:lang="en">Mathematical formula of the operator in plain notation (variables x, y for binary; x_1..x_n for n-ary).</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#Logic"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Property>
+  <amt:Logic rdf:about="http://academic-meta-tool.xyz/vocab#LukasiewiczLogic">
+    <rdfs:label xml:lang="en">Łukasiewicz logic</rdfs:label>
+    <rdfs:comment xml:lang="en">Bounded sum: max(x + y - 1, 0). Hard cutoff that collapses long chains to 0.</rdfs:comment>
+    <amt:formula>max(x + y - 1, 0)</amt:formula>
+    <amt:arity>binary</amt:arity>
+    <amt:isParametrised rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</amt:isParametrised>
+    <amt:recommendedFor>Strict reasoning at n=2. Practically unusable for n &gt;= 4 because the result almost always becomes 0.</amt:recommendedFor>
+  </amt:Logic>
+  <owl:Ontology rdf:about="http://academic-meta-tool.xyz/vocab">
+    <dct:title xml:lang="en">Academic Meta Tool Ontology</dct:title>
+    <rdfs:label xml:lang="en">AMT</rdfs:label>
+    <dct:description xml:lang="en">Vocabulary and reasoning rules for fuzzy semantic networks.</dct:description>
+    <owl:versionInfo xml:lang="en">Leonard Edition (extended)</owl:versionInfo>
+    <dct:creator>Florian Thiery</dct:creator>
+    <dct:creator>Martin Unold</dct:creator>
+    <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-01-19</dct:created>
+    <dct:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
+    <dct:source rdf:resource="https://doi.org/10.17175/sb004_004"/>
+    <rdfs:seeAlso rdf:resource="http://academic-meta-tool.xyz/ontology/"/>
+  </owl:Ontology>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#precondition">
+    <rdfs:label xml:lang="en">precondition</rdfs:label>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#ReasoningRule"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#antecedent2">
+    <rdfs:label xml:lang="en">antecedent 2</rdfs:label>
+    <rdfs:comment xml:lang="en">Second role in a 2-step role chain (legacy form).</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#RoleChainAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#isParametrised">
+    <rdfs:label xml:lang="en">is parametrised</rdfs:label>
+    <rdfs:comment xml:lang="en">True if the operator requires an additional numeric parameter (provided via amt:logicParameter on the axiom).</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#Logic"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#appliesTo">
+    <rdfs:label xml:lang="en">applies to</rdfs:label>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#ReasoningRule"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#recommendedFor">
+    <rdfs:label xml:lang="en">recommended for</rdfs:label>
+    <rdfs:comment xml:lang="en">Free-text hint about typical use cases of the operator.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#Logic"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Property>
+  <amt:ReasoningRule rdf:about="http://academic-meta-tool.xyz/vocab#SubsumptionRule">
+    <rdfs:label xml:lang="en">Subsumption Inference Rule</rdfs:label>
+    <amt:appliesTo rdf:resource="http://academic-meta-tool.xyz/vocab#SubsumptionAxiom"/>
+    <amt:precondition>There exists an edge (a -subRole-&gt; b) with weight w.</amt:precondition>
+    <amt:effect><![CDATA[Default (entailment) mode: add an edge (a -superRole-> b) with weight w. Mark the edge as inferred. Iterate to fixpoint. Minimal mode: apply no entailment, and after the fixpoint suppress every inferred edge (a -superRole-> b, w2) for which an edge (a -subRole-> b, w1) with w1 >= w2 exists. Never suppress an asserted edge; when w1 < w2 keep both, because a coarse relation derived along a strong path can be worth more than a fine relation derived along a weak one.]]></amt:effect>
+  </amt:ReasoningRule>
+  <amt:Logic rdf:about="http://academic-meta-tool.xyz/vocab#ProductLogic">
+    <rdfs:label xml:lang="en">Product logic</rdfs:label>
+    <rdfs:comment xml:lang="en">Probabilistic conjunction: weights multiply along the chain. Penalises path length exponentially.</rdfs:comment>
+    <amt:formula>x * y</amt:formula>
+    <amt:arity>binary</amt:arity>
+    <amt:isParametrised rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</amt:isParametrised>
+    <amt:recommendedFor>Independent-evidence semantics. Best for n=2; can be too aggressive for chains with n &gt;= 4.</amt:recommendedFor>
+  </amt:Logic>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#superRole">
+    <rdfs:label xml:lang="en">super-role</rdfs:label>
+    <rdfs:comment xml:lang="en">The coarser role, implied by the sub-role at no lower weight.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#SubsumptionAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <amt:ReasoningRule rdf:about="http://academic-meta-tool.xyz/vocab#InverseRule">
+    <rdfs:label xml:lang="en">Inverse Inference Rule</rdfs:label>
+    <amt:appliesTo rdf:resource="http://academic-meta-tool.xyz/vocab#InverseAxiom"/>
+    <amt:precondition>There exists an edge (a -antecedent-&gt; b) with weight w.</amt:precondition>
+    <amt:effect>Add an edge (b -inverse-&gt; a) with weight w. Mark the edge as inferred. Iterate to fixpoint.</amt:effect>
+  </amt:ReasoningRule>
+  <amt:ReasoningRule rdf:about="http://academic-meta-tool.xyz/vocab#RoleChainRule">
+    <rdfs:label xml:lang="en">Role Chain Inference Rule</rdfs:label>
+    <amt:appliesTo rdf:resource="http://academic-meta-tool.xyz/vocab#RoleChainAxiom"/>
+    <amt:precondition>There exists a sequence of edges e_1, ..., e_n such that e_i has role antecedents[i] and the target of e_i equals the source of e_{i+1}.</amt:precondition>
+    <amt:effect>Add a new edge from source of e_1 to target of e_n with role = consequent and weight = logic(weight(e_1), ..., weight(e_n)). Mark the edge as inferred. Iterate to fixpoint.</amt:effect>
+  </amt:ReasoningRule>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#logic">
+    <rdfs:label xml:lang="en">logic</rdfs:label>
+    <rdfs:comment xml:lang="en">Fuzzy logic operator used to combine weights along the inference chain.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#InferenceAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Logic"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#instanceOf">
+    <rdfs:label xml:lang="en">instance of</rdfs:label>
+    <rdfs:comment xml:lang="en">Links an individual node to its Concept.</rdfs:comment>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Concept"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#inverse">
+    <rdfs:label xml:lang="en">inverse</rdfs:label>
+    <rdfs:comment xml:lang="en">Inverse role of the antecedent.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#InverseAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#consequent">
+    <rdfs:label xml:lang="en">consequent</rdfs:label>
+    <rdfs:comment xml:lang="en">Role inferred between the first and last node of the chain.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#RoleChainAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#role1">
+    <rdfs:label xml:lang="en">role 1</rdfs:label>
+    <rdfs:comment xml:lang="en">First role in a disjointness assertion.</rdfs:comment>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#DisjointAxiom"/>
+    <rdfs:range rdf:resource="http://academic-meta-tool.xyz/vocab#Role"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#weight">
+    <rdfs:label xml:lang="en">weight</rdfs:label>
+    <rdfs:comment xml:lang="en">Fuzzy truth value in the closed interval [0, 1] attached to a quadruple.</rdfs:comment>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+  </rdf:Property>
+  <rdf:Property rdf:about="http://academic-meta-tool.xyz/vocab#effect">
+    <rdfs:label xml:lang="en">effect</rdfs:label>
+    <rdfs:domain rdf:resource="http://academic-meta-tool.xyz/vocab#ReasoningRule"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+  </rdf:Property>
+  <amt:ReasoningRule rdf:about="http://academic-meta-tool.xyz/vocab#SelfDisjointRule">
+    <rdfs:label xml:lang="en">Self-Disjoint Consistency Rule</rdfs:label>
+    <amt:appliesTo rdf:resource="http://academic-meta-tool.xyz/vocab#SelfDisjointAxiom"/>
+    <amt:precondition>There exists an edge (a -role-&gt; a) with weight &gt; 0.</amt:precondition>
+    <amt:effect>Report a consistency violation. The role is asserted to be irreflexive.</amt:effect>
+  </amt:ReasoningRule>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#RoleChainAxiom">
+    <rdfs:subClassOf rdf:resource="http://academic-meta-tool.xyz/vocab#InferenceAxiom"/>
+    <rdfs:label xml:lang="en">Role Chain Axiom</rdfs:label>
+    <rdfs:comment xml:lang="en">Asserts that a chain of roles implies a consequent role; supports both legacy 2-ary form (antecedent1/antecedent2) and n-ary form (antecedents as RDF list).</rdfs:comment>
+    <skos:note>Reasoning rule: if edges (a -r1-&gt; b) and (b -r2-&gt; c) exist with weights w1 and w2, infer (a -consequent-&gt; c) with weight = logic(w1, w2). Generalises to n antecedents.</skos:note>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#Role">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/>
+    <rdfs:label xml:lang="en">Role</rdfs:label>
+    <rdfs:comment xml:lang="en">A typed relation between Concepts (e.g. connectedWith, partOf).</rdfs:comment>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#Logic">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <rdfs:label xml:lang="en">Logic</rdfs:label>
+    <rdfs:comment xml:lang="en">A fuzzy logic operator used to combine weights in inference chains.</rdfs:comment>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#SubsumptionAxiom">
+    <rdfs:subClassOf rdf:resource="http://academic-meta-tool.xyz/vocab#InferenceAxiom"/>
+    <rdfs:label xml:lang="en">Subsumption Axiom</rdfs:label>
+    <rdfs:comment xml:lang="en">Asserts that one role is finer than another: every edge carrying the sub-role also carries the super-role, at no lower weight. A statement about roles, not about any pair of nodes.</rdfs:comment>
+    <skos:note>Two readings. Entailment: if edge (a -subRole-&gt; b) exists with weight w, infer (a -superRole-&gt; b) with weight w. Redundancy elimination: if both (a -subRole-&gt; b, w1) and (a -superRole-&gt; b, w2) exist with w1 &gt;= w2, the super-role edge is implied and may be suppressed. An implementation must offer entailment as its default and elimination as an option, because a consumer that does not know the role hierarchy needs every edge spelled out.</skos:note>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#SelfDisjointAxiom">
+    <rdfs:subClassOf rdf:resource="http://academic-meta-tool.xyz/vocab#IntegrityAxiom"/>
+    <rdfs:label xml:lang="en">Self-Disjoint Axiom</rdfs:label>
+    <rdfs:comment xml:lang="en">Asserts that a role cannot hold between a node and itself.</rdfs:comment>
+    <skos:note>Consistency check: violated if any edge (a -role-&gt; a) exists.</skos:note>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#InverseAxiom">
+    <rdfs:subClassOf rdf:resource="http://academic-meta-tool.xyz/vocab#InferenceAxiom"/>
+    <rdfs:label xml:lang="en">Inverse Axiom</rdfs:label>
+    <rdfs:comment xml:lang="en">Asserts that two roles are inverses of each other.</rdfs:comment>
+    <skos:note>Reasoning rule: if edge (a -antecedent-&gt; b) exists with weight w, infer (b -inverse-&gt; a) with weight w.</skos:note>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#Concept">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <rdfs:label xml:lang="en">Concept</rdfs:label>
+    <rdfs:comment xml:lang="en">A class of entities in the modelled domain (e.g. Person, Place).</rdfs:comment>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#InferenceAxiom">
+    <rdfs:subClassOf rdf:resource="http://academic-meta-tool.xyz/vocab#Axiom"/>
+    <rdfs:label xml:lang="en">Inference Axiom</rdfs:label>
+    <rdfs:comment xml:lang="en">Axiom that derives new edges from existing ones.</rdfs:comment>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#IntegrityAxiom">
+    <rdfs:subClassOf rdf:resource="http://academic-meta-tool.xyz/vocab#Axiom"/>
+    <rdfs:label xml:lang="en">Integrity Axiom</rdfs:label>
+    <rdfs:comment xml:lang="en">Axiom that constrains which edge configurations are valid.</rdfs:comment>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#DisjointAxiom">
+    <rdfs:subClassOf rdf:resource="http://academic-meta-tool.xyz/vocab#IntegrityAxiom"/>
+    <rdfs:label xml:lang="en">Disjoint Axiom</rdfs:label>
+    <rdfs:comment xml:lang="en">Asserts that two roles cannot simultaneously hold between the same pair of nodes.</rdfs:comment>
+    <skos:note>Consistency check: violated if both (a -role1-&gt; b) and (a -role2-&gt; b) exist.</skos:note>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#Axiom">
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2000/01/rdf-schema#Class"/>
+    <rdfs:label xml:lang="en">Axiom</rdfs:label>
+    <rdfs:comment xml:lang="en">Abstract base class for all AMT axioms.</rdfs:comment>
+  </rdfs:Class>
+  <rdfs:Class rdf:about="http://academic-meta-tool.xyz/vocab#ReasoningRule">
+    <rdfs:label xml:lang="en">Reasoning Rule</rdfs:label>
+    <rdfs:comment xml:lang="en">Informal but normative description of an inference or consistency rule.</rdfs:comment>
+  </rdfs:Class>
+</rdf:RDF>

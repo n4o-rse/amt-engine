@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 250" role="img" aria-labelledby="t-rca" font-family="Roboto, system-ui, -apple-system, Segoe UI, sans-serif">
+<title id="t-rca">Role chain: C1 to C2 by the first antecedent, C2 to C3 by the second; the consequent holds between C1 and C3</title>
+<defs><linearGradient id="g-rca" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--fig-node-top,#86bd63)"/><stop offset="1" style="stop-color:var(--fig-node-bottom,#5b9a34)"/></linearGradient></defs>
+<circle cx="100" cy="150" r="60" fill="url(#g-rca)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="100" y="169.3" text-anchor="middle" font-size="55.2" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="55.2" dy="0">C</tspan><tspan font-size="30.4" dy="15.5">1</tspan></text>
+<circle cx="450" cy="150" r="60" fill="url(#g-rca)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="450" y="169.3" text-anchor="middle" font-size="55.2" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="55.2" dy="0">C</tspan><tspan font-size="30.4" dy="15.5">2</tspan></text>
+<circle cx="800" cy="150" r="60" fill="url(#g-rca)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="800" y="169.3" text-anchor="middle" font-size="55.2" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="55.2" dy="0">C</tspan><tspan font-size="30.4" dy="15.5">3</tspan></text>
+<path d="M163,150 L385,150" fill="none" stroke="var(--fig-line,#1b1b18)" stroke-width="2.2"/>
+<polygon points="385,150 373,155 373,145" fill="var(--fig-line,#1b1b18)"/>
+<rect x="222.8" y="122" width="102.4" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
+<text x="274" y="137.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">antecedent1</tspan></text>
+<path d="M513,150 L735,150" fill="none" stroke="var(--fig-line,#1b1b18)" stroke-width="2.2"/>
+<polygon points="735,150 723,155 723,145" fill="var(--fig-line,#1b1b18)"/>
+<rect x="572.8" y="122" width="102.4" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
+<text x="624" y="137.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">antecedent2</tspan></text>
+<path d="M157.3,123.8 Q450,-10 740.9,123" fill="none" stroke="var(--fig-red,#d62828)" stroke-width="3.5" stroke-dasharray="11 7"/>
+<polygon points="740.9,123 727.9,122.6 732.1,113.4" fill="var(--fig-red,#d62828)"/>
+<rect x="373.1" y="30.7" width="152.8" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
+<text x="449.5" y="45.9" text-anchor="middle" font-size="15" fill="var(--fig-red,#d62828)"><tspan font-size="15" dy="0">consequent, logic</tspan></text>
+</svg>

@@ -39,10 +39,11 @@ amt/  ontology/  examples/  tests/  pyproject.toml  CHANGELOG.md  CITATION.cff
         │
         ▼
 python main.py
-  meta ─► ontology ─► tests ─► examples ─► determinism ─► docs-sync
+  meta ─► ontology ─► tests ─► examples ─► determinism ─► docs-sync ─► site
         │
         ▼
 build/pipeline_report.txt        docs/data/*.ttl (Spiegel von examples/)
+                                 docs/vocab, docs/ontology, docs/assets (erzeugt aus ontology/amt.ttl)
 ```
 
 Eigenschaften, die das Repo haben muss:
@@ -96,6 +97,14 @@ Eigenschaften, die das Repo haben muss:
 | Reihenfolge der SHACL-Verstöße | sortiert nach Knoten, Pfad und Meldung (`amt/validation.py`, `ontology/validate_examples.py`); die Menge der Verstöße ändert sich nicht | 2026-10-26 |
 | Rdflib-Warnungen im Testlauf | zwei Deprecation-Meldungen, die pyshacl auslöst, sind in `pyproject.toml` gefiltert; alle anderen Warnungen bleiben sichtbar | 2026-10-26 |
 | DOI | Concept-DOI `10.5281/zenodo.23669466` steht in `CITATION.cff` und README; Version 0.3.1 trägt `10.5281/zenodo.23669467` | 2026-10-26 |
+| Vokabular und Ontologie im Repo | `docs/vocab/` und `docs/ontology/` sind maßgeblich und werden von `python main.py` (Schritt `site`) aus `ontology/amt.ttl` erzeugt: Seite, `amt.ttl`, `amt.rdf`, `amt.jsonld`; die Namensraum-IRI `http://academic-meta-tool.xyz/vocab#` bleibt unverändert; Befund D2: `amt.ttl` ist eine Obermenge der Fassung von 2018, nichts ging verloren | 2026-10-26 |
+| Abbildungen der Seiten | werden aus Code gezeichnet (`py/site_figures.py`), SVG und PNG (3-fach); die Übersicht entsteht aus `amt.ttl`, nur die Positionen sind festgelegt; SVG wird byteweise geprüft, PNG nicht (hängt von Pillow ab) und nur bei geändertem SVG neu gezeichnet (`docs/assets/figures.json`); die alten Grafiken vom FTP werden nicht übernommen | 2026-10-26 |
+| Pillow | Entwicklungs-Abhängigkeit (`requirements.txt`, Extra `dev`), nur für die PNG-Abbildungen; `Pillow>=10.1` wegen `ImageFont.load_default(size)` | 2026-10-26 |
+| Lizenz und Autoren der Vokabular-Seite | CC BY 4.0 und die Autoren Florian Thiery und Martin Unold, wie auf den Seiten von 2018 veröffentlicht; Quelle: Unold, Thiery, Mees (2019), ZfdG Sonderband 4, DOI 10.17175/sb004_004 | 2026-10-26 |
+| Hell/Dunkel | alle Seiten folgen dem System und haben einen Umschalter (`docs/assets/site.js`); Abbildungen sind eingebettetes SVG und folgen über CSS-Variablen | 2026-10-26 |
+| Geplante Reihenfolge bis 0.4.0 | S9 Vokabular/Ontologie, S10 Startseite (Englisch und Deutsch, Explorer nach `/explorer/`, DFG-Verweis Projektnummer 501836407), S11 Playground, S12 w3id und Umleitung des FTP, S13 D6 und Release 0.4.0 | 2026-10-26 |
+| Playground | maßgeblich ist `leiza-rse/amt-playground` (Original zum ZfdG-Artikel); es muss mit dem neuen AMT wieder interaktiv Graphen erzeugen; eigener Schritt S11 | 2026-10-26 |
+| Release 0.4.0 | erst am Ende (nach S13); die ungereleasten Änderungen aus S7 bis S13 gehören dazu | 2026-10-26 |
 | Zenodo | GitHub-Zenodo-Anbindung ist für beide Repos eingeschaltet; jedes GitHub-Release erzeugt eine Version mit DOI, ein bloßer Tag nicht; deshalb keine Releases für alte Versionen | 2026-10-26 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
@@ -133,6 +142,12 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Release 0.3.1, Zenodo-DOI | amt-engine | S3, S4, S6 | erledigt 2026-10-26 |
 | S6 | `requirements-dev.txt` in `requirements.txt` einfassen; Folge für den Runner prüfen (er installiert aus dieser Datei) | amt-engine | S1, S2 | erledigt 2026-10-26 |
 | S7 | Offene Punkte aufräumen: D3 (Warnungen), D7 (Reihenfolge), D4 und D5 (Beschlüsse), D2 (Befund) | amt-engine, amt-runner | S5 | erledigt 2026-10-26 |
+| S8 | Node-24-Korrektur: `upload-artifact@v5` auf `@v6` | amt-engine, amt-runner | S7 | erledigt 2026-10-26 |
+| S9 | Vokabular und Ontologie ins Repo: Seiten, `amt.rdf`, Abbildungen aus Code (Schritt `site`) | amt-engine | S7 | erledigt 2026-10-26 |
+| S10 | Startseite (Englisch und Deutsch, Hell/Dunkel, Was AMT kann und nicht kann, Geschichte), Explorer nach `/explorer/` | amt-engine | S9 | offen |
+| S11 | Playground (`leiza-rse/amt-playground`) mit dem neuen AMT lauffähig machen | amt-playground | S9 | offen |
+| S12 | w3id-Eintrag und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | offen |
+| S13 | D6 (Exit-Code) und Release 0.4.0 samt Zenodo | amt-engine, amt-runner | S10 bis S12 | offen |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -278,12 +293,42 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - D4 und D5: Beschlüsse in A4.
 - D6 bleibt unverändert (Beschluss vom 2026-10-26).
 
+## S8 – Node-24-Korrektur
+
+**Ziel:** Die Node-20-Warnung in den Actions verschwindet.
+
+**Inhalt:** `actions/upload-artifact` von v5 auf v6 in allen Workflows beider Repos; die falsche Aussage aus S6 (v5 laufe auf Node 24) in A4, `CHANGELOG.md` und `PRIMER.md` berichtigt.
+
+**Abnahme:** Nach dem Push zeigt der Actions-Lauf keine Node-20-Meldung mehr.
+
+### Erledigt 2026-10-26
+
+- Geprüft an `action.yml` der Tags: `upload-artifact@v5` hat `using: node20`, `@v6` und `@v7` `node24`; `checkout@v5` und `setup-python@v6` waren schon `node24`. Beide CI-Läufe nach dem Push grün.
+
+## S9 – Vokabular und Ontologie ins Repo
+
+**Ziel:** Die Dokumentation der Namensraum-IRI liegt im Repo, wird aus `ontology/amt.ttl` erzeugt und kann nicht mehr hinter der Ontologie zurückbleiben.
+
+**Uploads:** die beiden Ordner `vocab` und `ontology` sowie der Rest des FTP (`amt.rdf`, Demos, Playground) aus `academic-meta-tool.xyz`.
+
+**Inhalt:** Neuer Schritt `site` (`py/step_site.py`, `py/site_pages.py`, `py/site_figures.py`, `py/amt_site.py`): erzeugt `docs/vocab/` (Seite, `amt.ttl`, `amt.rdf`, `amt.jsonld`, Übersichtsabbildung) und `docs/ontology/` (Datenmodell mit Beispielen und neun Abbildungen). Metadaten (Autoren, Datum, Lizenz, Quelle) stehen jetzt im `owl:Ontology`-Knoten von `ontology/amt.ttl`. Gemeinsames Stylesheet und Hell/Dunkel-Umschalter in `docs/assets/`. Tests in `tests/test_site.py`: jeder Begriff hat eine Karte, die Übersicht folgt der Ontologie, jedes Turtle-Beispiel besteht die SHACL-Prüfung, SVG ist deterministisch.
+
+**Abnahme:** `python main.py --strict` grün, zweimal hintereinander (der erste Lauf erzeugt die Dateien unter `docs/` und meldet sie als Warnung; danach committen); `git status` sauber; Seiten lokal in Hell und Dunkel ansehen, auch schmal.
+
+### Erledigt 2026-10-26
+
+- D2 geklärt: `amt.rdf` von 2018 (Penny Edition) hat 25 Begriffe, alle sind in `ontology/amt.ttl` mit gleicher IRI enthalten; neu sind 20 (u. a. `SubsumptionAxiom`, `antecedents`, `HamacherProduct`, `ReasoningRule`). Die Logiken waren 2018 Klassen, heute sind sie Instanzen von `amt:Logic`; 2018 stand zusätzlich `owl:Class`, `owl:ObjectProperty` und `owl:DatatypeProperty` an den Begriffen.
+- Der Test der Beispiele fand, dass jede Rolle ein `rdfs:label` braucht (SHACL); die Beispiele sind entsprechend ergänzt.
+- `amt.rdf` wird als Graph verglichen, nicht byteweise: die Byte-Reihenfolge des Serialisierers kann sich zwischen rdflib-Versionen ändern, der Inhalt nicht.
+- Nicht Teil von S9: Startseite (S10), Playground (S11), Umleitung und w3id (S12). Der Link „Explorer“ zeigt bis S10 auf `index.htm`.
+
 ---
 
 ## Teil D – Offene Punkte
 
 - **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.
-- **D2** Die Ontologie dort ist vermutlich älter als `ontology/amt.ttl` (Befund in S7, nicht belegt). Offen: `amt.rdf` abrufen und mit `ontology/amt.ttl` vergleichen (Klassen und Eigenschaften); wenn sie auseinanderlaufen, die veröffentlichte Fassung aktualisieren oder hier den Stand der Veröffentlichung nennen.
+- **D2** erledigt in S9: `amt.ttl` ist eine Obermenge der Fassung von 2018; die Veröffentlichung wird aus `amt.ttl` erzeugt.
+- **D9** Startseite (S10): die Geschichte hinter dem Namen („Wir wollten erst ein Amt errichten, das arbeitet …“) im Wortlaut vom Autor; bis dahin steht nur ein vorsichtiger Entwurf.
 - **D3** erledigt in S7: Ursache liegt in pyshacl und rdflib, die zwei Meldungen sind gefiltert.
 - **D7** erledigt in S7: Verstöße sind sortiert.
 - **D4** erledigt in S7: siehe A4 („Verhältnis zu `amt-explore`“).

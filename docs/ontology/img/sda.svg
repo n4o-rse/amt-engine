@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" role="img" aria-labelledby="t-sda" font-family="Roboto, system-ui, -apple-system, Segoe UI, sans-serif">
+<title id="t-sda">Self-disjoint axiom: a role must not hold between a node and itself</title>
+<defs><linearGradient id="g-sda" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--fig-node-top,#86bd63)"/><stop offset="1" style="stop-color:var(--fig-node-bottom,#5b9a34)"/></linearGradient></defs>
+<polygon points="294.2,165 299.4,186.1 300.2,208.9 296.3,232.5 274.8,246.4 252.1,255.6 229.4,260.3 212,271.9 192,280.7 170,286.2 146.6,287.7 122.7,285.2 99.1,278.7 85,258.8 75.9,238.1 71.8,217.5 55.8,203.5 42.4,185.8 32.3,165 38.4,143.5 48.2,124 61.3,106.9 69.3,86.8 81.8,67.6 98.4,50.3 122,42.8 146.1,39.4 170,40 192.3,47.6 211.9,58.5 228,71.9 249.8,76.9 271.3,86.3 291.6,100 296.9,122.2 297.6,144.2" fill="var(--fig-island-fill,#ffffff)" stroke="var(--fig-island-edge,#5b9a34)" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="703.4,165 709.7,184.5 711.8,206 709.3,228.8 692.4,244.5 673.3,256.9 652.8,265.7 634.9,279.3 613.8,290.2 590,297.5 565.6,293 542.9,284.8 522.5,273.3 507.3,256.3 496.2,237.8 489.5,218.8 473.3,204.3 459.7,186.3 449.6,165 457.1,143.3 468.2,124 482.4,107.5 489.3,86.8 500.9,66.7 517.1,48.1 543.2,46 567.8,48.5 590,55 611.3,53 633.4,54.6 655.5,60 676.5,69.6 695.8,82.8 712.8,99.4 714.3,123.1 711,145.2" fill="var(--fig-island-fill,#ffffff)" stroke="var(--fig-island-edge,#5b9a34)" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="170" cy="165" r="70" fill="url(#g-sda)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="170" y="187.5" text-anchor="middle" font-size="64.4" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="64.4" dy="0">R</tspan><tspan font-size="35.4" dy="18">1</tspan></text>
+<circle cx="590" cy="165" r="70" fill="url(#g-sda)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="590" y="187.5" text-anchor="middle" font-size="64.4" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="64.4" dy="0">R</tspan><tspan font-size="35.4" dy="18">1</tspan></text>
+<path d="M395,150 L370,150 L360,162.5 L360,187.5 L370,200 L395,200" fill="none" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M360,175 L395,175" fill="none" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M357.5,205 L402.5,145" fill="none" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

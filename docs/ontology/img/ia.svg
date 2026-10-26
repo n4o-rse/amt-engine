@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 250" role="img" aria-labelledby="t-ia" font-family="Roboto, system-ui, -apple-system, Segoe UI, sans-serif">
+<title id="t-ia">Inverse axiom: an edge with the antecedent role implies the reverse edge with the inverse role</title>
+<defs><linearGradient id="g-ia" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--fig-node-top,#86bd63)"/><stop offset="1" style="stop-color:var(--fig-node-bottom,#5b9a34)"/></linearGradient></defs>
+<circle cx="110" cy="100" r="60" fill="url(#g-ia)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="110" y="119.3" text-anchor="middle" font-size="55.2" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="55.2" dy="0">R</tspan><tspan font-size="30.4" dy="15.5">1</tspan></text>
+<circle cx="650" cy="100" r="60" fill="url(#g-ia)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="650" y="119.3" text-anchor="middle" font-size="55.2" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="55.2" dy="0">R</tspan><tspan font-size="30.4" dy="15.5">2</tspan></text>
+<path d="M171,84.2 Q380,30 587.1,83.7" fill="none" stroke="var(--fig-line,#1b1b18)" stroke-width="2.2"/>
+<polygon points="587.1,83.7 574.2,85.6 576.7,75.8" fill="var(--fig-line,#1b1b18)"/>
+<rect x="315.7" y="33" width="127.6" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
+<text x="379.5" y="48.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">amt:antecedent</tspan></text>
+<path d="M589,115.8 Q380,170 172.9,116.3" fill="none" stroke="var(--fig-line,#1b1b18)" stroke-width="2.2"/>
+<polygon points="172.9,116.3 185.8,114.4 183.3,124.2" fill="var(--fig-line,#1b1b18)"/>
+<rect x="329.3" y="149" width="102.4" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
+<text x="380.5" y="164.3" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">amt:inverse</tspan></text>
+</svg>

@@ -61,7 +61,7 @@ ontology/                   formal AMT specification
 ├── examples/               valid + invalid example data files
 └── validate_examples.py    standalone validation demo
 
-docs/                       webviewer (GitHub Pages) and its sample data
+docs/                       webviewer, vocabulary and ontology pages (GitHub Pages) and their data
 examples/                   sample TTL inputs to play with
 tests/                      pytest test suite
 
@@ -71,7 +71,7 @@ PRIMER.md                   work plan and decisions (German)
 CHANGELOG.md                what changed in which version
 CITATION.cff                how to cite this software
 pyproject.toml              build config + entry points
-requirements.txt            dependencies: runtime (mirrors pyproject) plus pytest
+requirements.txt            dependencies: runtime (mirrors pyproject) plus pytest and Pillow
 .github/workflows/          ci.yml (pipeline on push and pull request), sync-examples-to-docs.yml
 ```
 
@@ -94,7 +94,7 @@ pytest tests/ -q                       # all green
 
 If you vendor the source tree instead of installing it — a CI image, a
 Docker layer, a wrapper such as `amt.runner` that clones the repository —
-use the requirements file instead (it includes pytest):
+use the requirements file instead (it includes pytest and Pillow):
 
 ```bash
 pip install -r requirements.txt
@@ -310,8 +310,10 @@ on those files alone.
 `python main.py` runs the maintenance pipeline: it checks that version,
 date and changelog agree, validates the bundled SHACL examples, runs the test
 suite, pushes every example through the full pipeline, confirms that two runs
-under different hash seeds produce identical bytes, and syncs `examples/*.ttl`
-to `docs/data/`.
+under different hash seeds produce identical bytes, syncs `examples/*.ttl`
+to `docs/data/`, and generates the vocabulary and ontology pages, `amt.rdf` and
+the figures in `docs/` from `ontology/amt.ttl`. Those generated files are
+committed; with `--strict` a stale one fails the run.
 
 ```bash
 python main.py                     # all steps

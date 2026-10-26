@@ -29,6 +29,10 @@
     rdfs:label      "AMT"@en ;
     dct:description "Vocabulary and reasoning rules for fuzzy semantic networks."@en ;
     owl:versionInfo "Leonard Edition (extended)"@en ;
+    dct:creator     "Florian Thiery", "Martin Unold" ;
+    dct:created     "2018-01-19"^^xsd:date ;
+    dct:license     <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:source      <https://doi.org/10.17175/sb004_004> ;
     rdfs:seeAlso    <http://academic-meta-tool.xyz/ontology/> .
 
 

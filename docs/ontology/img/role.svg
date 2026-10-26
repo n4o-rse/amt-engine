@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-labelledby="t-role" font-family="Roboto, system-ui, -apple-system, Segoe UI, sans-serif">
+<title id="t-role">A Role relates two Concepts; it has the type amt:Role</title>
+<defs><linearGradient id="g-role" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--fig-node-top,#86bd63)"/><stop offset="1" style="stop-color:var(--fig-node-bottom,#5b9a34)"/></linearGradient></defs>
+<circle cx="90" cy="80" r="50" fill="url(#g-role)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="90" y="96.1" text-anchor="middle" font-size="46" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="46" dy="0">C</tspan><tspan font-size="25.3" dy="12.9">1</tspan></text>
+<circle cx="90" cy="230" r="50" fill="url(#g-role)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="90" y="246.1" text-anchor="middle" font-size="46" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="46" dy="0">C</tspan><tspan font-size="25.3" dy="12.9">2</tspan></text>
+<circle cx="340" cy="155" r="55" fill="url(#g-role)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="340" y="172.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="50.6" dy="0">R</tspan></text>
+<rect x="535" y="128" width="170" height="54" rx="9" fill="var(--fig-box-fill,#ffffff)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
+<text x="620" y="160.9" text-anchor="middle" font-size="17" font-weight="700" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="17" dy="0">amt:Role</tspan></text>
+<path d="M284.4,138.3 L142.7,95.8" fill="none" stroke="var(--fig-muted,#7a786b)" stroke-width="2.2" stroke-dasharray="2 5" stroke-linecap="round"/>
+<polygon points="142.7,95.8 155.6,94.4 152.7,104.1" fill="var(--fig-muted,#7a786b)"/>
+<rect x="162.4" y="99.1" width="102.4" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
+<text x="213.6" y="114.3" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">rdfs:domain</tspan></text>
+<path d="M284.4,171.7 L142.7,214.2" fill="none" stroke="var(--fig-muted,#7a786b)" stroke-width="2.2" stroke-dasharray="2 5" stroke-linecap="round"/>
+<polygon points="142.7,214.2 152.7,205.9 155.6,215.6" fill="var(--fig-muted,#7a786b)"/>
+<rect x="166.6" y="196.9" width="94" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
+<text x="213.6" y="212.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">rdfs:range</tspan></text>
+<path d="M398,155 L530,155" fill="none" stroke="var(--fig-muted,#7a786b)" stroke-width="2.2" stroke-dasharray="2 5" stroke-linecap="round"/>
+<polygon points="530,155 518,160 518,150" fill="var(--fig-muted,#7a786b)"/>
+<rect x="425.4" y="125" width="77.2" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
+<text x="464" y="140.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">rdf:type</tspan></text>
+</svg>

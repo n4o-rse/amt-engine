@@ -6,10 +6,11 @@
 # installing it — CI images, Binder, Docker layers, and wrappers such as
 # amt-runner that clone the repository rather than pip-install it.
 #
-# The last entry, pytest, is for the test suite and the development pipeline
-# (python main.py). It is the same as [project.optional-dependencies] dev. This
-# is the only requirements file in the repository; amt-runner installs it too,
-# so it also gets pytest, which it does not need and which does no harm.
+# The last two entries, pytest and Pillow, are for the development pipeline
+# (python main.py): the test suite, and the PNG figures of the docs pages. They
+# are the same as [project.optional-dependencies] dev. This is the only
+# requirements file in the repository; amt-runner installs it too, so it also
+# gets both, which it does not need and which do no harm.
 #
 #   pip install -r requirements.txt
 #
@@ -20,3 +21,4 @@ rdflib>=7.0        # RDF parsing, Turtle serialisation, RDF list handling
 pyshacl>=0.25      # SHACL validation against ontology/amt-shapes.ttl
 pyvis>=0.3         # interactive HTML graph export
 pytest>=7.0        # test suite in tests/ (development only)
+Pillow>=10.1       # PNG figures of docs/ (development only; load_default(size) needs 10.1)

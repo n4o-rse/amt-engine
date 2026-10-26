@@ -40,6 +40,7 @@ STEPS: list[tuple[str, str, str]] = [
     ("examples",    "step_examples.py",    "every examples/*.ttl runs through the full pipeline"),
     ("determinism", "step_determinism.py", "two runs under different hash seeds give identical bytes"),
     ("docs-sync",   "step_docs_sync.py",   "examples/*.ttl copied to docs/data/ (a change fails with --strict)"),
+    ("site",        "step_site.py",        "vocabulary and ontology pages, amt.rdf and figures generated from ontology/amt.ttl"),
 ]
 NAMES = [s[0] for s in STEPS]
 
