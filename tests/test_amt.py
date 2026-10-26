@@ -25,6 +25,7 @@ from amt import (
     validate_against_shapes,
     GOEDEL, PRODUCT, LUKASIEWICZ, EINSTEIN, GEOMETRIC, HAMACHER,
 )
+from amt.validation import _extract_violations
 
 ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES = ROOT / "examples"
@@ -99,6 +100,25 @@ class TestValidation:
         result = validate_against_shapes(ONTOLOGY_EX / "example-invalid.ttl")
         assert not result.conforms
         assert len(result.violations) == 4
+
+    def test_violations_come_in_a_fixed_order(self):
+        # pyshacl lists results in an order that differs between runs and
+        # platforms, so feed a report in the "wrong" order and expect it sorted.
+        report = "\n".join(
+            [
+                "Constraint Violation in X (http://example.org/shapes#S):",
+                "\tFocus Node: ex:b",
+                "\tResult Path: amt:weight",
+                "\tMessage: second",
+                "Constraint Violation in X (http://example.org/shapes#S):",
+                "\tFocus Node: ex:a",
+                "\tResult Path: amt:weight",
+                "\tMessage: first",
+            ]
+        )
+        found = _extract_violations(report)
+        assert [v["focus"] for v in found] == ["ex:a", "ex:b"]
+        assert [v["message"] for v in found] == ["first", "second"]
 
     def test_load_amt_with_validate_passes_on_valid(self):
         amt = load_amt(ONTOLOGY_EX / "example-valid.ttl", validate=True)

@@ -13,7 +13,19 @@ Zenodo.
 
 ## [Unreleased]
 
+### Changed
+
+- SHACL violations are returned and printed in a fixed order (sorted by focus
+  node, path and message) by `validate_against_shapes`, the command line and
+  `ontology/validate_examples.py`. pyshacl lists them in an order that differs
+  between runs and platforms. The set of violations is unchanged.
+- `pyproject.toml`: `[tool.pytest.ini_options]` silences two rdflib
+  deprecation warnings that pyshacl triggers about 83 000 times per test run.
+  Other warnings stay visible.
+
 ### Added
+
+- A test that checks the order of the violations.
 
 - The Zenodo DOI `10.5281/zenodo.23669466` (all versions) in `CITATION.cff`,
   and a "Citation" section with the DOI badge in `README.md`. Release 0.3.1

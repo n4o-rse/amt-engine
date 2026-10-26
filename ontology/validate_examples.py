@@ -178,6 +178,9 @@ def _extract_violations(report_text: str) -> list[dict]:
     if current is not None:
         violations.append(current)
 
+    # pyshacl reports results in an order that changes from run to run; sort so
+    # that the demo prints the same order every time.
+    violations.sort(key=lambda v: (v["focus"], v["path"], v["message"]))
     return violations
 
 

@@ -135,4 +135,7 @@ def _extract_violations(report_text: str) -> list[dict]:
                 current["message"] = line.split(":", 1)[1].strip()
     if current is not None:
         out.append(current)
+    # pyshacl reports results in an order that changes from run to run; sort so
+    # that messages, reports and tests see the same order every time.
+    out.sort(key=lambda v: (v["focus"], v["path"], v["message"]))
     return out

@@ -32,6 +32,16 @@ amt-runner = "amt.runner:main"
 # into the package namespace at build time, so an installed AMT carries it
 # as amt/ontology/ instead of claiming a generic top-level "ontology/"
 # directory in site-packages. amt._resources resolves both layouts.
+[tool.pytest.ini_options]
+# pyshacl hashes rdflib Datasets internally, and rdflib 7 warns about the
+# deprecated Dataset.identifier / Dataset.default_context on every call: about
+# 83 000 identical warnings per test run, none from this package. The two
+# filters below silence exactly these; every other warning stays visible.
+filterwarnings = [
+    "ignore:Dataset.identifier is deprecated:DeprecationWarning",
+    "ignore:Dataset.default_context is deprecated:DeprecationWarning",
+]
+
 [tool.setuptools]
 packages = ["amt", "amt.ontology", "amt.ontology.examples"]
 

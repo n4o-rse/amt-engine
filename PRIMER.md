@@ -23,10 +23,10 @@ Arbeitsplan für das Repo `amt-engine` (Academic Meta Tool, Python-Reasoner). Wi
 - Das README verwies auf `docs/architecture.mmd`; die Datei liegt in `amt/architecture.mmd`. Das Layout-Diagramm im README führte denselben Fehler. Beides korrigiert in S1.
 - `docs/data/subsumption-demo.ttl` fehlte. Der Workflow `sync-examples-to-docs.yml` startet nur bei einem Push, der `examples/**` berührt; die Datei kam mit Commit `03eb093` nach `examples/`. Warum der Sync nicht gelaufen ist, ist offen (die Actions-Läufe waren nicht einsehbar). `python main.py --only docs-sync` legt sie an.
 - Zwei Läufe der Pipeline auf `animals.ttl` und `subsumption-demo.ttl` unter `PYTHONHASHSEED=1` und `=2`: fünf der sechs Ausgabedateien sind byte-identisch, nur `*.report.md` unterscheidet sich (Start- und Endzeit). Die Reihenfolge-Korrektur aus 0.3.0 hält also.
-- `pytest` meldet 62 grüne Tests und rund 83 700 Warnungen (rdflib-Deprecation; die Zahl schwankt leicht zwischen Läufen); die Warnungen verdecken jede andere Meldung.
+- `pytest` meldete 62 grüne Tests und rund 83 700 Warnungen (rdflib-Deprecation; die Zahl schwankt leicht zwischen Läufen); die Warnungen verdeckten jede andere Meldung. Ursache in S7 geklärt (D3).
 - `.gitignore` schließt `dist/` aus (setuptools-Ausgabe). Das Primer-Muster legt Produkte sonst in `dist/` ab; hier geht das nicht, siehe A4.
 - Die Historie hatte 30 Commits und keine Tags. Die Versionen standen nur in `pyproject.toml`: 0.1.0 (2026-04-28), 0.2.0 (2026-05-05), 0.3.0 (2026-08-29). Seit S5 tragen die Commits `3357cde`, `5cc2fbf` und `03eb093` die Tags `v0.1.0` bis `v0.3.0`.
-- Commit `db1db2d` (2026-05-04) führt den Verlauf von `amt-explore` in dieses Repo zusammen. Der Webviewer in `docs/` stammt von dort.
+- Commit `db1db2d` (2026-05-04) führt den Verlauf von `amt-explore` in dieses Repo zusammen. Der Webviewer in `docs/` stammt von dort. Die Adresse `https://github.com/n4o-rse/amt-explore` leitet am 2026-10-26 auf dieses Repo um; der Webviewer läuft als „AMT Explorer“ unter `https://n4o-rse.github.io/amt-engine/`.
 - Windows-Lauf von `python main.py` (2026-10-26, `C:\git\amt-engine`): alle sechs Schritte `ok`, 62 Tests grün in 16,4 s, Gesamtlauf 38,1 s. Der Determinismus-Test besteht auch dort. Die Warnungszahl im Testlauf liegt mit 15 006 weit unter dem Linux-Wert (rdflib- und Python-Version, siehe D3).
 - `docs-sync` meldete auf Windows fünf Dateien als `updated`, obwohl die Blobs in `examples/` und `docs/data/` identisch sind und überall nur LF enthalten (geprüft an `9a0e8b7`). Ursache: `core.autocrlf` macht im Working Tree CRLF daraus; der Byte-Vergleich sah Unterschiede, wo keine sind. Behoben in S1a.
 - `examples/skos-mapping-example.ttl` meldet beim Konsistenzcheck zwei Verletzungen (`exactMatch` und `questionableMatch` zum selben Ziel; Selbstschleife über `questionableMatch`). Das ist als Demo gewollt (A4). Der Runner beendet sich trotzdem mit Exit-Code 0, deshalb bleibt der Schritt `examples` auf `ok`.
@@ -91,6 +91,10 @@ Eigenschaften, die das Repo haben muss:
 | Rolle von Unold | kein Autor von AMT.engine; das ursprüngliche Academic Meta Tool (Unold, Thiery, 2017) steht unter `references` in `CITATION.cff`, ohne erfundene DOI | 2026-10-26 |
 | Bedeutung von `RELEASE_DATE` | Datum des Commits, der die Version gesetzt hat (0.3.0: 2026-08-29, 0.3.1: 2026-10-26) | 2026-10-26 |
 | Tags und Releases | `v0.1.0` bis `v0.3.0` als annotierte Tags auf den Commits aus dem CHANGELOG, ohne GitHub-Release; `v0.3.1` ist das erste Release (Version 0.3.1: keine Verhaltensänderung, nur Metadaten, Tooling, CI) | 2026-10-26 |
+| Verhältnis zu `amt-explore` | kein eigenständiges zweites Repo: die Adresse leitet auf `amt-engine` um (Befund 2026-10-26, nicht aus der Historie belegt); `docs/` in diesem Repo ist maßgeblich | 2026-10-26 |
+| Standard-Ref des Runners (Tags) | bleibt `main`; Pin auf `v0.3.1` ist ein Beispiel in der README des Runners, kein Standard | 2026-10-26 |
+| Reihenfolge der SHACL-Verstöße | sortiert nach Knoten, Pfad und Meldung (`amt/validation.py`, `ontology/validate_examples.py`); die Menge der Verstöße ändert sich nicht | 2026-10-26 |
+| Rdflib-Warnungen im Testlauf | zwei Deprecation-Meldungen, die pyshacl auslöst, sind in `pyproject.toml` gefiltert; alle anderen Warnungen bleiben sichtbar | 2026-10-26 |
 | DOI | Concept-DOI `10.5281/zenodo.23669466` steht in `CITATION.cff` und README; Version 0.3.1 trägt `10.5281/zenodo.23669467` | 2026-10-26 |
 | Zenodo | GitHub-Zenodo-Anbindung ist für beide Repos eingeschaltet; jedes GitHub-Release erzeugt eine Version mit DOI, ein bloßer Tag nicht; deshalb keine Releases für alte Versionen | 2026-10-26 |
 
@@ -128,6 +132,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S4 | CI: GitHub Action mit `python main.py --strict` bei Push und Pull Request | amt-engine | S1 | erledigt 2026-10-26 |
 | S5 | Tags `v0.1.0` bis `v0.3.0` setzen, Release 0.3.1, Zenodo-DOI | amt-engine | S3, S4, S6 | erledigt 2026-10-26 |
 | S6 | `requirements-dev.txt` in `requirements.txt` einfassen; Folge für den Runner prüfen (er installiert aus dieser Datei) | amt-engine | S1, S2 | erledigt 2026-10-26 |
+| S7 | Offene Punkte aufräumen: D3 (Warnungen), D7 (Reihenfolge), D4 und D5 (Beschlüsse), D2 (Befund) | amt-engine, amt-runner | S5 | erledigt 2026-10-26 |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -255,14 +260,32 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - Siehe Abnahme; was auf Actions passiert, zeigt erst der Lauf nach dem Push.
 - Der Runner liest zur Laufzeit die `requirements.txt` aus dem geklonten Engine-Stand (`main`), nicht aus diesem Commit: Solange der Patch nicht gepusht ist, installiert er weiter ohne `pytest`.
 
+## S7 – Offene Punkte aufräumen
+
+**Ziel:** Teil D enthält nur noch, was wirklich offen ist.
+
+**Uploads:** `PRIMER.md`; Antworten aus einem Formular (D5, Netz-CI des Runners, D7, D4).
+
+**Inhalt:** D3: Ursache klären und die zwei Deprecation-Meldungen filtern. D7: Verstöße sortieren, mit Test. D4 und D5: Beschlüsse in A4. D2: Befund notieren.
+
+**Abnahme:** `python main.py --strict` grün, zweimal hintereinander; `pytest` meldet 63 Tests ohne Warnungen; fünf Läufe von `python ontology/validate_examples.py` unter verschiedenen `PYTHONHASHSEED` geben die Verstöße in derselben Reihenfolge aus; `git status` sauber.
+
+### Erledigt 2026-10-26
+
+- D3: Die Warnungen stammen nicht aus diesem Paket. `pyshacl` (0.40.1) ruft beim Erzeugen des Berichts `hash()` auf einem rdflib-`Dataset` auf (`validator.py`, `create_validation_report`), und rdflib 7.6 meldet dafür `Dataset.identifier` und `Dataset.default_context` als veraltet, einmal pro Aufruf. Behebbar ist das nur in pyshacl oder rdflib; hier ist es gefiltert, und die Filter sind in `pyproject.toml` begründet. Bei einem späteren pyshacl-Update prüfen, ob sie noch gebraucht werden.
+- D7: Die Gegenprobe zeigte, dass die Reihenfolge unter Linux stabil ist und nur auf Windows wechselt; deshalb prüft der Test die Sortierung an einem absichtlich falsch geordneten Bericht. Ohne die Sortierzeile schlägt er an.
+- D2: Der Abruf von `http://academic-meta-tool.xyz/vocab` liefert eine HTML-Seite mit der Vokabular-Dokumentation, nicht Turtle; das RDF liegt laut Seite getrennt unter dem Namen `amt.rdf`, der Abruf von dort schlug fehl. Die Seite nennt drei Logiken (Łukasiewicz, Product, Gödel) und keine Subsumption; `ontology/amt.ttl` hat sechs Logiken und `SubsumptionAxiom`. Das spricht dafür, dass die veröffentlichte Fassung älter ist. Das ist ein Befund aus einer Zusammenfassung der Seite, kein Vergleich der Dateien; D2 bleibt offen.
+- D4 und D5: Beschlüsse in A4.
+- D6 bleibt unverändert (Beschluss vom 2026-10-26).
+
 ---
 
 ## Teil D – Offene Punkte
 
 - **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.
-- **D2** Wo wird `http://academic-meta-tool.xyz/vocab#` aufgelöst, und liegt die Ontologie dort in derselben Fassung wie `ontology/amt.ttl`?
-- **D3** Die rund 83 700 rdflib-Warnungen im Testlauf (Linux, Python 3.13; auf Windows mit Python 3.10 sind es 15 006): Ursache klären (eigener Code oder Bibliothek) und, falls eigener Code, beheben.
-- **D7** Die Reihenfolge der vier Verstöße in der Konsolenausgabe des Ontologie-Schritts (`example-invalid.ttl`) ist bei jedem Lauf anders (pyshacl). Die geprüften Ausgabedateien sind davon nicht betroffen, der Determinismus-Schritt ist grün. Sortieren wäre ein kleiner eigener Schritt.
-- **D4** Verhältnis zu `amt-explore`: Der Verlauf ist seit 2026-05-04 hier eingemergt. Wird das separate Repo weitergepflegt, oder ist `docs/` hier jetzt maßgeblich?
-- **D5** Ob der Runner künftig auf Tags statt auf `main` pinnt: mit `v0.3.1` gibt es jetzt einen Tag, die Entscheidung kann fallen. Bis dahin bleibt `main` (A4).
+- **D2** Die Ontologie dort ist vermutlich älter als `ontology/amt.ttl` (Befund in S7, nicht belegt). Offen: `amt.rdf` abrufen und mit `ontology/amt.ttl` vergleichen (Klassen und Eigenschaften); wenn sie auseinanderlaufen, die veröffentlichte Fassung aktualisieren oder hier den Stand der Veröffentlichung nennen.
+- **D3** erledigt in S7: Ursache liegt in pyshacl und rdflib, die zwei Meldungen sind gefiltert.
+- **D7** erledigt in S7: Verstöße sind sortiert.
+- **D4** erledigt in S7: siehe A4 („Verhältnis zu `amt-explore`“).
+- **D5** erledigt in S7: Standard-Ref des Runners bleibt `main` (A4).
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.
