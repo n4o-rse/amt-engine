@@ -152,7 +152,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S11b | Playground (`leiza-rse/amt-playground`): nur Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden, mit dem gemeinsamen Reasoner | amt-playground | S11a | Patch geliefert (`patch-s11b-playground.zip`), nach Push erledigt |
 | S11c | Gestaltung: Farbwelt aus den Maskottchen (`design/palette.yaml`), Logos, Kopfleiste, Familien-Abschnitt, Explorer startet mit `animals` | amt-engine | S11a | Patch geliefert, nach Push erledigt |
 | S11d | Logos der Institutionen und Förderer (mainzed, i3mainz, LEIZA, NFDI4Objects, NFDI, DFG) im Fuß aller Seiten; Explorer-Kasten mit Pinguin | amt-engine | S11c | Patch geliefert, nach Push erledigt |
-| S12 | w3id-Eintrag und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | offen |
+| S12 | w3id-Eintrag (`w3id.org/ids/amt/`) und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | Patch geliefert; danach Deployment und w3id-Pull-Request durch den Autor |
 | S13 | D6 (Exit-Code) und Release 0.4.0 samt Zenodo | amt-engine, amt-runner | S10 bis S12 | offen |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
@@ -374,6 +374,18 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 ### S11d – Logos der Institutionen und Förderer
 
 Im Fuß jeder erzeugten Seite steht eine weiße Leiste mit den Logos von mainzed, i3mainz, LEIZA, NFDI4Objects, NFDI („In cooperation with“) und DFG („Funded by“), je mit Link (`LOGOS` in `py/amt_site.py`, Bilder in `docs/assets/img/logos/`). Der Kasten im Explorer zeigt nur noch den Pinguin und den Herkunftstext mit Förderhinweis. `docs/assets/img/partners.png` entfällt. Offen: vektorisierte Fassungen der Logos; Adressen der Links bitte prüfen.
+
+### S12 – Persistente Adressen: FTP und w3id
+
+**Ziel:** Alle öffentlichen Adressen von AMT führen über zwei dünne Weiterleitungsschichten zu GitHub Pages; zieht das Repository um, ändert sich nur `pages` in `deploy/redirects.yaml`.
+
+**Beschlüsse:** Der Namensraum `http://academic-meta-tool.xyz/vocab#` ändert sich nie. Das FTP von academic-meta-tool.xyz (Apache) darf geleert werden; es enthält nur noch die `.htaccess`. Der w3id-Eintrag liegt wie bei den anderen Einträgen des Autors unter `ids/` (also `https://w3id.org/ids/amt/`), Kontakt Florian Thiery. w3id sichert den bestehenden Namensraum nicht gegen einen Verfall der Domain; es gibt neuen Zitaten und Links eine Adresse, die nicht an Domain und Hoster hängt. Die Vokabelseite wird per Content Negotiation bedient (Turtle, RDF/XML, JSON-LD, sonst HTML; 303 auf dem FTP, 302 bei w3id), die Anker der Termseite heißen wie die Terme.
+
+**Inhalt:** `deploy/redirects.yaml` ist die einzige Quelle. `py/site_redirects.py` erzeugt daraus (Schritt `site`) `deploy/academic-meta-tool.xyz/.htaccess`, `deploy/w3id/ids/amt/.htaccess` und `deploy/w3id/ids/amt/README.md`, und rechnet mit `resolve()`, was jede Adresse antworten muss. `py/check_redirects.py` fragt nach dem Deployment die echten Server (mit verschiedenen `Accept`-Headern) und vergleicht; `--base-url` prüft einen Testserver. `.gitattributes` hält die Dateien in `deploy/` auf LF. Tests: Ziele existieren in `docs/`, erzeugte Dateien aktuell, Aushandlung und Altadressen.
+
+**Abnahme:** `python main.py`, `python main.py --strict` zweimal grün. Die Regeln sind gegen einen echten Apache 2.4 geprüft (alle Fälle wie erwartet, auch `?ttl=` bleibt erhalten). Nach dem Deployment: `python py/check_redirects.py --follow`.
+
+**Deployment (Autor):** 1. FTP leeren, `deploy/academic-meta-tool.xyz/.htaccess` als `.htaccess` ins Wurzelverzeichnis; 2. `deploy/w3id/ids/amt/` als Ordner `ids/amt/` in einen Fork von `perma-id/w3id.org` kopieren und den Pull Request stellen; 3. `python py/check_redirects.py --follow`.
 
 ## Teil D – Offene Punkte
 

@@ -64,6 +64,8 @@ ontology/                   formal AMT specification
 docs/                       start page, explorer (docs/explorer/), vocabulary and ontology pages (GitHub Pages) and their data
 examples/                   sample TTL inputs to play with
 tests/                      pytest test suite
+design/                     palette.yaml, the colours of the pages (single source)
+deploy/                     redirects.yaml and the generated .htaccess files for the FTP and w3id.org
 
 main.py                     development pipeline (see "Development")
 py/                         the steps behind main.py
@@ -310,7 +312,8 @@ on those files alone.
 `python main.py` runs the maintenance pipeline: it checks that version,
 date and changelog agree, validates the bundled SHACL examples, syncs
 `examples/*.ttl` to `docs/data/`, generates the start, vocabulary and ontology
-pages, `amt.rdf` and the figures in `docs/` from `ontology/amt.ttl`, runs the
+pages, `amt.rdf`, the figures and the palette in `docs/` from `ontology/amt.ttl` and
+`design/palette.yaml`, the redirect files in `deploy/` from `deploy/redirects.yaml`, runs the
 test suite, pushes every example through the full pipeline and confirms that two
 runs under different hash seeds produce identical bytes. The generated files
 are committed; with `--strict` a stale one fails the run. The tests that
@@ -329,6 +332,15 @@ python main.py --strict            # warnings become errors (use this in CI)
 GitHub Actions runs `python main.py --strict` on every push to `main` and on
 every pull request (`.github/workflows/ci.yml`), on Linux and Windows with
 Python 3.10 and 3.13. The report of each job is kept as a workflow artefact.
+
+### Persistent addresses
+
+The namespace `http://academic-meta-tool.xyz/vocab#` never changes. The pages
+live on GitHub Pages; `academic-meta-tool.xyz` (Apache, `.htaccess`) and
+`https://w3id.org/ids/amt/` only redirect there, and `/vocab` answers Turtle,
+RDF/XML or JSON-LD by content negotiation. Both redirect files are generated
+from `deploy/redirects.yaml`. After deploying them, `python py/check_redirects.py`
+asks the live servers and compares the answers with that file.
 
 The combined output is written to `build/pipeline_report.txt`. The product
 commands `amt` and `amt-runner` are independent of `main.py`. Changes are

@@ -1,0 +1,60 @@
+# Where the persistent addresses of AMT lead. The single source for
+#   deploy/academic-meta-tool.xyz/.htaccess   (the FTP of academic-meta-tool.xyz, Apache)
+#   deploy/w3id/ids/amt/.htaccess             (the entry in perma-id/w3id.org)
+#   deploy/w3id/ids/amt/README.md             (its README)
+# Edit here, then run `python main.py` (step "site"). After deploying, run
+# `python py/check_redirects.py` to compare the live servers with this file.
+#
+# The namespace http://academic-meta-tool.xyz/vocab# never changes: it is in the
+# data, in the article of 2018 and in every user's Turtle files. The pages
+# live on GitHub Pages; the two sites below only point there, so a move of the
+# repository means changing `pages` here and nothing else.
+
+pages: https://n4o-rse.github.io/amt-engine/
+
+# The vocabulary is a hash namespace: the server sees /vocab, the fragment stays
+# in the browser. Content negotiation on the Accept header (first match wins).
+vocab:
+  turtle: vocab/amt.ttl
+  rdfxml: vocab/amt.rdf
+  jsonld: vocab/amt.jsonld
+  html: vocab/
+
+sites:
+  academic-meta-tool.xyz:
+    file: deploy/academic-meta-tool.xyz/.htaccess
+    base_url: http://academic-meta-tool.xyz/
+    vocab_status: 303        # See Other, as for the namespace of a hash vocabulary
+    status: 302
+    routes:
+      - {path: "",          to: ""}
+      - {path: vocab,       vocab: true}
+      - {path: explorer,    to: explorer/}
+      - {path: ontology,    to: ontology/}
+      - {path: amt.rdf,     to: vocab/amt.rdf, status: 301}   # the old address of the RDF file
+  w3id:
+    file: deploy/w3id/ids/amt/.htaccess
+    readme: deploy/w3id/ids/amt/README.md
+    base_url: https://w3id.org/ids/amt/
+    rewrite_base: /ids/amt/
+    vocab_status: 302        # w3id.org asks for 302
+    status: 302
+    routes:
+      - {path: "",          to: ""}
+      - {path: vocab,       vocab: true}
+      - {path: explorer,    to: explorer/}
+      - {path: ontology,    to: ontology/}
+      - {path: engine,      to: "https://github.com/n4o-rse/amt-engine"}
+      - {path: runner,      to: "https://github.com/n4o-rse/amt-runner"}
+      - {path: doi,         to: "https://doi.org/10.5281/zenodo.23669466"}   # concept DOI of the engine
+
+w3id_readme:
+  title: Academic Meta Tool (AMT)
+  text: >-
+    Repository created to store the redirections for the Academic Meta Tool:
+    the vocabulary (with content negotiation), the Explorer, the data model
+    page and the software repositories. The pages are hosted on GitHub Pages
+    of the NFDI4Objects organisation (n4o-rse). The namespace of the vocabulary
+    itself is http://academic-meta-tool.xyz/vocab# and does not change.
+  contacts:
+    - "Florian Thiery, florian.thiery@leiza.de, @florianthiery"

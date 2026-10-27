@@ -1,0 +1,19 @@
+# Generated from deploy/redirects.yaml by py/site_redirects.py. Do not edit.
+RewriteEngine On
+
+RewriteRule ^$ https://n4o-rse.github.io/amt-engine/ [R=302,L]
+
+# The vocabulary: content negotiation on the Accept header
+RewriteCond %{HTTP_ACCEPT} text/turtle|application/x-turtle
+RewriteRule ^vocab/?$ https://n4o-rse.github.io/amt-engine/vocab/amt.ttl [R=303,L]
+RewriteCond %{HTTP_ACCEPT} application/rdf\+xml
+RewriteRule ^vocab/?$ https://n4o-rse.github.io/amt-engine/vocab/amt.rdf [R=303,L]
+RewriteCond %{HTTP_ACCEPT} application/(ld\+)?json
+RewriteRule ^vocab/?$ https://n4o-rse.github.io/amt-engine/vocab/amt.jsonld [R=303,L]
+RewriteRule ^vocab/?$ https://n4o-rse.github.io/amt-engine/vocab/ [R=303,L]
+
+RewriteRule ^explorer/?$ https://n4o-rse.github.io/amt-engine/explorer/ [R=302,L]
+
+RewriteRule ^ontology/?$ https://n4o-rse.github.io/amt-engine/ontology/ [R=302,L]
+
+RewriteRule ^amt\.rdf/?$ https://n4o-rse.github.io/amt-engine/vocab/amt.rdf [R=301,L]

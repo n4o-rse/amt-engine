@@ -15,6 +15,11 @@ Zenodo.
 
 ### Added
 
+- `deploy/redirects.yaml` and `py/site_redirects.py`: the persistent addresses of
+  AMT. They generate the `.htaccess` for academic-meta-tool.xyz (the vocabulary
+  `/vocab` is negotiated: Turtle, RDF/XML, JSON-LD or the HTML page) and the entry
+  for `https://w3id.org/ids/amt/` (with its README), both in `deploy/`.
+  `py/check_redirects.py` compares the live servers with the file.
 - `design/palette.yaml`, the colour palette of AMT (green, bronze-gold and steel
   blue, taken from the mascots), and `py/site_palette.py`, which generates
   `docs/assets/palette.css`, the palette picture `docs/assets/img/palette.svg|png`

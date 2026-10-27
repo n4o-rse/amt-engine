@@ -15,6 +15,9 @@ Writes, below ``docs/``:
     assets/img/palette.svg|png  the palette as a picture
     assets/figures.json       SHA-256 of every figure SVG (see below)
 
+and, outside docs/, the redirect files of deploy/ (the FTP of academic-meta-tool.xyz
+and the w3id.org entry) from deploy/redirects.yaml.
+
 Nothing is written when nothing changed, and nothing reads the clock, so two
 runs leave ``git status`` clean. A file that had to be written is a warning; in
 ``--strict`` mode that fails the step, which makes the step a drift check for
@@ -48,12 +51,14 @@ try:
     import site_figures as figs
     import site_pages as pages
     import site_palette as palette
+    import site_redirects as redirects
     from site_home import home_page
 except ImportError:  # imported as py.step_site from the repository root
     from py.amt_dev_utils import DOCS_DIR, ONTOLOGY_DIR, ROOT, Report
     from py import site_figures as figs
     from py import site_pages as pages
     from py import site_palette as palette
+    from py import site_redirects as redirects
     from py.site_home import home_page
 
 MANIFEST = DOCS_DIR / "assets" / "figures.json"
@@ -140,6 +145,10 @@ def main() -> int:
         rep.warn(f"drew {_rel(pal_base.with_suffix('.png'))}")
     _write_text(rep, pal_base.with_suffix(".svg"), pal_svg, counts)
     _write_text(rep, MANIFEST, json.dumps(new, indent=2, sort_keys=True) + "\n", counts)
+
+    # 2c. the redirect files for the FTP of academic-meta-tool.xyz and for w3id.org
+    for path, text in redirects.outputs().items():
+        _write_text(rep, path, text, counts)
 
     # 3. pages and ontology files
     inline = {name: svg[name] for name in figs.SMALL_FIGURES}
