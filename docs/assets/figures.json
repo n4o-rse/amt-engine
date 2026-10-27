@@ -1,13 +1,13 @@
 {
-  "docs/assets/img/palette.svg": "b3a2d7d269f521907e8c23e46271fe5af1b068788409c5d6f3fe90b0b4214535",
-  "docs/ontology/img/concept.svg": "d1dcbe229fd2baf0b9fa5f012bab548309477c9055d11a35008c0824e3b38985",
-  "docs/ontology/img/da.svg": "3e16affbc2a045f81039d051ad964ea75ebe23afca7777ddafcc765541c50e96",
-  "docs/ontology/img/ia.svg": "56a920cb34a0aa1ba3cbf8a7898d6d23e85b68d7ce75f212f1e6dd3b4745062a",
-  "docs/ontology/img/quadruple.svg": "ceeb2ae36da2a7edd435def6dac8b2fd0871c8166d671e0bc301ced0894bddbc",
-  "docs/ontology/img/rca-nary.svg": "81dfab35c33882014eb1784b67df852230e75593e5ace259bcbb783466c137bd",
-  "docs/ontology/img/rca.svg": "12b3221062848d87e55c512363cc9a5d628d25a8b411a0f70ff55e2ee53c5ceb",
-  "docs/ontology/img/role.svg": "f8c2f7f0ea7d3fda02b0d1d621a27459cd653bfaa85d634a1c30ca63505b25f4",
-  "docs/ontology/img/sda.svg": "d488ef5cdad26bc4ee63b145d7c61bba70a7535ec5db8c5e28b63e3cbef2d7e0",
-  "docs/ontology/img/subsumption.svg": "9d32e823f4c6bf1185d44d48d6182f8c6a52de28fdecf6fd8977cd603d9f6714",
-  "docs/vocab/amt-overview.svg": "bcd4ab71d84d541d75ed9a084546650f45bc073acd2db19f72826d667796806a"
+  "docs/assets/img/palette.svg": "f2ab2b6968f80d24fec9509ec1cfd9b18be652ce718403130968b8c3a7fb4deb",
+  "docs/ontology/img/concept.svg": "85db675741af1363a868f1ecd8c1530a77aa9eb0328ba0b3c6dd766fccd69352",
+  "docs/ontology/img/da.svg": "2869b272e9a66e9c1b6bf5ebe859b81406a6aecb0225af2c700a03d8cfd58790",
+  "docs/ontology/img/ia.svg": "595265d7663f96eb48aa22d9ca4b2b40f15b603246999ea88ce0e117bb6069ee",
+  "docs/ontology/img/quadruple.svg": "0b3e7f468a72d7302178c9ecad75e2c0d5452400e18e2a17654da9316bc7f295",
+  "docs/ontology/img/rca-nary.svg": "76b4b8e7a7289a99b6bcd4f48ca73e166a9ad86ad4adf4393dd4e22d91872e92",
+  "docs/ontology/img/rca.svg": "41bf0a4c9585bda2bb445615c4f79500a055cd7a942a0e9b1788e00d4a6dc1cc",
+  "docs/ontology/img/role.svg": "1fde1abef2d5f0831f83539537555d43400f922cb23e19e16d8c9795f3ae521a",
+  "docs/ontology/img/sda.svg": "c3de3eac8156b632dfb9b66efb5664e0356d1459a651624ba33cd47a82cf3738",
+  "docs/ontology/img/subsumption.svg": "c3c69e5c90befded6212a98f7c8759929e3444dc37e27c1d1e8a6cd65a3307b8",
+  "docs/vocab/amt-overview.svg": "bd66f7ad9c3ea7a418421f3e84c7ca05ab7ffd9ae79d09822bab3096e65030f0"
 }

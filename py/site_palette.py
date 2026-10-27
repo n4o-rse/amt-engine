@@ -18,6 +18,11 @@ from __future__ import annotations
 from html import escape
 from pathlib import Path
 
+try:
+    from site_fonts import pil_font
+except ImportError:
+    from py.site_fonts import pil_font
+
 ROOT = Path(__file__).resolve().parent.parent
 PALETTE_FILE = ROOT / "design" / "palette.yaml"
 
@@ -128,24 +133,23 @@ def svg(pal: dict | None = None) -> str:
 
 
 def render_png(path: Path, pal: dict | None = None) -> None:
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import Image, ImageDraw
     pal = pal or load()
     items, w, h = _layout(pal)
     ids = _ids(pal)
     im = Image.new("RGB", (w, h), _resolve("paper", ids))
     d = ImageDraw.Draw(im)
-    fonts: dict[int, object] = {}
-    font = lambda px: fonts.setdefault(px, ImageFont.load_default(size=px))
+    font = pil_font
     head = _resolve("green-deep", ids)
-    d.text((MARGIN, 28), pal["title"], font=font(34), fill=head)
+    d.text((MARGIN, 28), pal["title"], font=font(34, True), fill=head)
     d.text((MARGIN, 76), pal["subtitle"], font=font(18), fill="#55625d")
     for kind, x, y, v in items:
         if kind == "group":
-            d.text((x, y), v, font=font(20), fill=head)
+            d.text((x, y), v, font=font(20, True), fill=head)
             continue
         fg = "#ffffff" if _luma(v["hex"]) < 140 else "#1b1b18"
         d.rounded_rectangle((x, y, x + TILE_W, y + TILE_H), 10, fill=v["hex"], outline="#c9c9c2")
-        d.text((x + 14, y + 12), v["name"], font=font(20), fill=fg)
+        d.text((x + 14, y + 12), v["name"], font=font(20, True), fill=fg)
         d.text((x + 14, y + 44), v["hex"], font=font(18), fill=fg)
         d.text((x + 14, y + 76), v["use"], font=font(15), fill=fg)
     path.parent.mkdir(parents=True, exist_ok=True)

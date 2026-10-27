@@ -77,3 +77,25 @@ def test_pyvis_export_does_not_depend_on_the_platform_encoding(tmp_path):
     data = (tmp_path / "g.html").read_bytes()
     data.decode("utf-8")
     assert b"\r\n" not in data
+
+
+def test_roboto_is_served_from_the_repository():
+    """The pages use Roboto (the house typeface of mainzed) from docs/vendor/roboto/, not from a font server."""
+    css = (DOCS / "assets" / "site.css").read_text(encoding="utf-8")
+    assert "font-family: Roboto" in css and "Roboto, system-ui" in css
+    for weight in (400, 500, 700):
+        for subset in ("latin", "latin-ext"):
+            assert f"roboto-{subset}-{weight}-normal.woff2" in css
+            assert (DOCS / "vendor" / "roboto" / f"roboto-{subset}-{weight}-normal.woff2").exists()
+    assert (DOCS / "vendor" / "roboto" / "LICENSE").exists()
+    assert (ROOT / "design" / "fonts" / "LICENSE").exists()
+
+
+def test_png_figures_are_drawn_with_the_same_typeface():
+    import sys
+    sys.path.insert(0, str(ROOT / "py"))
+    from site_fonts import BOLD, REGULAR, fonts_digest, pil_font
+    assert REGULAR.exists() and BOLD.exists()
+    assert pil_font(20).getname() == ("Roboto", "Regular") and pil_font(20, True).getname() == ("Roboto", "Bold")
+    assert pil_font(20).getlength("Größe") > 0        # the umlauts of German are in the file
+    assert len(fonts_digest()) == 64

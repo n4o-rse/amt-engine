@@ -13,8 +13,20 @@ Zenodo.
 
 ## [Unreleased]
 
+### Added
+
+- Roboto, the house typeface of mainzed, as the typeface of the static pages: the
+  files are in `docs/vendor/roboto/` (400, 500 and 700; Latin and Latin Extended;
+  SIL OFL 1.1) and `docs/assets/site.css` declares them, so the pages show the same
+  type on every device and load nothing from a font server. `tests/test_offline.py`
+  checks the declarations and the files.
+
 ### Changed
 
+- The PNG figures are drawn with Roboto Regular and Bold (`design/fonts/`,
+  `py/site_fonts.py`) instead of Pillow's default font and a thickened outline for
+  bold text. The fonts belong to the key in `docs/assets/figures.json`, so a changed
+  typeface redraws the PNGs.
 - `README.md`, "Citation": names the version DOI of 0.4.0,
   `10.5281/zenodo.23688518`. The concept DOI is unchanged.
 - This changelog: the entry for 0.4.0 has one list each for Added, Changed and

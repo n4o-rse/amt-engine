@@ -17,8 +17,8 @@ Determinism
 -----------
 The SVG files are plain text from fixed numbers and are compared byte for
 byte. The PNG files depend on the Pillow/FreeType build, so they are not
-compared: ``figures.json`` records the SHA-256 of every SVG, and a PNG is
-redrawn only when its SVG changed or the PNG is missing.
+compared: ``figures.json`` records the SHA-256 of every SVG (plus the font files), and a PNG is
+redrawn only when its SVG or the fonts changed or the PNG is missing.
 """
 from __future__ import annotations
 
@@ -35,8 +35,10 @@ _SS = 2            # supersampling for the antialiasing of the PNG
 # colours). In the pages, assets/palette.css defines the same names for the
 # light and the dark theme; a standalone SVG or PNG uses these values.
 try:
+    from site_fonts import pil_font
     from site_palette import figure_tokens
 except ImportError:
+    from py.site_fonts import pil_font
     from py.site_palette import figure_tokens
 TOKENS = figure_tokens()
 
@@ -327,28 +329,23 @@ def render_svg(sc: Scene) -> str:
 # PNG renderer (Pillow)
 # --------------------------------------------------------------------------- #
 def render_png(sc: Scene, path: Path) -> None:
-    from PIL import Image, ImageDraw, ImageFilter, ImageFont
+    from PIL import Image, ImageDraw, ImageFilter
 
     K = PNG_SCALE * _SS
     W, H = sc.w * K, sc.h * K
     img = Image.new("RGBA", (W, H), (255, 255, 255, 0))
     d = ImageDraw.Draw(img)
-    fonts: dict[int, object] = {}
-
-    def font(px: float):
-        px = max(6, int(round(px)))
-        if px not in fonts:
-            fonts[px] = ImageFont.load_default(size=px)
-        return fonts[px]
+    def font(px: float, bold: bool = False):
+        return pil_font(max(6, int(round(px))), bold)
 
     def draw_runs(x, y, rs, size, color, bold=False, anchor="m"):
         # total width first, then draw the runs left to right
-        widths = [d.textlength(t, font=font(size * f * K)) for t, f, _ in rs]
+        widths = [d.textlength(t, font=font(size * f * K, bold)) for t, f, _ in rs]
         total = sum(widths)
         cx = x * K - (total / 2 if anchor == "m" else 0)
         for (t, f, dy), w in zip(rs, widths):
-            d.text((cx, (y + size * dy) * K), t, font=font(size * f * K), fill=_hex(color) + (255,),
-                   anchor="lm", stroke_width=(1 if bold else 0), stroke_fill=_hex(color) + (255,))
+            d.text((cx, (y + size * dy) * K), t, font=font(size * f * K, bold), fill=_hex(color) + (255,),
+                   anchor="lm")
             cx += w
 
     def poly(pts, fill=None, outline=None, width=0):

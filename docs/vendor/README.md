@@ -11,7 +11,12 @@ They are not generated. To update one, replace the files and change the version 
 | `jquery/` | [jQuery](https://jquery.com) (`jquery.min.js`) | 1.12.4 | MIT | Materialize, jQuery UI |
 | `jquery-ui/` | [jQuery UI](https://jqueryui.com) (`jquery-ui.min.js`, `.css`, `images/`) | 1.12.1 | MIT | dialogs and widgets |
 | `materialize/` | [Materialize](https://github.com/Dogfalo/materialize) (`css`, `js`, Roboto fonts) | 0.100.2 | MIT | layout, buttons |
+| `roboto/` | [Roboto](https://github.com/googlefonts/roboto-classic) via [Fontsource](https://fontsource.org/fonts/roboto) (`files/roboto-latin*-{400,500,700}-normal.woff2`) | 5.3.0 | SIL OFL 1.1 | the typeface of the static pages (`assets/site.css`) |
 | `material-icons/` | [Material Icons](https://github.com/marella/material-icons) (`iconfont/material-icons.woff2`, `.woff`) | 1.13.12 | Apache-2.0 | the icons of the toolbar |
 
 The Explorer page, `../explorer/index.html`, loads them from here; `tests/test_offline.py` checks that no page
 and no stylesheet of `docs/` references a file on another server.
+
+Roboto comes twice, on purpose: the static pages use the current files in `roboto/` (Latin and Latin Extended),
+the Explorer keeps the older Roboto cut that Materialize ships in `materialize/fonts/`. The PNG figures are drawn
+from `design/fonts/` (Regular and Bold as TrueType, converted from the same files in `roboto/`; licence next to them).

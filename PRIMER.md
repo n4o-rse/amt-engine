@@ -163,6 +163,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S12 | w3id-Eintrag (`w3id.org/amt/`) und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | erledigt 2026-10-27 (FTP live; w3id-PR gestellt) |
 | S14 | Texte (Namensgeschichte B, Familiensatz), Bibliografie, Bibliotheken lokal, w3id-Header aus der YAML und Adresse ohne `ids/`, `preferred-citation`, Seitentest | amt-engine | S12 | Patch geliefert, nach Push erledigt |
 | S13 | D6 (Exit-Code, unverändert) und Release 0.4.0 (Engine) / 0.3.0 (Runner) samt Zenodo | amt-engine, amt-runner | S10 bis S12, S14 | 13a und 13b erledigt (Tag `v0.4.0`, Release, Zenodo); 13c als Patch geliefert |
+| S15 | Schrift: Roboto lokal (Seiten und PNG-Figuren), Beschluss D10 | amt-engine | S13 | Patch geliefert |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -426,6 +427,16 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 
 **Abnahme:** `python main.py --strict` zweimal grün (Windows), `git status` sauber; `git tag` zeigt `v0.4.0` bzw. `v0.3.0`; „Releases“ zeigt es; auf zenodo.org steht je eine neue Version mit den Autoren aus `CITATION.cff`; nach 13c nennt die README die Versions-DOI.
 
+### S15 – Schrift
+
+**Ziel:** Alle Seiten und Figuren verwenden dieselbe Schrift, auf jedem Gerät und ohne Anfrage an einen Schriftserver.
+
+**Beschluss (2026-10-27):** Roboto, die Hausschrift von mainzed. Die Seiten laden sie aus `docs/vendor/roboto/` (Schnitte 400, 500, 700, Latin und Latin-Ext, SIL OFL 1.1, Fontsource 5.3.0); `docs/assets/site.css` deklariert sie mit `@font-face` und `unicode-range`, `Roboto` steht vor den Systemschriften. Die PNG-Figuren zeichnet Pillow mit `design/fonts/Roboto-Regular.ttf` und `Roboto-Bold.ttf` (aus denselben woff2-Dateien umgewandelt; die Pillow-Standardschrift und das künstliche Fett per Strichstärke entfallen). `py/site_fonts.py` hält Pfade und Schriftcache; die Prüfsumme der Schriftdateien gehört zum Schlüssel in `docs/assets/figures.json`, eine geänderte Schrift zeichnet die PNGs also neu. Die Code-Schrift bleibt die Systemschrift (`ui-monospace`, Cascadia, Consolas). Der Explorer behält das ältere Roboto, das Materialize mitbringt.
+
+**Grenzen:** SVG-Dateien, die einzeln geöffnet oder als `<img>` eingebunden werden, können keine Webschrift laden; sie fallen auf die Systemschrift zurück. Die Figuren auf den Seiten sind eingebettet und zeigen Roboto.
+
+**Abnahme:** `python main.py` einmal (zeichnet die PNGs neu), danach `--strict` zweimal grün, `git status` sauber; im Browser lädt die Startseite nur Dateien aus `docs/`, und die Schrift ist Roboto.
+
 ## Teil D – Offene Punkte
 
 - **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.
@@ -436,6 +447,6 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 - **D4** erledigt in S7: siehe A4 („Verhältnis zu `amt-explore`“).
 - **D5** erledigt in S7: Standard-Ref des Runners bleibt `main` (A4).
 - **D8** erledigt in S10: Ursache war `Dataset.contexts is deprecated` (rdflib 7.6, ausgelöst von pyshacl 0.26.0), jetzt gefiltert. Vorher: Unter Windows meldet `pytest` 63 Tests mit 204 Warnungen (Linux: keine). Offen: `python -m pytest tests -q -rw` in `C:\git\amt-engine` ausführen, die Warnungsarten ablesen und entscheiden, ob sie zu filtern oder zu beheben sind.
-- **D10** Gestaltung: Farbwelt und Logos umgesetzt in S11c (`design/palette.yaml`). Wortlaut des Familien-Abschnitts erledigt in S14, Links bewusst keine (Alpaka und Alligator in Überarbeitung). Offen: vektorisierte Logos, Schrift (Systemschrift oder eigene Webschrift, z. B. Inter und IBM Plex Mono, dann lokal in `docs/assets`). Der Explorer startet seit S11c mit `animals.ttl`.
+- **D10** Gestaltung: Farbwelt und Logos umgesetzt in S11c (`design/palette.yaml`). Wortlaut des Familien-Abschnitts erledigt in S14, Links bewusst keine (Alpaka und Alligator in Überarbeitung). Schrift erledigt in S15 (Roboto, lokal). Offen: vektorisierte Logos (die Logos der Institutionen bleiben bis auf Weiteres Pixelbilder; Pinguin, Alpaka und Alligator sind eigene Entwürfe des Autors, erstellt mit Google Gemini). Der Explorer startet seit S11c mit `animals.ttl`.
 - **D11** Der Playground (`leiza-rse/amt-playground`) und der Explorer sind funktional fertig, dürfen aber später schöner und hübscher werden (Layout, Aufteilung, Startnetz mit echten Beispieldaten); der Playground bleibt im LEIZA-Blau.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.

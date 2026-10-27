@@ -15,7 +15,7 @@ Writes, below ``docs/``:
     ontology/img/*.svg|png    the small figures of that page
     assets/palette.css        the colours of every page, from design/palette.yaml
     assets/img/palette.svg|png  the palette as a picture
-    assets/figures.json       SHA-256 of every figure SVG (see below)
+    assets/figures.json       SHA-256 of every figure SVG and the fonts (see below)
 
 and, outside docs/, the redirect files of deploy/ (the FTP of academic-meta-tool.xyz
 and the w3id.org entry) from deploy/redirects.yaml.
@@ -34,7 +34,7 @@ What is compared how:
   content cannot.
 * PNG files are derived from the SVGs. Their bytes depend on the Pillow and
   FreeType build, so they are not compared; a PNG is redrawn only when its SVG
-  changed (``figures.json``) or the PNG is missing.
+  changed or the fonts changed (``figures.json``), or the PNG is missing.
 
 Standalone:  python py/step_site.py
 """
@@ -55,6 +55,7 @@ try:
     import site_palette as palette
     import site_redirects as redirects
     import site_bib as bib
+    from site_fonts import fonts_digest
     from site_home import home_page
 except ImportError:  # imported as py.step_site from the repository root
     from py.amt_dev_utils import DOCS_DIR, ONTOLOGY_DIR, ROOT, Report
@@ -63,6 +64,7 @@ except ImportError:  # imported as py.step_site from the repository root
     from py import site_palette as palette
     from py import site_redirects as redirects
     from py import site_bib as bib
+    from py.site_fonts import fonts_digest
     from py.site_home import home_page
 
 MANIFEST = DOCS_DIR / "assets" / "figures.json"
@@ -118,11 +120,12 @@ def main() -> int:
 
     # 2. PNGs follow the SVGs through the manifest
     old = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.exists() else {}
+    fonts = fonts_digest()      # the PNGs are drawn with these files, so they belong to the key
     new = {}
     redrawn = 0
     for name in sorted(scenes):
         base = where[name]
-        digest = hashlib.sha256(svg[name].encode("utf-8")).hexdigest()
+        digest = hashlib.sha256((svg[name] + fonts).encode("utf-8")).hexdigest()
         new[_rel(base.with_suffix(".svg"))] = digest
         png = base.with_suffix(".png")
         if not png.exists() or old.get(_rel(base.with_suffix(".svg"))) != digest:
@@ -139,7 +142,7 @@ def main() -> int:
     _write_text(rep, DOCS_DIR / "assets" / "palette.css", palette.css(pal), counts)
     pal_base = DOCS_DIR / "assets" / "img" / "palette"
     pal_svg = palette.svg(pal)
-    pal_digest = hashlib.sha256(pal_svg.encode("utf-8")).hexdigest()
+    pal_digest = hashlib.sha256((pal_svg + fonts).encode("utf-8")).hexdigest()
     new[_rel(pal_base.with_suffix(".svg"))] = pal_digest
     if not pal_base.with_suffix(".png").exists() or old.get(_rel(pal_base.with_suffix(".svg"))) != pal_digest:
         try:
