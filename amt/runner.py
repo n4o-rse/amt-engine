@@ -46,11 +46,21 @@ from . import (
     render_to_html,
     validate_against_shapes,
 )
+from .diagnostics import Finding, diagnose, has_errors, summarise
+from .validation import format_violations
 
 
 # ─────────────────────────────────────────────────────────────────────────
 # Run report
 # ─────────────────────────────────────────────────────────────────────────
+class DiagnosticsError(Exception):
+    """Raised by ``run_all(strict=True)`` when :func:`amt.diagnostics.diagnose` reports an error."""
+
+    def __init__(self, findings: list[Finding]):
+        self.findings = findings
+        super().__init__(f"{sum(1 for f in findings if f.level == 'error')} diagnostic error(s)")
+
+
 class RunReport:
     """Collects events across a pipeline run and renders them as Markdown.
 
@@ -68,6 +78,7 @@ class RunReport:
         self.summary: dict = {}
         self.validation: dict | None = None
         self.consistency: dict | None = None
+        self.findings: list[Finding] | None = None
         self.reasoning: dict | None = None
         self.outputs: list[Path] = []
         self.ontology_summary: dict | None = None
@@ -98,6 +109,9 @@ class RunReport:
 
     def record_validation(self, conforms: bool, violations: list) -> None:
         self.validation = {"conforms": conforms, "violations": list(violations)}
+
+    def record_findings(self, findings: list[Finding]) -> None:
+        self.findings = list(findings)
 
     def record_consistency(self, ok: bool, violations: list[str]) -> None:
         self.consistency = {"ok": ok, "violations": list(violations)}
@@ -168,8 +182,25 @@ class RunReport:
                 lines.append(f"✗ Validation **failed** with {len(vios)} violation(s):")
                 lines.append("")
                 for i, v in enumerate(vios, 1):
-                    msg = v.get("message", "?") if isinstance(v, dict) else str(v)
-                    lines.append(f"{i}. {msg}")
+                    if isinstance(v, dict):
+                        lines.append(f"{i}. `{v.get('focus', '?')}` — {v.get('message', '?')}")
+                    else:
+                        lines.append(f"{i}. {v}")
+            lines.append("")
+
+        # ── Diagnostics ─────────────────────────────────────────────────
+        if self.findings is not None:
+            lines.append("## Diagnostics")
+            lines.append("")
+            if not self.findings:
+                lines.append("✓ Nothing to report.")
+            else:
+                lines.append(f"{summarise(self.findings)}.")
+                lines.append("")
+                for f in self.findings:
+                    lines.append(f"- **{f.level}** `{f.code}` — {f.message}")
+                    for row in f.hint.splitlines():
+                        lines.append(f"  - {row}")
             lines.append("")
 
         # ── Counts ──────────────────────────────────────────────────────
@@ -328,10 +359,17 @@ def run_all(
     write_report: bool = True,
     height: str = "600px",
     ontology_dir: str | Path | None = None,
+    check_only: bool = False,
+    strict: bool = False,
 ) -> dict:
     """
     Run the full AMT pipeline. Returns the loaded ``amt`` dict so callers
     (notebook, tests) can keep working with it.
+
+    ``check_only=True`` stops after validation, loading and diagnostics and
+    writes no file at all; use it while building a file.
+    ``strict=True`` raises :class:`DiagnosticsError` when the diagnostics
+    contain an error (by default errors are printed and the run continues).
 
     A Markdown run-report is written into the output folder by default
     (``<stem>.report.md``); pass ``write_report=False`` to skip it.
@@ -349,14 +387,18 @@ def run_all(
         raise FileNotFoundError(input_path)
 
     out_dir = Path(output_dir) if output_dir else input_path.parent / "out"
-    if out_dir.exists():
+    if check_only:
+        write_report = False
+        export_ttl_ = export_cypher_ = export_csv_ = export_html_ = False
+    if out_dir.exists() and not check_only:
         import shutil
         for entry in out_dir.iterdir():
             if entry.is_dir():
                 shutil.rmtree(entry)
             else:
                 entry.unlink()
-    out_dir.mkdir(parents=True, exist_ok=True)
+    if not check_only:
+        out_dir.mkdir(parents=True, exist_ok=True)
     stem = input_path.stem
 
     report = RunReport(input_path=input_path, options={
@@ -380,8 +422,7 @@ def run_all(
         report.record_validation(result.conforms, result.violations)
         if not result.conforms:
             print(f"FAIL Validation failed with {len(result.violations)} violation(s):")
-            for i, v in enumerate(result.violations, 1):
-                print(f"  [{i}] {v.get('message', '?')}")
+            print(format_violations(result.violations))
             if write_report:
                 _write_report_safely(report, out_dir, stem)
             raise AMTValidationError(result.report_text, result.violations)
@@ -398,6 +439,24 @@ def run_all(
         f"{len(amt['edges'])} Edges | "
         f"{len(amt['axioms'])} Axioms"
     )
+
+    findings = diagnose(amt)
+    report.record_findings(findings)
+    if findings:
+        print(f"\nDIAG {summarise(findings)}:")
+        for f in findings:
+            print(f.format())
+        if any(f.level == "error" for f in findings):
+            print("     (see https://n4o-rse.github.io/amt-engine/howto/validate/ for what each code means)")
+    if strict and has_errors(findings):
+        if write_report:
+            _write_report_safely(report, out_dir, stem)
+        raise DiagnosticsError(findings)
+
+    if check_only:
+        print("\nOK   Check finished; nothing was written (--check-only)."
+              if not has_errors(findings) else "\nFAIL Check finished with errors (see above).")
+        return amt
 
     if info:
         report.record_ontology(amt)
@@ -534,6 +593,14 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--no-report",   action="store_true",
                    help="Skip writing the Markdown run report")
     p.add_argument("--ontology",    type=Path, default=None, help="Custom ontology folder")
+    p.add_argument("--check-only", action="store_true",
+                   help="Validate, load and diagnose, then stop: no reasoning output, "
+                        "no exports (the quick check while you build a file)")
+    p.add_argument("--strict", action="store_true",
+                   help="Exit with code 1 when the diagnostics contain an error "
+                        "(by default they are printed and the run continues)")
+    p.add_argument("--debug", action="store_true",
+                   help="Show the full Python traceback if something unexpected fails")
     p.add_argument("--height", default="600px",
                    help="Canvas height for the HTML graph (default: 600px)")
     args = p.parse_args(argv)
@@ -550,12 +617,24 @@ def main(argv: list[str] | None = None) -> int:
             write_report=not args.no_report,
             height=args.height,
             ontology_dir=args.ontology,
+            check_only=args.check_only,
+            strict=args.strict,
         )
+    except DiagnosticsError:
+        print("FAIL  --strict: fix the errors above (or run without --strict).", file=sys.stderr)
+        return 1
     except FileNotFoundError as e:
         print(f"FAIL  Input file not found: {e}", file=sys.stderr)
         return 2
     except AMTValidationError:
         return 1
+    except Exception as e:  # noqa: BLE001 - last line of defence: say what happened, not just a traceback
+        if args.debug:
+            raise
+        print(f"FAIL  Unexpected error: {type(e).__name__}: {e}", file=sys.stderr)
+        print("      Run with --debug for the full traceback. If the input validated, please report this at "
+              "https://github.com/n4o-rse/amt-engine/issues together with the input file.", file=sys.stderr)
+        return 3
     return 0
 
 

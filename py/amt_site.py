@@ -21,6 +21,7 @@ NAV = [
     ("Home", "index.html", "home"),
     ("Vocabulary", "vocab/", "vocab"),
     ("Data model", "ontology/", "ontology"),
+    ("How-To", "howto/", "howto"),
     ("Explorer", "explorer/", "explorer"),
     ("Bibliography", "bibliography/", "bibliography"),
     ("GitHub", "https://github.com/n4o-rse/amt-engine", "github"),

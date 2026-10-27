@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How-To – AMT</title>
+<meta name="description" content="How to build, check and fix an Academic Meta Tool data file.">
+<link rel="icon" type="image/png" href="../assets/img/amt-penguin-small.png">
+<link rel="stylesheet" href="../assets/palette.css">
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../assets/site.js"></script>
+</head>
+<body>
+<header class="site"><div class="in">
+<a class="brand" href="../index.html"><img src="../assets/img/amt-penguin-small.png" alt="" width="34" height="48">Academic Meta Tool</a>
+<nav><a href="../index.html">Home</a><a href="../vocab/">Vocabulary</a><a href="../ontology/">Data model</a><a href="../howto/" aria-current="page">How-To</a><a href="../explorer/">Explorer</a><a href="../bibliography/">Bibliography</a><a href="https://github.com/n4o-rse/amt-engine">GitHub</a></nav>
+<button type="button" class="theme push" id="theme-toggle" aria-label="Switch between light and dark mode">Dark mode</button>
+</div></header>
+<main>
+
+<h1>How-To</h1>
+<p class="lead">Practical guides for working with AMT files: build one, check it, and understand what the messages mean.
+Each guide starts from a small example you can copy.</p>
+
+<div class="cols"><div class="term"><h3><a href="create/">Build an AMT file</a></h3><p>What an AMT file consists of, a complete file to start from, and how to turn existing RDF into AMT with a SPARQL CONSTRUCT query.</p></div><div class="term"><h3><a href="validate/">Check an AMT file</a></h3><p>Run the checks, read what they say, and fix it. Every message is explained with the IRI it names, what causes it and what to add.</p></div><div class="term"><h3><a href="https://n4o-rse.github.io/amt-engine/explorer/">Look at the result</a></h3><p>Load the <code>.reasoned.ttl</code> that a run writes into the Explorer. It runs in your browser; nothing is uploaded.</p></div></div>
+
+<h2>The short version</h2>
+<ol>
+<li><strong>Declare concepts</strong> (<code>ex:Coin a amt:Concept ; rdfs:label "Coin"</code>).</li>
+<li><strong>Make every end of every edge a node</strong> (<code>ex:c1 amt:instanceOf ex:Coin</code>), including the things your edges point <em>to</em>.</li>
+<li><strong>Write edges</strong> as a statement with <code>rdf:subject</code>, <code>rdf:predicate</code>, <code>rdf:object</code> and <code>amt:weight</code>.</li>
+<li><strong>Check</strong> before you reason: <code>python run_amt.py my.ttl --check-only</code>.</li>
+</ol>
+
+<h2>Which tool for which job</h2>
+<table>
+<thead><tr><th>You want to&hellip;</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td>try a file once, without installing anything but Python and git</td><td><a href="https://github.com/n4o-rse/amt-runner"><code>amt-runner</code></a> &rarr; <code>python run_amt.py my.ttl</code></td></tr>
+<tr><td>check a file quickly while you build it</td><td><code>python run_amt.py my.ttl --check-only</code> (or <code>amt-runner my.ttl --check-only</code> with the engine installed)</td></tr>
+<tr><td>run it inside your own Python project</td><td><code>pip install -e .</code> from <a href="https://github.com/n4o-rse/amt-engine">amt-engine</a>, then <code>from amt import load_amt, diagnose</code></td></tr>
+<tr><td>look at the graph and the inferred edges</td><td><a href="../explorer/">The Explorer</a> in your browser</td></tr>
+</tbody></table>
+<p class="note">The two things called <em>amt-runner</em>: the repository <code>amt-runner</code> is a small wrapper
+(<code>run_amt.py</code>) that fetches the engine for you; the engine itself also has a command <code>amt-runner</code>.
+Both accept the same options.</p>
+
+</main>
+<footer class="site">
+Academic Meta Tool &middot; amt-engine 0.4.0 &middot;
+<a href="https://github.com/n4o-rse/amt-engine">source</a><br>
+<div class="logos"><a href="https://www.mainzed.org" title="mainzed"><img src="../assets/img/logos/mainzed.png" alt="mainzed" height="28"></a><a href="https://i3mainz.hs-mainz.de" title="i3mainz"><img src="../assets/img/logos/i3mainz.png" alt="i3mainz" height="54"></a><a href="https://www.leiza.de" title="LEIZA"><img src="../assets/img/logos/leiza.png" alt="LEIZA" height="54"></a><a href="https://www.nfdi4objects.net" title="NFDI4Objects"><img src="../assets/img/logos/nfdi4objects.png" alt="NFDI4Objects" height="54"></a><a href="https://www.nfdi.de" title="Nationale Forschungsdateninfrastruktur (NFDI), in cooperation with"><img src="../assets/img/logos/nfdi.png" alt="Nationale Forschungsdateninfrastruktur (NFDI), in cooperation with" height="66"></a><a href="https://www.dfg.de" title="Deutsche Forschungsgemeinschaft (DFG), funded by"><img src="../assets/img/logos/dfg.png" alt="Deutsche Forschungsgemeinschaft (DFG), funded by" height="66"></a></div>
+A <strong>mainzed</strong> project of i3mainz (Hochschule Mainz) and the RGZM (today LEIZA), developed further in
+NFDI4Objects, which is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) &ndash;
+project number 501836407.
+</footer>
+</body>
+</html>

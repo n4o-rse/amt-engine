@@ -30,6 +30,7 @@ Arbeitsplan für das Repo `amt-engine` (Academic Meta Tool, Python-Reasoner). Wi
 - Windows-Lauf von `python main.py` (2026-10-26, `C:\git\amt-engine`): alle sechs Schritte `ok`, 62 Tests grün in 16,4 s, Gesamtlauf 38,1 s. Der Determinismus-Test besteht auch dort. Die Warnungszahl im Testlauf liegt mit 15 006 weit unter dem Linux-Wert (rdflib- und Python-Version, siehe D3).
 - `docs-sync` meldete auf Windows fünf Dateien als `updated`, obwohl die Blobs in `examples/` und `docs/data/` identisch sind und überall nur LF enthalten (geprüft an `9a0e8b7`). Ursache: `core.autocrlf` macht im Working Tree CRLF daraus; der Byte-Vergleich sah Unterschiede, wo keine sind. Behoben in S1a.
 - `examples/skos-mapping-example.ttl` meldet beim Konsistenzcheck zwei Verletzungen (`exactMatch` und `questionableMatch` zum selben Ziel; Selbstschleife über `questionableMatch`). Das ist als Demo gewollt (A4). Der Runner beendet sich trotzdem mit Exit-Code 0, deshalb bleibt der Schritt `examples` auf `ok`.
+- Rückmeldung aus der Praxis (Karsten, AFE-Münzen, 2026-10-27): Eine per SPARQL CONSTRUCT erzeugte Datei bestand die Validierung, der Lauf endete aber mit `AssertionError: non existent node 'http://nomisma.org/id/vespasian'` in `amt/viz.py`. Ursache: nur die Münzen hatten `amt:instanceOf`, die Ziele der Kanten (`nm:vespasian` usw.) nicht; `load_amt` lädt nur Knoten mit `amt:instanceOf`, die Kanten blieben ohne Endknoten, `pyvis.add_edge` bricht dann ab (geprüft mit `AFE_all_cases_asAMT.ttl`: 4 Knoten, 7 Kanten, 7 Kantenenden ohne Knoten). Zweites Fehlerbild: `amt:instanceOf amt:Concept` löst „Each Concept must have at least one rdfs:label“ aus (der Bereich von `amt:instanceOf` ist `amt:Concept`, also zählt jedes Objekt als Konzept), und die Meldung nannte den Knoten nicht. `lado:hasAMT` stört nicht: die Engine liest Kanten nur über `amt:weight`.
 - `pyproject.toml` nannte als Autor „AMT contributors"; `LICENSE` nannte Florian Thiery | LEIZA | NFDI4Objects; `docs/index.htm` nennt Thiery und Unold (Software) sowie Thiery und Mees (Datenkonzept). Geklärt in S3 (A4).
 
 ### A2 Zielbild
@@ -117,6 +118,10 @@ Eigenschaften, die das Repo haben muss:
 | Rechte, Impressum | Rechte an Logos und Maskottchen sind geklärt (Autor); Impressum und Datenschutzerklärung sind für diese Seiten nicht nötig (Autor) | 2026-10-27 |
 | Texte der Startseite | Namensgeschichte in der Fassung B („AMT steht für Academic Meta Tool. Der Name funktioniert eigentlich nur auf Deutsch …“); Familiensatz ohne Links, weil Alpaka und Alligator noch entstehen bzw. überarbeitet werden | 2026-10-27 |
 | Version des Runners | 0.3.0, zusammen mit der Engine 0.4.0 (schlankere Abhängigkeiten, Explorer-Hinweis) | 2026-10-27 |
+| Diagnose statt Absturz | Kantenenden ohne `amt:instanceOf` sind ein Befund `AMT-E101` (mit IRI und Zeilen zum Einfügen), kein Abbruch; `viz.py` zeichnet solche Enden als graue Platzhalter; Modul `amt/diagnostics.py` (nicht `diagnose.py`: der Name würde in `amt/__init__.py` von der Funktion `diagnose` verdeckt) | 2026-10-27 |
+| Exit-Codes des Runners | 0 fertig, 1 Validierung oder `--strict` gescheitert, 2 Eingabe fehlt, 3 unerwarteter Fehler (`--debug` zeigt den Traceback); Diagnose-Fehler ändern den Exit-Code nur mit `--strict`; D6 bleibt unverändert (Konsistenzverletzungen: 0) | 2026-10-27 |
+| `--check-only` | Validieren, laden, diagnostizieren, nichts schreiben; auch im Wrapper `amt-runner/run_amt.py` (kein Ausgabeordner, kein `latest`) | 2026-10-27 |
+| How-To-Sektion | `docs/howto/` (Übersicht, „bauen“, „prüfen“) aus `py/site_howto.py`; Beispiele und das SPARQL-Rezept stehen im Modul und werden von `tests/test_howto.py` ausgeführt; jeder Code von `amt/diagnostics.py` hat einen Eintrag mit Anker auf der Seite „prüfen“; weitere Unterseiten kommen als Einträge in `PAGES` | 2026-10-27 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
 
@@ -164,6 +169,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S14 | Texte (Namensgeschichte B, Familiensatz), Bibliografie, Bibliotheken lokal, w3id-Header aus der YAML und Adresse ohne `ids/`, `preferred-citation`, Seitentest | amt-engine | S12 | Patch geliefert, nach Push erledigt |
 | S13 | D6 (Exit-Code, unverändert) und Release 0.4.0 (Engine) / 0.3.0 (Runner) samt Zenodo | amt-engine, amt-runner | S10 bis S12, S14 | 13a und 13b erledigt (Tag `v0.4.0`, Release, Zenodo); 13c als Patch geliefert |
 | S15 | Schrift: Roboto lokal (Seiten und PNG-Figuren), Beschluss D10 | amt-engine | S13 | Patch geliefert |
+| S16 | Nutzerfreundliche Validierung: Diagnose (`AMT-E…`), SHACL-Meldungen mit Knoten, `--check-only`/`--strict`, viz ohne Absturz, How-To-Sektion | amt-engine, amt-runner | S15 | Patch geliefert |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -437,6 +443,26 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 
 **Abnahme:** `python main.py` einmal (zeichnet die PNGs neu), danach `--strict` zweimal grün, `git status` sauber; im Browser lädt die Startseite nur Dateien aus `docs/`, und die Schrift ist Roboto.
 
+### S16 – Nutzerfreundliche Validierung und How-To
+
+**Ziel:** Wer eine AMT-Datei baut (auch per SPARQL CONSTRUCT), bekommt Fehlermeldungen, die den Knoten nennen und sagen, was zu ergänzen ist, und findet auf der Website eine Anleitung zum Bauen und Prüfen.
+
+**Anlass:** Rückmeldung von Karsten (AFE → AMT), siehe A1, Befund vom 2026-10-27.
+
+**Inhalt:** (1) `amt/diagnostics.py` mit `Finding`, `diagnose()`, Codes `AMT-E101`, `E102`, `E103`, `W201`, `W204`, `N301`, `N302`; (2) `amt/validation.py`: `format_violations()` und Hinweise zu den Shape-Meldungen; (3) `amt/viz.py`: Platzhalterknoten statt `AssertionError`; (4) `amt/runner.py` und `amt/cli.py`: Diagnose nach dem Laden, `--check-only`, `--strict`, `--debug`, Exit-Code 3, Abschnitt „Diagnostics“ im Report; (5) `py/site_howto.py`, Navigationseintrag „How-To“, Schaltfläche auf der Startseite (EN und DE); (6) Tests `tests/test_diagnose.py`, `tests/test_howto.py`; (7) CHANGELOG und README.
+
+**Gegenstück im Runner:** S8 im Primer von `amt-runner` (`--check-only` im Wrapper, Erklärung der Exit-Codes, Hinweis auf `--update`).
+
+**Für Karsten:** `python run_amt.py <datei>.ttl --update --check-only`. Ohne `--update` bleibt sein `.amt-cache` auf der alten Engine und zeigt weiter den Traceback. Die Datei braucht für die Ziele (`nm:…`) ein `amt:instanceOf` auf ein zweites Konzept (z. B. `nm:Authority`); das Rezept steht auf `howto/create/#convert` und ist getestet.
+
+**Abnahme:** `python main.py --strict` zweimal grün, `git status` danach sauber; `amt-runner AFE_all_cases_asAMT.ttl` endet ohne Traceback und nennt `AMT-E101` mit den sieben IRIs; dieselbe Datei mit den Authority-Knoten ergänzt meldet keinen Fehler; `amt-runner x.ttl --check-only` schreibt keine Datei; die Seiten `/howto/`, `/howto/create/`, `/howto/validate/` laden ohne Anfrage an fremde Server.
+
+### Erledigt 2026-10-27
+
+- Sandbox: 142 Tests grün (vorher 115), `python main.py` ok (7 Schritte), Determinismus unverändert. Die Beispiele der How-To-Seiten sind getestet; das CONSTRUCT-Rezept erzeugt aus der Beispieleingabe zwei Konzepte, sieben Knoten und vier Kanten (0,5; 0,5; 0,6; 1,0), die validieren.
+- Beim Bau aufgefallen: heißt das Modul wie die Funktion (`amt/diagnose.py` und `diagnose`), liefert `import amt.diagnose as d` die Funktion statt des Moduls. Deshalb `diagnostics.py`.
+- Noch nicht geprüft: Windows-Lauf, Lauf mit Karstens vollständiger Datei im Original (nur `AFE_all_cases_asAMT.ttl` aus dem Anhang).
+
 ## Teil D – Offene Punkte
 
 - **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.
@@ -450,3 +476,4 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 - **D10** Gestaltung: Farbwelt und Logos umgesetzt in S11c (`design/palette.yaml`). Wortlaut des Familien-Abschnitts erledigt in S14, Links bewusst keine (Alpaka und Alligator in Überarbeitung). Schrift erledigt in S15 (Roboto, lokal). Offen: vektorisierte Logos (die Logos der Institutionen bleiben bis auf Weiteres Pixelbilder; Pinguin, Alpaka und Alligator sind eigene Entwürfe des Autors, erstellt mit Google Gemini). Der Explorer startet seit S11c mit `animals.ttl`.
 - **D11** Der Playground (`leiza-rse/amt-playground`) und der Explorer sind funktional fertig, dürfen aber später schöner und hübscher werden (Layout, Aufteilung, Startnetz mit echten Beispieldaten); der Playground bleibt im LEIZA-Blau.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.
+- **D12** Weitere How-To-Unterseiten (Rezepte: Rollen und Axiome Schritt für Schritt, AMT-Datei aus Wikibase/Wikidata, Ergebnis im Explorer lesen) und ein Beispiel `examples/afe-coins.ttl` mit dem AFE-Fall; wartet auf Rückmeldung von Karsten und Lasse, ob das Rezept auf `howto/create/` für ihre Daten reicht.

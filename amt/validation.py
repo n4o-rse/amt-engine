@@ -22,6 +22,50 @@ from pyshacl import validate as _pyshacl_validate
 from ._resources import ontology_candidates, ontology_dir as _bundled_ontology_dir
 
 
+# Hints for the messages of ontology/amt-shapes.ttl: (start of the message, what to do).
+# {focus} is replaced by the IRI the violation is about.
+_HINTS = [
+    ("Each Concept must have at least one rdfs:label",
+     "Add  {focus} rdfs:label \"...\" .  If this IRI is not meant to be a concept, check where it is used as "
+     "the object of amt:instanceOf: every object of amt:instanceOf counts as a Concept (and amt:Concept itself is not one of yours)."),
+    ("Each Role must have at least one rdfs:label",
+     "Add  {focus} rdfs:label \"...\" ."),
+    ("Each Role must have exactly one rdfs:domain",
+     "Add exactly one  {focus} rdfs:domain <Concept> ."),
+    ("Each Role must have exactly one rdfs:range",
+     "Add exactly one  {focus} rdfs:range <Concept> ."),
+    ("Hamacher",
+     "Add  {focus} amt:logicParameter \"0.5\"^^xsd:decimal .  (any non-negative number)"),
+]
+
+
+def violation_hint(violation: dict) -> str:
+    """What to do about one violation, or an empty string if there is no specific advice."""
+    message = violation.get("message", "")
+    for start, hint in _HINTS:
+        if message.startswith(start) or start in message:
+            return hint.format(focus=violation.get("focus", "?"))
+    return ""
+
+
+def format_violations(violations: list[dict], *, indent: str = "  ") -> str:
+    """
+    Render violations for the terminal: the node they are about first, then the
+    message, then the hint if one is known. Without the node ("Each Concept
+    must have a label") nobody can tell which of the 200 concepts is meant.
+    """
+    rows: list[str] = []
+    for i, v in enumerate(violations, 1):
+        focus = v.get("focus", "?")
+        path = v.get("path", "?")
+        rows.append(f"{indent}[{i}] {focus}")
+        rows.append(f"{indent}    {v.get('message', '?')}" + (f"  (property: {path})" if path not in ("?", "") else ""))
+        hint = violation_hint(v)
+        if hint:
+            rows.append(f"{indent}    -> {hint}")
+    return "\n".join(rows)
+
+
 class AMTValidationError(Exception):
     """Raised when SHACL validation fails on an AMT data file."""
 
@@ -32,9 +76,7 @@ class AMTValidationError(Exception):
         n = len(self.violations)
         msg = f"SHACL validation failed with {n} violation(s)."
         if violations:
-            msg += "\n  " + "\n  ".join(
-                f"[{i+1}] {v.get('message', '?')}" for i, v in enumerate(violations)
-            )
+            msg += "\n" + format_violations(violations)
         super().__init__(msg)
 
 

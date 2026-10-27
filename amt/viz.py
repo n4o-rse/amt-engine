@@ -116,6 +116,26 @@ def build_network(
             title=f"Concept: {concept_label}",
         )
 
+    # An edge may end at an IRI that was never declared as an instance of a
+    # Concept (see amt.diagnostics, AMT-E101). pyvis refuses an edge to an unknown
+    # node with a bare AssertionError, so such ends are drawn as grey
+    # placeholders instead; the runner reports them in plain words.
+    known = {n["id"] for n in nodes.values()}
+    for e in display_edges:
+        for end in (e["from"], e["to"]):
+            if end not in known:
+                known.add(end)
+                net.add_node(
+                    end,
+                    label=local_name(end),
+                    color={"background": "#e5e7eb", "border": "#9ca3af",
+                           "highlight": {"background": "white", "border": "#9ca3af"}},
+                    shape="dot",
+                    size=14,
+                    font={"size": 14, "face": "monospace", "color": "#555"},
+                    title="Not declared: add amt:instanceOf for this IRI",
+                )
+
     for e in display_edges:
         inferred = e.get("inferred", False)
         role_short = local_name(e["role"])

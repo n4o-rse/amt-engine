@@ -187,6 +187,27 @@ The `amt-runner` command runs everything at once and writes a report.
 Use the equivalent `python -m amt.runner` form if you don't want to rely
 on the installed entry point. It takes `--minimal` too.
 
+### Checking a file while you build it
+
+```bash
+amt-runner my.ttl --check-only            # validate, load, diagnose; writes nothing
+amt-runner my.ttl --check-only --strict   # exit code 1 if the diagnostics contain an error
+```
+
+Besides the SHACL validation, the loader's results are checked for what SHACL cannot see: an edge
+that ends at an IRI that is not a node, `amt:instanceOf amt:Concept`, a statement with a missing
+part. Each message names the IRI and says what to add. The same is available in Python:
+
+```python
+from amt import load_amt, diagnose
+for finding in diagnose(load_amt("my.ttl")):
+    print(finding.format())
+```
+
+The [How-To pages](https://n4o-rse.github.io/amt-engine/howto/) explain how to build a file
+(including a SPARQL CONSTRUCT recipe) and what every message means. Exit codes of `amt-runner`:
+0 done, 1 validation or `--strict` failed, 2 input not found, 3 unexpected error (`--debug` for the traceback).
+
 ## Role subsumption
 
 Some vocabularies define roles as *sets* of finer roles — Freksa's

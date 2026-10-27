@@ -50,8 +50,10 @@ from .logic import (
 from .validation import (
     AMTValidationError,
     ValidationResult,
+    format_violations,
     validate_against_shapes,
 )
+from .diagnostics import Finding, diagnose
 from .export import (
     export_csv,
     export_cypher,
@@ -94,6 +96,10 @@ __all__ = [
     "validate_against_shapes",
     "AMTValidationError",
     "ValidationResult",
+    "format_violations",
+    # diagnostics
+    "diagnose",
+    "Finding",
     # export
     "export_ttl",
     "export_cypher",

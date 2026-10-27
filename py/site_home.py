@@ -40,7 +40,7 @@ TEXT = {
         "tag": "Reasoning with vague knowledge",
         "lead": "AMT models relations that hold only to a degree and derives new relations from them by rules. "
                 "It works on RDF graphs, in Python and in the browser.",
-        "btn": ["Open the Explorer", "Vocabulary", "Data model", "Source code"],
+        "btn": ["Open the Explorer", "How-To", "Vocabulary", "Data model", "Source code"],
         "ex_h": "An example in three lines",
         "ex_p": "Every relation carries a weight between 0 and 1. A rule says how weights combine along a chain of "
                 "relations. AMT applies the rules until nothing new follows, and marks what it inferred.",
@@ -101,7 +101,7 @@ TEXT = {
         "tag": "Schlussfolgern mit unscharfem Wissen",
         "lead": "AMT modelliert Beziehungen, die nur bis zu einem gewissen Grad gelten, und leitet daraus regelbasiert "
                 "neue Beziehungen ab. Es arbeitet auf RDF-Graphen, in Python und im Browser.",
-        "btn": ["Explorer öffnen", "Vokabular", "Datenmodell", "Quellcode"],
+        "btn": ["Explorer öffnen", "Anleitung", "Vokabular", "Datenmodell", "Quellcode"],
         "ex_h": "Ein Beispiel in drei Zeilen",
         "ex_p": "Jede Beziehung trägt ein Gewicht zwischen 0 und 1. Eine Regel legt fest, wie sich Gewichte entlang einer "
                 "Kette von Beziehungen verbinden. AMT wendet die Regeln an, bis nichts Neues mehr folgt, und "
@@ -168,7 +168,7 @@ TEXT = {
     },
 }
 
-LINKS = ["explorer/", "vocab/", "ontology/", "https://github.com/n4o-rse/amt-engine"]
+LINKS = ["explorer/", "howto/", "vocab/", "ontology/", "https://github.com/n4o-rse/amt-engine"]
 
 
 def _block(lang: str) -> str:

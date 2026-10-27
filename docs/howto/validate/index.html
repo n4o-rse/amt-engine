@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Check an AMT file – How-To – AMT</title>
+<meta name="description" content="How to validate an Academic Meta Tool file, read the messages and fix what they name.">
+<link rel="icon" type="image/png" href="../../assets/img/amt-penguin-small.png">
+<link rel="stylesheet" href="../../assets/palette.css">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js"></script>
+</head>
+<body>
+<header class="site"><div class="in">
+<a class="brand" href="../../index.html"><img src="../../assets/img/amt-penguin-small.png" alt="" width="34" height="48">Academic Meta Tool</a>
+<nav><a href="../../index.html">Home</a><a href="../../vocab/">Vocabulary</a><a href="../../ontology/">Data model</a><a href="../../howto/" aria-current="page">How-To</a><a href="../../explorer/">Explorer</a><a href="../../bibliography/">Bibliography</a><a href="https://github.com/n4o-rse/amt-engine">GitHub</a></nav>
+<button type="button" class="theme push" id="theme-toggle" aria-label="Switch between light and dark mode">Dark mode</button>
+</div></header>
+<main>
+
+<h1>How to check an AMT file</h1>
+<p class="lead">Three checks, from "is it well formed" to "does it say what I meant". Run them while you build the file,
+not after. Every message names the IRI it is about and says what to add.</p>
+
+<ul class="toc">
+<li><a href="#levels">1. What is checked</a></li>
+<li><a href="#run">2. Run the check</a></li>
+<li><a href="#read">3. Read the output</a></li>
+<li><a href="#catalogue">4. The messages, one by one</a></li>
+<li><a href="#exit">5. Exit codes</a></li>
+<li><a href="#faq">6. Questions that come up</a></li>
+</ul>
+
+<h2 id="levels">1. What is checked</h2>
+<table>
+<thead><tr><th>Check</th><th>Question</th><th>Message looks like</th></tr></thead>
+<tbody>
+<tr><td><strong>Validation</strong> (SHACL)</td><td>Is the file well formed? Labels, weights, axioms complete?</td><td><code>FAIL Validation failed &hellip; [1] ex:Thing &hellip;</code></td></tr>
+<tr><td><strong>Diagnostics</strong></td><td>Does it mean what you think? Are all edge ends nodes?</td><td><code>ERR [AMT-E101] &hellip;</code></td></tr>
+<tr><td><strong>Consistency</strong></td><td>After reasoning, do the integrity axioms hold (disjoint roles, no reflexive roles)?</td><td><code>FAIL 2 consistency violation(s)</code></td></tr>
+</tbody></table>
+<p>The first two need no axioms and are what you want while building. The third only matters once you use axioms.</p>
+
+<h2 id="run">2. Run the check</h2>
+<p><strong>With the wrapper</strong> (needs Python and git; it fetches the engine itself):</p>
+<pre><code>git clone https://github.com/n4o-rse/amt-runner
+cd amt-runner
+python run_amt.py my.ttl --check-only</code></pre>
+<p>If you get <em>"does not know --check-only"</em> or a Python traceback, the engine copy cached in <code>.amt-cache/</code> is old:</p>
+<pre><code>python run_amt.py my.ttl --check-only --update</code></pre>
+<p><strong>With the engine installed</strong> (<code>pip install -e .</code> in <a href="https://github.com/n4o-rse/amt-engine">amt-engine</a>):</p>
+<pre><code>amt-runner my.ttl --check-only
+amt-runner my.ttl --check-only --strict
+amt my.ttl --validate-only</code></pre>
+<ul>
+<li><code>--check-only</code> validates, loads and diagnoses, and <strong>writes nothing</strong>.</li>
+<li><code>--strict</code> turns diagnostic errors into exit code 1, useful in scripts and CI.</li>
+<li><code>amt --validate-only</code> runs only the SHACL validation.</li>
+<li>A full run (<code>python run_amt.py my.ttl</code>) additionally reasons and writes Turtle, Cypher, CSV, an HTML graph and a report.</li>
+<li><code>--debug</code> shows the Python traceback if something unexpected fails.</li>
+</ul>
+<p><strong>In Python:</strong></p>
+<pre><code>from amt import load_amt, diagnose
+amt = load_amt("my.ttl")
+for finding in diagnose(amt):
+    print(finding.format())</code></pre>
+
+<h2 id="read">3. Read the output</h2>
+<p>A file whose emperors are not nodes (the case that prompted this page):</p>
+<pre><code>VAL  Validating my.ttl ...
+OK   Validation passed.
+LOAD Loading my.ttl ...
+OK   1 Concepts | 0 Roles | 4 Nodes | 7 Edges | 0 Axioms        &lt;- 4 nodes, but 7 edges that end somewhere else
+
+DIAG 1 error(s), 0 warning(s), 1 note(s):
+ERR  [AMT-E101] 7 IRI(s) are the subject or object of a weighted statement but are not AMT nodes: &lt;http://nomisma.org/id/aurelian&gt;, ...
+  -&gt; Every end of an edge needs an amt:instanceOf &hellip; Add, for each, e.g.:
+     &lt;http://nomisma.org/id/aurelian&gt; amt:instanceOf &lt;&hellip;&gt; ; rdfs:label "..." .</code></pre>
+<p>Compare the counts in the <code>OK</code> line with what you expect: if there are far fewer <em>Nodes</em> than the things your edges
+connect, some are not declared. A missing node is never silent any more, but a count that is too low is still the quickest hint.</p>
+<p>Earlier versions of the engine stopped later with <code>AssertionError: non existent node ...</code> when drawing the graph.
+That was this same problem; it is now reported up front, and the graph shows such IRIs as grey placeholder nodes.</p>
+
+<h2 id="catalogue">4. The messages, one by one</h2>
+<h3>Diagnostics</h3>
+<div class="cols" style="grid-template-columns:1fr">
+<div class="term" id="AMT-E101">
+<h3><code>AMT-E101</code> <span class="badge">error</span></h3>
+<p><strong>N IRI(s) are the subject or object of a weighted statement but are not AMT nodes</strong></p>
+<p><em>Cause.</em> An edge points at (or starts from) an IRI that has no amt:instanceOf. The reasoner cannot place it, so the edge cannot be followed or drawn. Giving the IRI an rdfs:label is not enough.</p>
+<p><em>Fix.</em> Add amt:instanceOf and a concept to every IRI named in the message. If these IRIs are a different kind of thing than the others (coins and emperors, say), declare a second concept for them.</p>
+<h4>Example</h4><pre><code>ex:Coins a amt:Concept ; rdfs:label &quot;Coins&quot; .
+ex:coin1 amt:instanceOf ex:Coins ; rdfs:label &quot;coin 1&quot; .
+
+[] rdf:subject ex:coin1 ; rdf:predicate ex:hasAuthority ; rdf:object ex:vespasian ; amt:weight 0.5 .
+ex:vespasian rdfs:label &quot;vespasian&quot; .          # a label does not make it a node</code></pre></div>
+<div class="term" id="AMT-E102">
+<h3><code>AMT-E102</code> <span class="badge">error</span></h3>
+<p><strong>&lt;...&gt; is declared as amt:instanceOf amt:Concept / is the target of amt:instanceOf but is not declared as an amt:Concept</strong></p>
+<p><em>Cause.</em> amt:instanceOf must point at a concept of your own, and that concept must be declared with <code>a amt:Concept</code>. Pointing at amt:Concept itself, or at an IRI that is never declared, means those nodes are not loaded.</p>
+<p><em>Fix.</em> Declare the concept once with a label and point to it.</p>
+<h4>Example</h4><pre><code>ex:coin1 amt:instanceOf ex:Coins .             # ex:Coins is never declared as a concept</code></pre></div>
+<div class="term" id="AMT-E103">
+<h3><code>AMT-E103</code> <span class="badge">error</span></h3>
+<p><strong>A statement with amt:weight lacks rdf:subject / rdf:predicate / rdf:object</strong></p>
+<p><em>Cause.</em> A weighted edge needs all four properties together. A statement with a missing part is ignored.</p>
+<p><em>Fix.</em> Add the missing property.</p>
+<h4>Example</h4><pre><code>ex:C a amt:Concept ; rdfs:label &quot;C&quot; .
+ex:a amt:instanceOf ex:C .
+[] rdf:subject ex:a ; rdf:predicate ex:r ; amt:weight 0.5 .      # no rdf:object</code></pre></div>
+<div class="term" id="AMT-W201">
+<h3><code>AMT-W201</code> <span class="badge">warning</span></h3>
+<p><strong>Weight X is outside [0, 1]</strong></p>
+<p><em>Cause.</em> Weights are degrees of truth between 0 and 1. SHACL rejects the file first, but with --no-validate the engine would clamp values above 1.</p>
+<p><em>Fix.</em> Use a value between 0 and 1.</p>
+<h4>Example</h4><pre><code>ex:C a amt:Concept ; rdfs:label &quot;C&quot; .
+ex:a amt:instanceOf ex:C . ex:b amt:instanceOf ex:C .
+[] rdf:subject ex:a ; rdf:predicate ex:r ; rdf:object ex:b ; amt:weight 1.5 .</code></pre></div>
+<div class="term" id="AMT-W204">
+<h3><code>AMT-W204</code> <span class="badge">warning</span></h3>
+<p><strong>The file contains no weighted statement</strong></p>
+<p><em>Cause.</em> There is nothing to reason about. Typical reasons: the edges are written without amt:weight, or they are only linked from the nodes (for example with lado:hasAMT) and the reified statement itself is missing.</p>
+<p><em>Fix.</em> Write each edge as a statement with rdf:subject, rdf:predicate, rdf:object and amt:weight.</p>
+</div>
+<div class="term" id="AMT-N301">
+<h3><code>AMT-N301</code> <span class="badge">note</span></h3>
+<p><strong>Role ... is used in edges but not declared as an amt:Role</strong></p>
+<p><em>Cause.</em> Fine for simple files. Only axioms need declared roles.</p>
+<p><em>Fix.</em> Declare the role (label, domain, range) if you want to use it in an axiom.</p>
+</div>
+<div class="term" id="AMT-N302">
+<h3><code>AMT-N302</code> <span class="badge">note</span></h3>
+<p><strong>N node(s) have no rdfs:label</strong></p>
+<p><em>Cause.</em> The end of the IRI is shown instead, which is hard to read in the graph.</p>
+<p><em>Fix.</em> Add an rdfs:label to the nodes.</p>
+</div>
+</div>
+<h3 id="shacl">Validation (SHACL)</h3>
+<p>These come from <a href="https://github.com/n4o-rse/amt-engine/blob/main/ontology/amt-shapes.ttl"><code>ontology/amt-shapes.ttl</code></a>.
+The line above each message is the IRI it is about, followed by a hint on what to add.</p>
+<div class="cols" style="grid-template-columns:1fr">
+<div class="term"><h3><code>Each Concept must have at least one rdfs:label.</code></h3><p>A concept has no label. The message names the IRI. Beware: every object of amt:instanceOf counts as a concept, so this message also appears when you write <code>amt:instanceOf amt:Concept</code> or point at an undeclared class.</p><pre><code>ex:Coins a amt:Concept .                       # no rdfs:label
+ex:coin1 amt:instanceOf ex:Coins .</code></pre></div>
+<div class="term"><h3><code>Each Role must have at least one rdfs:label. / exactly one rdfs:domain / exactly one rdfs:range.</code></h3><p>A role declared with <code>a amt:Role</code> needs a label, one domain and one range.</p></div>
+<div class="term"><h3><code>amt:weight must be a single xsd:decimal in the closed interval [0, 1].</code></h3><p>A weight is missing, doubled, not a number, or outside 0 to 1.</p><pre><code>ex:C a amt:Concept ; rdfs:label &quot;C&quot; .
+ex:a amt:instanceOf ex:C . ex:b amt:instanceOf ex:C .
+[] rdf:subject ex:a ; rdf:predicate ex:r ; rdf:object ex:b ; amt:weight 1.5 .</code></pre></div>
+<div class="term"><h3><code>RoleChainAxiom must have exactly one amt:consequent / amt:logic ...</code></h3><p>An axiom lacks a part, or uses the legacy and the list form of antecedents at once. The messages for the other axiom types (inverse, subsumption, disjoint) work the same way.</p></div>
+<div class="term"><h3><code>RoleChainAxiom using amt:HamacherProduct must specify amt:logicParameter.</code></h3><p>The Hamacher operator needs its parameter: <code>amt:logicParameter 0.5</code>.</p></div>
+</div>
+<p>This is how a validation failure reads (two mistakes in one file):</p>
+<pre><code>FAIL Validation failed with 2 violation(s):
+  [1] amt:Concept
+      Each Concept must have at least one rdfs:label.  (property: rdfs:label)
+      -&gt; Add  amt:Concept rdfs:label "..." .  If this IRI is not meant to be a concept, check where it is used as the object of amt:instanceOf: &hellip;
+  [2] ex:Thing
+      Each Concept must have at least one rdfs:label.  (property: rdfs:label)
+      -&gt; Add  ex:Thing rdfs:label "..." . &hellip;</code></pre>
+
+<h2 id="exit">5. Exit codes</h2>
+<table>
+<thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>0</code></td><td>Done. Diagnostics may still have printed errors unless you used <code>--strict</code>; consistency violations of your axioms also leave this at 0.</td></tr>
+<tr><td><code>1</code></td><td>The file did not pass validation, or <code>--strict</code> found a diagnostic error.</td></tr>
+<tr><td><code>2</code></td><td>The input file was not found.</td></tr>
+<tr><td><code>3</code></td><td>Something unexpected failed. Run with <code>--debug</code> and report it with the file, please.</td></tr>
+</tbody></table>
+
+<h2 id="faq">6. Questions that come up</h2>
+<dl class="meta">
+<dt>Is <code>lado:hasAMT</code> (or any other link from a node to its edge statement) right?</dt>
+<dd>It does no harm. The engine finds edges by their <code>amt:weight</code> and reads the subject, predicate and object from the statement itself.
+You can keep such a link for your own queries; AMT ignores it.</dd>
+<dt>The checker says "OK" but the graph is empty or too small.</dt>
+<dd>Look at the counts in the <code>OK</code> line and at the diagnostics. Zero edges usually means the statements have no <code>amt:weight</code>
+(<a href="#AMT-W204"><code>AMT-W204</code></a>); too few nodes means <a href="#AMT-E101"><code>AMT-E101</code></a> or <a href="#AMT-E102"><code>AMT-E102</code></a>.</dd>
+<dt>"Each Concept must have at least one rdfs:label", but I declared my concepts.</dt>
+<dd>Every object of <code>amt:instanceOf</code> counts as a concept. The message names the IRI: it is either a concept of yours that lacks a label,
+or something you pointed at by mistake (often <code>amt:Concept</code> itself).</dd>
+<dt>Do I need roles?</dt>
+<dd>Not until you write axioms. Undeclared roles show up as a harmless note (<a href="#AMT-N301"><code>AMT-N301</code></a>).</dd>
+<dt>Does validation check my data against my own ontology?</dt>
+<dd>No. It checks that the file is valid <em>AMT</em>. Whether your concepts and roles make sense for your domain is yours to decide.</dd>
+<dt>It ends with a Python traceback.</dt>
+<dd>Update the engine (<code>--update</code> with the wrapper, <code>git pull</code> otherwise) and run again. If it persists, run with <code>--debug</code>
+and open an issue at <a href="https://github.com/n4o-rse/amt-engine/issues">amt-engine</a> with the file attached.</dd>
+</dl>
+
+</main>
+<footer class="site">
+Academic Meta Tool &middot; amt-engine 0.4.0 &middot;
+<a href="https://github.com/n4o-rse/amt-engine">source</a><br>
+<div class="logos"><a href="https://www.mainzed.org" title="mainzed"><img src="../../assets/img/logos/mainzed.png" alt="mainzed" height="28"></a><a href="https://i3mainz.hs-mainz.de" title="i3mainz"><img src="../../assets/img/logos/i3mainz.png" alt="i3mainz" height="54"></a><a href="https://www.leiza.de" title="LEIZA"><img src="../../assets/img/logos/leiza.png" alt="LEIZA" height="54"></a><a href="https://www.nfdi4objects.net" title="NFDI4Objects"><img src="../../assets/img/logos/nfdi4objects.png" alt="NFDI4Objects" height="54"></a><a href="https://www.nfdi.de" title="Nationale Forschungsdateninfrastruktur (NFDI), in cooperation with"><img src="../../assets/img/logos/nfdi.png" alt="Nationale Forschungsdateninfrastruktur (NFDI), in cooperation with" height="66"></a><a href="https://www.dfg.de" title="Deutsche Forschungsgemeinschaft (DFG), funded by"><img src="../../assets/img/logos/dfg.png" alt="Deutsche Forschungsgemeinschaft (DFG), funded by" height="66"></a></div>
+A <strong>mainzed</strong> project of i3mainz (Hochschule Mainz) and the RGZM (today LEIZA), developed further in
+NFDI4Objects, which is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) &ndash;
+project number 501836407.
+</footer>
+</body>
+</html>

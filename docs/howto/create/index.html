@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build an AMT file – How-To – AMT</title>
+<meta name="description" content="How to write an Academic Meta Tool file: concepts, nodes, weighted edges, and how to generate one with SPARQL.">
+<link rel="icon" type="image/png" href="../../assets/img/amt-penguin-small.png">
+<link rel="stylesheet" href="../../assets/palette.css">
+<link rel="stylesheet" href="../../assets/site.css">
+<script src="../../assets/site.js"></script>
+</head>
+<body>
+<header class="site"><div class="in">
+<a class="brand" href="../../index.html"><img src="../../assets/img/amt-penguin-small.png" alt="" width="34" height="48">Academic Meta Tool</a>
+<nav><a href="../../index.html">Home</a><a href="../../vocab/">Vocabulary</a><a href="../../ontology/">Data model</a><a href="../../howto/" aria-current="page">How-To</a><a href="../../explorer/">Explorer</a><a href="../../bibliography/">Bibliography</a><a href="https://github.com/n4o-rse/amt-engine">GitHub</a></nav>
+<button type="button" class="theme push" id="theme-toggle" aria-label="Switch between light and dark mode">Dark mode</button>
+</div></header>
+<main>
+
+<h1>How to build an AMT file</h1>
+<p class="lead">An AMT file is an ordinary Turtle file with three kinds of statements: concepts, nodes and weighted edges.
+The most common mistake is to forget that <em>both ends</em> of an edge have to be nodes.</p>
+
+<ul class="toc">
+<li><a href="#parts">1. The parts</a></li>
+<li><a href="#start">2. A complete file to start from</a></li>
+<li><a href="#rules">3. Seven rules</a></li>
+<li><a href="#roles">4. Roles and axioms (optional)</a></li>
+<li><a href="#convert">5. From existing RDF with SPARQL CONSTRUCT</a></li>
+<li><a href="#then">6. Then check it</a></li>
+</ul>
+
+<h2 id="parts">1. The parts</h2>
+<table>
+<thead><tr><th>Part</th><th>What it is</th><th>How you write it</th></tr></thead>
+<tbody>
+<tr><td><strong>Concept</strong></td><td>a kind of thing (Person, Coin, Authority)</td><td><code>ex:Coin a amt:Concept ; rdfs:label "Coin" .</code></td></tr>
+<tr><td><strong>Node</strong></td><td>one thing of that kind</td><td><code>ex:c1 amt:instanceOf ex:Coin ; rdfs:label "coin 1" .</code></td></tr>
+<tr><td><strong>Edge</strong></td><td>a relation between two nodes that holds to a degree</td><td>a statement with <code>rdf:subject</code>, <code>rdf:predicate</code>, <code>rdf:object</code>, <code>amt:weight</code></td></tr>
+<tr><td>Role</td><td>names an edge type and says what it may connect (optional until an axiom needs it)</td><td><code>ex:knows a amt:Role ; rdfs:domain ex:Person ; rdfs:range ex:Person .</code></td></tr>
+<tr><td>Axiom</td><td>a rule that derives new edges (optional)</td><td>see the <a href="../../ontology/">data model</a></td></tr>
+</tbody></table>
+
+<h2 id="start">2. A complete file to start from</h2>
+<p>Copy this, replace the names, keep the structure. It passes every check.</p>
+<p>Start with the prefixes. <code>ex:</code> stands for your own data; use your own namespace.</p>
+<pre><code>@prefix amt:  &lt;http://academic-meta-tool.xyz/vocab#&gt; .
+@prefix rdf:  &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+@prefix xsd:  &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+@prefix ex:   &lt;http://example.org/&gt; .</code></pre>
+<pre><code># 1. Concepts: the kinds of things your file talks about
+ex:Person a amt:Concept ;
+    rdfs:label &quot;Person&quot; .
+
+# 2. Nodes: every end of an edge, each one an instance of a concept
+ex:ada     amt:instanceOf ex:Person ; rdfs:label &quot;Ada Lovelace&quot; .
+ex:charles amt:instanceOf ex:Person ; rdfs:label &quot;Charles Babbage&quot; .
+ex:mary    amt:instanceOf ex:Person ; rdfs:label &quot;Mary Somerville&quot; .
+
+# 3. Edges: subject, role, object and a weight between 0 and 1
+[] rdf:subject   ex:ada ;
+   rdf:predicate ex:knows ;
+   rdf:object    ex:charles ;
+   amt:weight    &quot;0.8&quot;^^xsd:decimal .
+
+[] rdf:subject   ex:charles ;
+   rdf:predicate ex:knows ;
+   rdf:object    ex:mary ;
+   amt:weight    &quot;0.6&quot;^^xsd:decimal .</code></pre>
+
+<h2 id="rules">3. Seven rules</h2>
+<ol>
+<li><strong>Every concept is declared</strong> with <code>a amt:Concept</code> and has an <code>rdfs:label</code>.</li>
+<li><strong>Every end of every edge is a node</strong>: it has <code>amt:instanceOf</code>. This includes the thing an edge points <em>to</em>
+(the emperor, the place, the other person). A label alone does not make it a node.</li>
+<li><strong>Never write <code>amt:instanceOf amt:Concept</code>.</strong> amt:Concept is the class of concepts. Point at a concept of your own.</li>
+<li><strong>An edge is a statement with four properties</strong>, all together. The subject and object must be IRIs, not literals.</li>
+<li><strong>Weights are decimals from 0 to 1</strong> (<code>0.8</code> or <code>"0.8"^^xsd:decimal</code>). 1 means certain, 0 means not at all.</li>
+<li><strong>Give nodes labels.</strong> Without one, the end of the IRI is shown, which is unreadable for IRIs like <code>.../coin?afeid=15661</code>.</li>
+<li><strong>Extra triples are fine.</strong> AMT reads the parts above and ignores the rest. A link such as <code>lado:hasAMT</code> from a coin
+to its edge statement is harmless and can stay; the engine finds edges by their <code>amt:weight</code>, not by that link.</li>
+</ol>
+<p class="note">Rule 2 is the one behind the error <a href="../validate/#AMT-E101"><code>AMT-E101</code></a>. This is what it looks like when it is broken, and the repair:</p>
+<div class="cols" style="grid-template-columns:1fr">
+<div class="term no"><h3>Broken</h3><pre><code>ex:Coins a amt:Concept ; rdfs:label &quot;Coins&quot; .
+ex:coin1 amt:instanceOf ex:Coins ; rdfs:label &quot;coin 1&quot; .
+
+[] rdf:subject ex:coin1 ; rdf:predicate ex:hasAuthority ; rdf:object ex:vespasian ; amt:weight 0.5 .
+ex:vespasian rdfs:label &quot;vespasian&quot; .          # a label does not make it a node</code></pre></div>
+<div class="term"><h3>Fixed</h3><pre><code>ex:Coins     a amt:Concept ; rdfs:label &quot;Coins&quot; .
+ex:Authority a amt:Concept ; rdfs:label &quot;Authority&quot; .          # a second concept for the other end
+
+ex:coin1     amt:instanceOf ex:Coins     ; rdfs:label &quot;coin 1&quot; .
+ex:vespasian amt:instanceOf ex:Authority ; rdfs:label &quot;vespasian&quot; .     # now it is a node
+
+[] rdf:subject ex:coin1 ; rdf:predicate ex:hasAuthority ; rdf:object ex:vespasian ; amt:weight 0.5 .</code></pre></div>
+</div>
+
+<h2 id="roles">4. Roles and axioms (optional)</h2>
+<p>Edges work without declared roles. As soon as you write an axiom, the roles it names have to be declared with a label,
+a domain and a range:</p>
+<pre><code>ex:Person a amt:Concept ; rdfs:label &quot;Person&quot; .
+ex:ada     amt:instanceOf ex:Person ; rdfs:label &quot;Ada&quot; .
+ex:charles amt:instanceOf ex:Person ; rdfs:label &quot;Charles&quot; .
+
+# A role is optional until an axiom needs it. Then it names its domain and range.
+ex:knows a amt:Role ;
+    rdfs:label  &quot;knows&quot; ;
+    rdfs:domain ex:Person ;
+    rdfs:range  ex:Person .
+
+[] rdf:subject ex:ada ; rdf:predicate ex:knows ; rdf:object ex:charles ; amt:weight 0.8 .
+
+# An axiom: whoever knows someone who knows someone, knows that person a little (product logic)
+ex:RCA a amt:RoleChainAxiom ;
+    amt:antecedents ( ex:knows ex:knows ) ;
+    amt:consequent  ex:knows ;
+    amt:logic       amt:ProductLogic .</code></pre>
+<p>All axiom types, with a figure and an example each, are on the <a href="../../ontology/">data model page</a>.</p>
+
+<h2 id="convert">5. From existing RDF with SPARQL CONSTRUCT</h2>
+<p>If your data is already RDF, you do not write the file by hand: a <code>CONSTRUCT</code> query produces it. The query has to
+produce <strong>three things</strong>, in this order of importance:</p>
+<ol>
+<li>the <strong>concepts</strong>, declared with labels (once, as constant triples),</li>
+<li><strong>both ends of every edge</strong> as nodes with <code>amt:instanceOf</code> and a label,</li>
+<li>one <strong>weighted statement per edge</strong>.</li>
+</ol>
+<p>The example turns the vague and certain emperor attributions of the AFE coins into AMT. Sample input:</p>
+<pre><code>@prefix afe: &lt;http://afe.dainst.org/coin?afeid=&gt; .
+@prefix nfdi_fw: &lt;http://w3id.org/fw_ontology/&gt; .
+@prefix nm: &lt;http://nomisma.org/id/&gt; .
+@prefix nmo: &lt;http://nomisma.org/ontology#&gt; .
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .
+
+# a coin that is either of two emperors (vague)
+afe:15661 a nmo:NumismaticObject ;
+    nmo:hasAuthority [ a nfdi_fw:VagueResourceValue, skos:Collection ;
+        skos:member [ nfdi_fw:hasConfidence 0.5 ; rdf:value nm:vespasian ],
+                    [ nfdi_fw:hasConfidence 0.5 ; rdf:value nm:titus ] ] .
+
+# a coin with one certain emperor
+afe:15668 a nmo:NumismaticObject ;
+    nmo:hasAuthority nm:aurelian .
+
+# a coin with one emperor, but only 60 % sure
+afe:16048 a nmo:NumismaticObject ;
+    nmo:hasAuthority [ a nfdi_fw:UncertainValue ;
+        nfdi_fw:hasConfidence 0.6 ; rdf:value nm:philip_the_arab ] .
+
+# a coin whose emperor is unknown: no edge, so it does not become a node
+afe:11471 a nmo:NumismaticObject ;
+    nmo:hasAuthority nm:uncertain_value .</code></pre>
+<p>and the query:</p>
+<pre><code>PREFIX amt:     &lt;http://academic-meta-tool.xyz/vocab#&gt;
+PREFIX rdf:     &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs:    &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX xsd:     &lt;http://www.w3.org/2001/XMLSchema#&gt;
+PREFIX skos:    &lt;http://www.w3.org/2004/02/skos/core#&gt;
+PREFIX nmo:     &lt;http://nomisma.org/ontology#&gt;
+PREFIX nm:      &lt;http://nomisma.org/id/&gt;
+PREFIX afe:     &lt;http://afe.dainst.org/coin?afeid=&gt;
+PREFIX nfdi_fw: &lt;http://w3id.org/fw_ontology/&gt;
+
+CONSTRUCT {
+  # 1. Declare the concepts once, with labels
+  afe:Coins    a amt:Concept ; rdfs:label &quot;AFE coins&quot; .
+  nm:Authority a amt:Concept ; rdfs:label &quot;Authority&quot; .
+
+  # 2. Make BOTH ends of every edge a node (this is the line people forget)
+  ?coin      amt:instanceOf afe:Coins ;    rdfs:label ?coinLabel .
+  ?authority amt:instanceOf nm:Authority ; rdfs:label ?authorityLabel .
+
+  # 3. One weighted statement per edge
+  ?edge rdf:subject   ?coin ;
+        rdf:predicate nmo:hasAuthority ;
+        rdf:object    ?authority ;
+        amt:weight    ?weight .
+}
+WHERE {
+  {
+    # vague or combined values: one edge per candidate, with its confidence
+    ?coin a nmo:NumismaticObject ; nmo:hasAuthority ?container .
+    ?container skos:member ?candidate .
+    ?candidate rdf:value ?authority ; nfdi_fw:hasConfidence ?weight .
+  }
+  UNION
+  {
+    # one value with a confidence
+    ?coin a nmo:NumismaticObject ; nmo:hasAuthority ?container .
+    ?container a nfdi_fw:UncertainValue ; rdf:value ?authority ; nfdi_fw:hasConfidence ?weight .
+  }
+  UNION
+  {
+    # a certain authority: weight 1. Only real IRIs; the containers above are blank nodes
+    ?coin a nmo:NumismaticObject ; nmo:hasAuthority ?authority .
+    FILTER(isIRI(?authority) &amp;&amp; ?authority != nm:uncertain_value)
+    BIND(&quot;1.0&quot;^^xsd:decimal AS ?weight)
+  }
+  BIND(BNODE() AS ?edge)
+  BIND(STRAFTER(STR(?coin), &quot;?&quot;) AS ?coinLabel)
+  BIND(STRAFTER(STR(?authority), &quot;http://nomisma.org/id/&quot;) AS ?authorityLabel)
+}</code></pre>
+<p>Things to adapt: the two concept IRIs, the properties in <code>WHERE</code>, and how labels are made (here
+<code>STRAFTER</code> takes the part of the IRI after a marker). <code>BNODE()</code> makes a fresh node for each edge statement.</p>
+<p class="note">A <code>CONSTRUCT</code> that leaves out the second part (the authority nodes) is the typical cause of
+<a href="../validate/#AMT-E101"><code>AMT-E101</code></a>: the coins are nodes, the emperors are not. Run the check on a small
+sample first, then on the whole file.</p>
+
+<h2 id="then">6. Then check it</h2>
+<p>Save the result as <code>my.ttl</code> and continue with <a href="../validate/">how to check an AMT file</a>.</p>
+
+</main>
+<footer class="site">
+Academic Meta Tool &middot; amt-engine 0.4.0 &middot;
+<a href="https://github.com/n4o-rse/amt-engine">source</a><br>
+<div class="logos"><a href="https://www.mainzed.org" title="mainzed"><img src="../../assets/img/logos/mainzed.png" alt="mainzed" height="28"></a><a href="https://i3mainz.hs-mainz.de" title="i3mainz"><img src="../../assets/img/logos/i3mainz.png" alt="i3mainz" height="54"></a><a href="https://www.leiza.de" title="LEIZA"><img src="../../assets/img/logos/leiza.png" alt="LEIZA" height="54"></a><a href="https://www.nfdi4objects.net" title="NFDI4Objects"><img src="../../assets/img/logos/nfdi4objects.png" alt="NFDI4Objects" height="54"></a><a href="https://www.nfdi.de" title="Nationale Forschungsdateninfrastruktur (NFDI), in cooperation with"><img src="../../assets/img/logos/nfdi.png" alt="Nationale Forschungsdateninfrastruktur (NFDI), in cooperation with" height="66"></a><a href="https://www.dfg.de" title="Deutsche Forschungsgemeinschaft (DFG), funded by"><img src="../../assets/img/logos/dfg.png" alt="Deutsche Forschungsgemeinschaft (DFG), funded by" height="66"></a></div>
+A <strong>mainzed</strong> project of i3mainz (Hochschule Mainz) and the RGZM (today LEIZA), developed further in
+NFDI4Objects, which is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) &ndash;
+project number 501836407.
+</footer>
+</body>
+</html>

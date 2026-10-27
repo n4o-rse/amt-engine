@@ -15,6 +15,23 @@ Zenodo.
 
 ### Added
 
+- `amt/diagnostics.py`: plain-language checks that SHACL cannot make, run after loading by
+  `amt-runner` and `amt` and available as `amt.diagnose(amt_dict)`. Each finding has a stable
+  code, names the IRI it is about and says what to add: `AMT-E101` (an edge end that is not an
+  AMT node, because it has no `amt:instanceOf`), `AMT-E102` (`amt:instanceOf` pointing at
+  `amt:Concept` itself or at an undeclared concept), `AMT-E103` (a weighted statement with a
+  missing part), `AMT-W201` (weight outside [0, 1]), `AMT-W204` (no weighted statement at all),
+  `AMT-N301` and `AMT-N302` (notes: undeclared role, unlabelled nodes).
+- `amt-runner --check-only`: validate, load and diagnose, then stop; nothing is written.
+  `--strict`: a diagnostic error ends the run with exit code 1. `--debug`: show the Python
+  traceback of an unexpected error.
+- `amt.format_violations()`: SHACL violations rendered with the node they are about and a hint
+  on what to add.
+- The How-To section of the website (`docs/howto/`): how to build an AMT file (including a
+  tested SPARQL CONSTRUCT recipe for turning other RDF into AMT), how to check one, and every
+  message explained with cause, fix and example. `py/site_howto.py` holds the examples and
+  `tests/test_howto.py` runs them. "How-To" is in the navigation and on the start page.
+
 - Roboto, the house typeface of mainzed, as the typeface of the static pages: the
   files are in `docs/vendor/roboto/` (400, 500 and 700; Latin and Latin Extended;
   SIL OFL 1.1) and `docs/assets/site.css` declares them, so the pages show the same
@@ -23,6 +40,11 @@ Zenodo.
 
 ### Changed
 
+- A failed SHACL validation names the node of each violation ("Each Concept must have a label"
+  now says which concept), with the property and a hint. The report lists the node too.
+- An unexpected error in `amt-runner` ends with a short message and exit code 3 instead of a
+  traceback (`--debug` restores the traceback). Exit code 0 for consistency violations is
+  unchanged (decision D6).
 - The PNG figures are drawn with Roboto Regular and Bold (`design/fonts/`,
   `py/site_fonts.py`) instead of Pillow's default font and a thickened outline for
   bold text. The fonts belong to the key in `docs/assets/figures.json`, so a changed
@@ -33,6 +55,12 @@ Zenodo.
   Fixed (it had grown by accretion and repeated its headings), its introduction
   says what the release changes, and the entry for 0.3.1 states correctly which
   GitHub Actions run on Node 24.
+
+### Fixed
+
+- `amt-runner` no longer stops with `AssertionError: non existent node ...` when an edge ends at
+  an IRI that is not an AMT node. The problem is reported up front (`AMT-E101`), and the HTML
+  graph draws such IRIs as grey placeholder nodes.
 
 ## [0.4.0] - 2026-10-27
 

@@ -23,6 +23,8 @@ import argparse
 import sys
 from pathlib import Path
 
+from .diagnostics import diagnose, summarise
+from .validation import format_violations
 from . import (
     AMTValidationError,
     __version__,
@@ -152,8 +154,7 @@ def main(argv: list[str] | None = None) -> int:
             print("OK  Validation passed.")
         else:
             print(f"FAIL  Validation failed with {len(result.violations)} violation(s):")
-            for i, v in enumerate(result.violations, 1):
-                print(f"  [{i}] {v.get('message', '?')}")
+            print(format_violations(result.violations))
             if args.validate_only or not args.no_validate:
                 return 1
 
@@ -164,6 +165,12 @@ def main(argv: list[str] | None = None) -> int:
     print(f"LOAD Loading {args.input.name} ...")
     amt = load_amt(args.input, ontology_path=(args.ontology / "amt.ttl") if args.ontology else None)
     _print_summary(amt)
+
+    findings = diagnose(amt)
+    if findings:
+        print(f"\nDIAG {summarise(findings)}:")
+        for f in findings:
+            print(f.format())
 
     if args.info:
         _print_info(amt)

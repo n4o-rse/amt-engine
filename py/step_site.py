@@ -12,6 +12,7 @@ Writes, below ``docs/``:
     bibliography/index.html   the bibliography (APA 7), from data/bibliography.bib
     bibliography/amt.bib      a copy of data/bibliography.bib
     ontology/index.html       the data model page
+    howto/index.html, howto/create/index.html, howto/validate/index.html   the How-To pages
     ontology/img/*.svg|png    the small figures of that page
     assets/palette.css        the colours of every page, from design/palette.yaml
     assets/img/palette.svg|png  the palette as a picture
@@ -55,6 +56,7 @@ try:
     import site_palette as palette
     import site_redirects as redirects
     import site_bib as bib
+    import site_howto as howto
     from site_fonts import fonts_digest
     from site_home import home_page
 except ImportError:  # imported as py.step_site from the repository root
@@ -64,6 +66,7 @@ except ImportError:  # imported as py.step_site from the repository root
     from py import site_palette as palette
     from py import site_redirects as redirects
     from py import site_bib as bib
+    from py import site_howto as howto
     from py.site_fonts import fonts_digest
     from py.site_home import home_page
 
@@ -162,6 +165,8 @@ def main() -> int:
     _write_text(rep, DOCS_DIR / "index.html", home_page(), counts)
     _write_text(rep, DOCS_DIR / "vocab" / "index.html", pages.vocab_page(g, svg["overview"]), counts)
     _write_text(rep, DOCS_DIR / "ontology" / "index.html", pages.ontology_page(g, inline), counts)
+    for rel, make in howto.PAGES.items():
+        _write_text(rep, DOCS_DIR / rel, make(), counts)
     entries = bib.load()
     for line in bib.check(entries):
         rep.warn(f"bibliography: {line}")
