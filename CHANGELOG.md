@@ -13,6 +13,15 @@ Zenodo.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-27
+
+0.4.0 does not change the reasoner or the command line of `amt` and `amt-runner`.
+It adds what the project needs to be found and cited: the vocabulary and the data
+model as pages generated from `ontology/amt.ttl`, a start page in English and
+German, the Explorer with a shared JavaScript reasoner, the persistent addresses
+(`https://w3id.org/amt/` and academic-meta-tool.xyz redirect to the pages), the
+bibliography and the colours and mascots. Nothing is loaded from a CDN any more.
+
 ### Added
 
 - `deploy/redirects.yaml` and `py/site_redirects.py`: the persistent addresses of
@@ -276,7 +285,8 @@ continuous integration.
 - The formal ontology: `ontology/amt.ttl`, `ontology/amt-shapes.ttl`, valid and
   invalid example files, `validate_examples.py` and an ontology README.
 
-[Unreleased]: https://github.com/n4o-rse/amt-engine/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/n4o-rse/amt-engine/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/n4o-rse/amt-engine/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/n4o-rse/amt-engine/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/n4o-rse/amt-engine/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/n4o-rse/amt-engine/compare/v0.1.0...v0.2.0

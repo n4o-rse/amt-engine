@@ -107,7 +107,7 @@ Eigenschaften, die das Repo haben muss:
 | Playground-Ziel | in der Engine heißt die Anwendung weiter **Explorer** (`/explorer/`, kein eigenes `/playground/`), mit allen Beispielen aus `docs/data/` und „TTL laden“; `leiza-rse/amt-playground` bleibt der **Playground** mit nur dem Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden; beide nutzen denselben JS-Reasoner (Engine ist Quelle, der Playground bekommt eine Kopie) | 2026-10-26 |
 | JS-Reasoner | `docs/js/amt-reasoner.js` ist ein Port von `amt/reasoning.py` und `amt/logic.py` (Entailment-Lesart, ohne `minimal`); `tests/test_js_reasoner.py` vergleicht beide auf allen Beispielen (Node nötig, sonst übersprungen); Änderungen an der Python-Logik ziehen den JS-Port nach | 2026-10-26 |
 | Startseite | `docs/index.html` aus `py/site_home.py`; Englisch bevorzugt, Deutsch umschaltbar, Hell/Dunkel; Explorer unter `/explorer/`, `docs/index.htm` leitet weiter; DFG-Projektnummer 501836407 bestätigt | 2026-10-26 |
-| Release 0.4.0 | erst am Ende (nach S13); die ungereleasten Änderungen aus S7 bis S13 gehören dazu | 2026-10-26 |
+| Release 0.4.0 | mit S13 (Patch 13a); die ungereleasten Änderungen aus S7 bis S14 gehören dazu; Tag, Release und Zenodo danach durch den Autor | 2026-10-27 |
 | Zenodo | GitHub-Zenodo-Anbindung ist für beide Repos eingeschaltet; jedes GitHub-Release erzeugt eine Version mit DOI, ein bloßer Tag nicht; deshalb keine Releases für alte Versionen | 2026-10-26 |
 | Öffentliche w3id-Adresse | `https://w3id.org/amt/`, ohne `ids/`: der Ordner `ids/amt/` im Repo `perma-id/w3id.org` ist nur der Ablageort, `RewriteBase` ist `/amt/` (Erfahrung des Autors; am 2026-10-27 korrigiert, S12 hatte `/ids/amt/`) | 2026-10-27 |
 | w3id-Pull-Request | wir warten nicht auf den Merge; passt etwas nicht, gibt es einen Hotfix; Header der `.htaccess` (Adressliste, Namensraum, Kontakt) wird aus `deploy/redirects.yaml` erzeugt | 2026-10-27 |
@@ -162,7 +162,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S11d | Logos der Institutionen und Förderer (mainzed, i3mainz, LEIZA, NFDI4Objects, NFDI, DFG) im Fuß aller Seiten; Explorer-Kasten mit Pinguin | amt-engine | S11c | Patch geliefert, nach Push erledigt |
 | S12 | w3id-Eintrag (`w3id.org/amt/`) und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | erledigt 2026-10-27 (FTP live; w3id-PR gestellt) |
 | S14 | Texte (Namensgeschichte B, Familiensatz), Bibliografie, Bibliotheken lokal, w3id-Header aus der YAML und Adresse ohne `ids/`, `preferred-citation`, Seitentest | amt-engine | S12 | Patch geliefert, nach Push erledigt |
-| S13 | D6 (Exit-Code) und Release 0.4.0 samt Zenodo | amt-engine, amt-runner | S10 bis S12 | offen |
+| S13 | D6 (Exit-Code, unverändert) und Release 0.4.0 (Engine) / 0.3.0 (Runner) samt Zenodo | amt-engine, amt-runner | S10 bis S12, S14 | Patch geliefert; danach Tags, Releases, Zenodo, DOI-Patch durch den Autor |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -411,6 +411,20 @@ Im Fuß jeder erzeugten Seite steht eine weiße Leiste mit den Logos von mainzed
 ### Nachtrag 2026-10-27 (Windows-Lauf)
 
 Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht zeigen konnte: `pyvis` schreibt die HTML-Datei mit der Standard-Kodierung der Plattform (cp1252), und die eingebettete vis-Bibliothek enthält Zeichen darüber hinaus (`UnicodeEncodeError` in `test_pyvis_export_embeds_its_library_by_default`). Betroffen war jede Ausgabe mit `render_to_html`, also auch `amt --export-html` und den Runner unter Windows. Behoben in `amt/viz.py`: die Seite wird mit `generate_html()` erzeugt und von uns als UTF-8 mit LF geschrieben. Neuer Test `test_pyvis_export_does_not_depend_on_the_platform_encoding` erzwingt eine ASCII-Plattform-Kodierung (`LC_ALL=C`, `PYTHONUTF8=0`) und schlug mit dem alten Code fehl. Lehre: Dateien, die Fremdcode öffnet, kann nur ein Test mit erzwungener Kodierung prüfen; ein grüner Lauf unter Linux sagt darüber nichts.
+
+### S13 – Release 0.4.0
+
+**Ziel:** Die Engine 0.4.0 und der Runner 0.3.0 sind veröffentlicht, archiviert und zitierbar.
+
+**Beschlüsse (2026-10-27):** D6 bleibt unverändert (Exit-Code 0 bei Konsistenzverletzungen). Der Runner erscheint als 0.3.0 zusammen mit der Engine 0.4.0. Der Standard-Ref des Runners bleibt `main`; die README des Runners zeigt `--ref v0.4.0` als Beispiel.
+
+**Teil 13a (Patch):** Version 0.4.0 in `pyproject.toml`, `amt/__init__.py`, `CITATION.cff` (mit `date-released`), `py/amt_dev_utils.py` (`RELEASE`, `RELEASE_DATE`) und `CHANGELOG.md` (`[Unreleased]` wird `[0.4.0] - 2026-10-27`, Vergleichslinks); die Fußzeile der erzeugten Seiten nennt die neue Version, deshalb gehören `docs/index.html`, `docs/vocab/index.html`, `docs/ontology/index.html` und `docs/bibliography/index.html` in den Commit. Dasselbe im Runner mit 0.3.0; dort ruft der Schritt `smoke` den Runner mit `--update` auf, damit er die aktuelle Engine prüft und nicht den Cache.
+
+**Teil 13b (manuell, nach dem Push von 13a):** je Repo ein annotierter Tag (`v0.4.0` in `amt-engine`, `v0.3.0` in `amt-runner`) auf dem Commit von 13a, `git push origin <tag>`, auf GitHub ein Release aus dem Tag. Nur das Release löst bei Zenodo die Archivierung aus.
+
+**Teil 13c (Patch):** die Versions-DOIs in README (Abschnitt „Citation“) und CHANGELOG eintragen; die Concept-DOIs bleiben.
+
+**Abnahme:** `python main.py --strict` zweimal grün (Windows), `git status` sauber; `git tag` zeigt `v0.4.0` bzw. `v0.3.0`; „Releases“ zeigt es; auf zenodo.org steht je eine neue Version mit den Autoren aus `CITATION.cff`; nach 13c nennt die README die Versions-DOI.
 
 ## Teil D – Offene Punkte
 
