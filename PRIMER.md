@@ -151,6 +151,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S11a | Gemeinsamer JS-Reasoner (Port der Python-Engine, Paritätstest), Explorer mit Beispielliste und „TTL laden“, schlankes Layout | amt-engine | S10 | erledigt 2026-10-26 |
 | S11b | Playground (`leiza-rse/amt-playground`): nur Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden, mit dem gemeinsamen Reasoner | amt-playground | S11a | Patch geliefert (`patch-s11b-playground.zip`), nach Push erledigt |
 | S11c | Gestaltung: Farbwelt aus den Maskottchen (`design/palette.yaml`), Logos, Kopfleiste, Familien-Abschnitt, Explorer startet mit `animals` | amt-engine | S11a | Patch geliefert, nach Push erledigt |
+| S11d | Logos der Institutionen und Förderer (mainzed, i3mainz, LEIZA, NFDI4Objects, NFDI, DFG) im Fuß aller Seiten; Explorer-Kasten mit Pinguin | amt-engine | S11c | Patch geliefert, nach Push erledigt |
 | S12 | w3id-Eintrag und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | offen |
 | S13 | D6 (Exit-Code) und Release 0.4.0 samt Zenodo | amt-engine, amt-runner | S10 bis S12 | offen |
 
@@ -369,6 +370,10 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 **Offen:** Die Logos sind Pixelbilder (vektorisierte Fassungen folgen vom Autor und ersetzen sie); die Schrift ist weiter die Systemschrift (Entscheidung offen, siehe D10); der Satz im Abschnitt „Teil einer Familie“ ist ein Entwurf und braucht den Wortlaut des Autors; Links zu Alpaka und Alligator fehlen.
 
 ---
+
+### S11d – Logos der Institutionen und Förderer
+
+Im Fuß jeder erzeugten Seite steht eine weiße Leiste mit den Logos von mainzed, i3mainz, LEIZA, NFDI4Objects, NFDI („In cooperation with“) und DFG („Funded by“), je mit Link (`LOGOS` in `py/amt_site.py`, Bilder in `docs/assets/img/logos/`). Der Kasten im Explorer zeigt nur noch den Pinguin und den Herkunftstext mit Förderhinweis. `docs/assets/img/partners.png` entfällt. Offen: vektorisierte Fassungen der Logos; Adressen der Links bitte prüfen.
 
 ## Teil D – Offene Punkte
 

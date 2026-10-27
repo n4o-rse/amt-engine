@@ -26,6 +26,17 @@ NAV = [
 ]
 
 
+# (file in assets/img/logos/, name, address, display height in px): shown in the footer of every page.
+LOGOS = [
+    ("mainzed.png", "mainzed", "https://www.mainzed.org", 28),
+    ("i3mainz.png", "i3mainz", "https://i3mainz.hs-mainz.de", 54),
+    ("leiza.png", "LEIZA", "https://www.leiza.de", 54),
+    ("nfdi4objects.png", "NFDI4Objects", "https://www.nfdi4objects.net", 54),
+    ("nfdi.png", "Nationale Forschungsdateninfrastruktur (NFDI), in cooperation with", "https://www.nfdi.de", 66),
+    ("dfg.png", "Deutsche Forschungsgemeinschaft (DFG), funded by", "https://www.dfg.de", 66),
+]
+
+
 def page(*, title: str, body: str, depth: int, current: str, description: str = "", lang_switch: bool = False) -> str:
     """Wrap ``body`` into a complete HTML page. Output uses LF line ends only."""
     up = "../" * depth
@@ -40,6 +51,10 @@ def page(*, title: str, body: str, depth: int, current: str, description: str = 
     lang_btn = ('<button type="button" class="theme push" id="lang-toggle" '
                 'aria-label="Switch language: English or German">Deutsch</button>') if lang_switch else ""
     theme_extra = "" if lang_switch else " push"
+    logos = '<div class="logos">' + "".join(
+        f'<a href="{escape(url)}" title="{escape(name, quote=True)}"><img src="{up}assets/img/logos/{f}" '
+        f'alt="{escape(name, quote=True)}" height="{h}"></a>'
+        for f, name, url, h in LOGOS) + "</div>"
     desc = f'<meta name="description" content="{escape(description, quote=True)}">\n' if description else ""
     return f"""<!doctype html>
 <html lang="en">
@@ -64,7 +79,7 @@ def page(*, title: str, body: str, depth: int, current: str, description: str = 
 <footer class="site">
 Academic Meta Tool &middot; amt-engine {escape(RELEASE)} &middot;
 <a href="https://github.com/n4o-rse/amt-engine">source</a><br>
-<img class="partners" src="{up}assets/img/partners.png" alt="mainzed, i3mainz, LEIZA" height="40"><br>
+{logos}
 A <strong>mainzed</strong> project of i3mainz (Hochschule Mainz) and the RGZM (today LEIZA), developed further in
 NFDI4Objects, which is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) &ndash;
 project number 501836407.

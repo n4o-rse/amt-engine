@@ -72,5 +72,7 @@ pre.flow { font-size: .92em; }
 .family figure { margin: 0; text-align: center; font-size: .9em; color: var(--muted); }
 .family img { height: 150px; width: auto; display: block; margin: 0 auto .3rem; background: none; border: 0; }
 .family .me img { height: 190px; }
-footer.site img.partners { height: 40px; width: auto; background: #fff; border-radius: 6px; padding: 4px 8px; margin-bottom: .5rem; }
+footer.site .logos { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .8rem 1.6rem; background: #fff; border-radius: 8px; padding: .7rem 1rem; margin-bottom: .9rem; }
+footer.site .logos a { display: block; line-height: 0; }
+footer.site .logos img { width: auto; }
 @media (max-width: 40rem) { .cols { grid-template-columns: 1fr; } .hero h1 { font-size: 2rem; } .hero { grid-template-columns: 1fr; } .hero .mascot { grid-column: 1; grid-row: auto; width: 140px; } }

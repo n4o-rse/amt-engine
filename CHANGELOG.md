@@ -26,6 +26,8 @@ Zenodo.
 
 ### Changed
 
+- The footer of every page shows the logos of mainzed, i3mainz, LEIZA, NFDI4Objects,
+  NFDI and DFG, linked; the box in the Explorer shows the penguin and the origin text.
 - All pages, the figures and the Explorer use the new colours, in the light and
   in the dark theme; inferred edges stay red, asserted edges are steel blue, the
   reasoning switch is bronze when on.
