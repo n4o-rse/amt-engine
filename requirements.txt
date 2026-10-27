@@ -6,11 +6,12 @@
 # installing it — CI images, Binder, Docker layers, and wrappers such as
 # amt-runner that clone the repository rather than pip-install it.
 #
-# The last two entries, pytest and Pillow, are for the development pipeline
-# (python main.py): the test suite, and the PNG figures of the docs pages. They
+# The last three entries, pytest, Pillow and PyYAML, are for the development
+# pipeline (python main.py): the test suite, the PNG figures of the docs pages and
+# the colour palette (design/palette.yaml). They
 # are the same as [project.optional-dependencies] dev. This is the only
-# requirements file in the repository; amt-runner installs it too, so it also
-# gets both, which it does not need and which do no harm.
+# requirements file in the repository; amt-runner installs it too, so it
+# gets them too, which it does not need and which do no harm.
 #
 #   pip install -r requirements.txt
 #
@@ -22,3 +23,4 @@ pyshacl>=0.25      # SHACL validation against ontology/amt-shapes.ttl
 pyvis>=0.3         # interactive HTML graph export
 pytest>=7.0        # test suite in tests/ (development only)
 Pillow>=10.1       # PNG figures of docs/ (development only; load_default(size) needs 10.1)
+PyYAML>=6.0        # design/palette.yaml, the colours of the docs pages (development only)

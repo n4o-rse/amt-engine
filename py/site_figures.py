@@ -31,18 +31,14 @@ AMT = "http://academic-meta-tool.xyz/vocab#"
 PNG_SCALE = 3      # PNG pixels per SVG unit
 _SS = 2            # supersampling for the antialiasing of the PNG
 
-# Light-theme fallbacks. In the pages, site.css defines the same names for
-# the light and the dark theme; a standalone SVG or PNG uses these values.
-TOKENS = {
-    "line": "#1b1b18", "muted": "#7a786b", "red": "#d62828", "bg": "#ffffff",
-    "node-top": "#86bd63", "node-bottom": "#5b9a34", "node-text": "#d3e8c3",
-    "node-edge": "#4f8a2b",
-    "white-fill": "#ffffff", "white-text": "#3f7d20",
-    "box-fill": "#ffffff", "box-text": "#1b1b18",
-    "axiom-fill": "#f0e68c", "logic-fill": "#cfe0f5", "rule-fill": "#e6d5f0",
-    "ext-fill": "#eceae0", "lit-fill": "#ffd966",
-    "island-fill": "#ffffff", "island-edge": "#5b9a34",
-}
+# Light-theme fallbacks, from design/palette.yaml (the single source of the
+# colours). In the pages, assets/palette.css defines the same names for the
+# light and the dark theme; a standalone SVG or PNG uses these values.
+try:
+    from site_palette import figure_tokens
+except ImportError:
+    from py.site_palette import figure_tokens
+TOKENS = figure_tokens()
 
 
 def tok(name: str) -> str:

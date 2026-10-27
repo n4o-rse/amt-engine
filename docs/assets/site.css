@@ -1,59 +1,5 @@
-/* Shared style of the static AMT pages (vocabulary, ontology, start page). */
-:root {
-  --bg: #fdfcf5;
-  --fg: #1b1b18;
-  --muted: #5d5b52;
-  --accent: #f0e68c;       /* the khaki of the AMT logo page */
-  --accent-strong: #8a7d00;
-  --bar: #111111;
-  --bar-fg: #e9e9e4;
-  --card: #ffffff;
-  --line: #dedbc9;
-  --code-bg: #f4f1dc;
-  --link: #0b5cad;
-  /* figures (py/site_figures.py names the same tokens, with these values as fallback) */
-  --fig-line: #1b1b18; --fig-muted: #7a786b; --fig-red: #d62828; --fig-bg: #fdfcf5;
-  --fig-node-top: #86bd63; --fig-node-bottom: #5b9a34; --fig-node-text: #d3e8c3; --fig-node-edge: #4f8a2b;
-  --fig-white-fill: #ffffff; --fig-white-text: #3f7d20; --fig-box-fill: #ffffff; --fig-box-text: #1b1b18;
-  --fig-axiom-fill: #f0e68c; --fig-logic-fill: #cfe0f5; --fig-rule-fill: #e6d5f0; --fig-ext-fill: #eceae0;
-  --fig-lit-fill: #ffd966; --fig-island-fill: #ffffff; --fig-island-edge: #5b9a34;
-  color-scheme: light dark;
-}
-:root[data-theme="light"] { color-scheme: light; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-  --bg: #15150f;
-  --fg: #ecebe3;
-  --muted: #a9a794;
-  --accent-strong: #e3d65a;
-  --card: #1d1d15;
-  --line: #3a3a2c;
-  --code-bg: #24241a;
-  --link: #7db7f0;
-  --fig-line: #ecebe3; --fig-muted: #a9a794; --fig-red: #ff7b7b; --fig-bg: #15150f;
-  --fig-node-top: #6fa84c; --fig-node-bottom: #4a8527; --fig-node-text: #dff0d2; --fig-node-edge: #86bd63;
-  --fig-white-fill: #1d1d15; --fig-white-text: #a8d88a; --fig-box-fill: #1d1d15; --fig-box-text: #ecebe3;
-  --fig-axiom-fill: #5b5420; --fig-logic-fill: #2c4466; --fig-rule-fill: #4a3358; --fig-ext-fill: #2b2b20;
-  --fig-lit-fill: #7a6420; --fig-island-fill: #1d1d15; --fig-island-edge: #86bd63;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #15150f;
-  --fg: #ecebe3;
-  --muted: #a9a794;
-  --accent-strong: #e3d65a;
-  --card: #1d1d15;
-  --line: #3a3a2c;
-  --code-bg: #24241a;
-  --link: #7db7f0;
-  --fig-line: #ecebe3; --fig-muted: #a9a794; --fig-red: #ff7b7b; --fig-bg: #15150f;
-  --fig-node-top: #6fa84c; --fig-node-bottom: #4a8527; --fig-node-text: #dff0d2; --fig-node-edge: #86bd63;
-  --fig-white-fill: #1d1d15; --fig-white-text: #a8d88a; --fig-box-fill: #1d1d15; --fig-box-text: #ecebe3;
-  --fig-axiom-fill: #5b5420; --fig-logic-fill: #2c4466; --fig-rule-fill: #4a3358; --fig-ext-fill: #2b2b20;
-  --fig-lit-fill: #7a6420; --fig-island-fill: #1d1d15; --fig-island-edge: #86bd63;
-  color-scheme: dark;
-}
+/* Shared style of the static AMT pages (vocabulary, ontology, start page).
+   The colours are CSS variables from assets/palette.css, generated from design/palette.yaml. */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
@@ -63,10 +9,11 @@ body {
 a { color: var(--link); }
 header.site { background: var(--bar); color: var(--bar-fg); border-bottom: 4px solid var(--accent); }
 header.site .in { max-width: 62rem; margin: 0 auto; padding: .9rem 16px; display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; align-items: baseline; }
-header.site .brand { font-size: 1.15rem; font-weight: 600; letter-spacing: .02em; color: var(--bar-fg); text-decoration: none; }
+header.site .brand { display: inline-flex; align-items: center; gap: .6rem; font-size: 1.15rem; font-weight: 600; letter-spacing: .02em; color: var(--bar-fg); text-decoration: none; }
 header.site nav { display: flex; flex-wrap: wrap; gap: .2rem 1.1rem; }
 header.site nav a { color: var(--bar-fg); text-decoration: none; opacity: .8; }
 header.site nav a:hover, header.site nav a[aria-current="page"] { opacity: 1; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; }
+header.site .brand img { height: 48px; width: auto; margin: -.2rem 0; }
 main { max-width: 62rem; margin: 0 auto; padding: 1.5rem 16px 3rem; }
 h1 { font-size: 2rem; line-height: 1.2; margin: .2rem 0 .8rem; }
 h2 { font-size: 1.4rem; margin: 2.4rem 0 .6rem; padding-bottom: .25rem; border-bottom: 2px solid var(--accent); }
@@ -105,7 +52,9 @@ figure.fig figcaption a { margin-right: .8rem; }
 /* language: English unless the visitor picked German (site.js sets data-lang on <html>) */
 html:not([data-lang="de"]) [data-l="de"], html[data-lang="de"] [data-l="en"] { display: none; }
 /* start page */
-.hero { padding: 1.2rem 0 .4rem; }
+.hero { padding: 1.2rem 0 .4rem; align-content: center; display: grid; grid-template-columns: 1fr auto; gap: 1rem 2rem; align-items: center; }
+.hero .mascot { grid-column: 2; grid-row: 1 / span 4; width: 210px; max-width: 30vw; height: auto; }
+.hero > :not(.mascot) { grid-column: 1; }
 .hero h1 { font-size: 2.6rem; margin-bottom: .2rem; }
 .hero .tag { font-size: 1.3rem; font-weight: 600; color: var(--accent-strong); margin: 0 0 .6rem; }
 .btns { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.2rem 0 .4rem; }
@@ -119,4 +68,9 @@ html:not([data-lang="de"]) [data-l="de"], html[data-lang="de"] [data-l="en"] { d
 .term.no { border-left-color: var(--fig-red); }
 pre.flow { font-size: .92em; }
 .note { color: var(--muted); font-size: .9em; }
-@media (max-width: 40rem) { .cols { grid-template-columns: 1fr; } .hero h1 { font-size: 2rem; } }
+.family { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: flex-end; margin: 1rem 0; }
+.family figure { margin: 0; text-align: center; font-size: .9em; color: var(--muted); }
+.family img { height: 150px; width: auto; display: block; margin: 0 auto .3rem; background: none; border: 0; }
+.family .me img { height: 190px; }
+footer.site img.partners { height: 40px; width: auto; background: #fff; border-radius: 6px; padding: 4px 8px; margin-bottom: .5rem; }
+@media (max-width: 40rem) { .cols { grid-template-columns: 1fr; } .hero h1 { font-size: 2rem; } .hero { grid-template-columns: 1fr; } .hero .mascot { grid-column: 1; grid-row: auto; width: 140px; } }

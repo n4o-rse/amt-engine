@@ -11,6 +11,8 @@ Writes, below ``docs/``:
     vocab/amt-overview.svg|png  overview figure, drawn from the ontology
     ontology/index.html       the data model page
     ontology/img/*.svg|png    the small figures of that page
+    assets/palette.css        the colours of every page, from design/palette.yaml
+    assets/img/palette.svg|png  the palette as a picture
     assets/figures.json       SHA-256 of every figure SVG (see below)
 
 Nothing is written when nothing changed, and nothing reads the clock, so two
@@ -45,11 +47,13 @@ try:
     from amt_dev_utils import DOCS_DIR, ONTOLOGY_DIR, ROOT, Report
     import site_figures as figs
     import site_pages as pages
+    import site_palette as palette
     from site_home import home_page
 except ImportError:  # imported as py.step_site from the repository root
     from py.amt_dev_utils import DOCS_DIR, ONTOLOGY_DIR, ROOT, Report
     from py import site_figures as figs
     from py import site_pages as pages
+    from py import site_palette as palette
     from py.site_home import home_page
 
 MANIFEST = DOCS_DIR / "assets" / "figures.json"
@@ -120,6 +124,21 @@ def main() -> int:
             redrawn += 1
             rep.warn(f"drew {_rel(png)}")
         _write_text(rep, base.with_suffix(".svg"), svg[name], counts)
+
+    # 2b. the palette: CSS variables for every page, and the picture of it
+    pal = palette.load()
+    _write_text(rep, DOCS_DIR / "assets" / "palette.css", palette.css(pal), counts)
+    pal_base = DOCS_DIR / "assets" / "img" / "palette"
+    pal_svg = palette.svg(pal)
+    pal_digest = hashlib.sha256(pal_svg.encode("utf-8")).hexdigest()
+    new[_rel(pal_base.with_suffix(".svg"))] = pal_digest
+    if not pal_base.with_suffix(".png").exists() or old.get(_rel(pal_base.with_suffix(".svg"))) != pal_digest:
+        try:
+            palette.render_png(pal_base.with_suffix(".png"), pal)
+        except ImportError:
+            return rep.fail("Pillow is needed to draw the PNG figures: pip install -r requirements.txt")
+        rep.warn(f"drew {_rel(pal_base.with_suffix('.png'))}")
+    _write_text(rep, pal_base.with_suffix(".svg"), pal_svg, counts)
     _write_text(rep, MANIFEST, json.dumps(new, indent=2, sort_keys=True) + "\n", counts)
 
     # 3. pages and ontology files

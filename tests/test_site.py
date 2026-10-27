@@ -214,7 +214,7 @@ def test_old_explorer_address_redirects_and_keeps_the_query():
 
 def test_explorer_resolves_data_paths_one_level_up():
     js = (DOCS / "js" / "amt.js").read_text(encoding="utf-8")
-    assert '"data/PotterAttributionExample.ttl"' in js and '"../" + p' in js
+    assert '"data/animals.ttl"' in js and '"../" + p' in js
     assert (DOCS / "data" / "PotterAttributionExample.ttl").exists()
 
 
@@ -238,3 +238,45 @@ def test_explorer_loads_the_reasoner_before_amt_js():
     assert order == sorted(order)
     for n in ("amt-reasoner", "amt", "amt-render", "amt-export"):
         assert (DOCS / "js" / f"{n}.js").exists()
+
+
+# ---------------------------------------------------------------- palette
+def _palette():
+    import site_palette
+    return site_palette
+
+
+def test_palette_ids_are_unique_and_every_token_resolves():
+    pal = _palette()
+    data = pal.load()
+    ids = pal._ids(data)                      # raises on a duplicate id
+    assert len(ids) == sum(len(g["colours"]) for g in data["groups"])
+    for theme in ("light", "dark"):
+        toks = pal.tokens(data, theme)
+        assert all(re.fullmatch(r"#[0-9a-f]{6}", v) for v in toks.values()), theme
+    assert set(data["tokens"]["dark"]) <= set(data["tokens"]["light"])
+
+
+def test_palette_css_and_picture_are_in_step_with_the_yaml():
+    pal = _palette()
+    data = pal.load()
+    assert (DOCS / "assets" / "palette.css").read_text(encoding="utf-8").replace("\r\n", "\n") == pal.css(data)
+    svg = (DOCS / "assets" / "img" / "palette.svg").read_text(encoding="utf-8").replace("\r\n", "\n")
+    assert svg == pal.svg(data)
+    for g in data["groups"]:
+        for c in g["colours"]:
+            assert c["hex"] in svg
+    assert (DOCS / "assets" / "img" / "palette.png").exists()
+
+
+def test_figure_fallbacks_are_the_light_tokens_of_the_palette():
+    import site_figures
+    assert site_figures.TOKENS == _palette().figure_tokens()
+
+
+def test_pages_link_the_palette_before_the_stylesheet():
+    for page in ("index.html", "vocab/index.html", "ontology/index.html", "explorer/index.html"):
+        html = (DOCS / page).read_text(encoding="utf-8")
+        assert "assets/palette.css" in html, page
+    home = (DOCS / "index.html").read_text(encoding="utf-8")
+    assert home.index("palette.css") < home.index("site.css")

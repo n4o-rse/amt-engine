@@ -5,18 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Academic Meta Tool</title>
 <meta name="description" content="Reasoning with vague knowledge: weighted relations and rules that derive new relations. Developed at mainzed, continued in NFDI4Objects.">
+<link rel="icon" type="image/png" href="assets/img/amt-penguin-small.png">
+<link rel="stylesheet" href="assets/palette.css">
 <link rel="stylesheet" href="assets/site.css">
 <script src="assets/site.js"></script>
 </head>
 <body>
 <header class="site"><div class="in">
-<a class="brand" href="index.html">Academic Meta Tool</a>
+<a class="brand" href="index.html"><img src="assets/img/amt-penguin-small.png" alt="" width="34" height="48">Academic Meta Tool</a>
 <nav><a href="index.html" aria-current="page">Home</a><a href="vocab/">Vocabulary</a><a href="ontology/">Data model</a><a href="explorer/">Explorer</a><a href="https://github.com/n4o-rse/amt-engine">GitHub</a></nav>
 <button type="button" class="theme push" id="lang-toggle" aria-label="Switch language: English or German">Deutsch</button><button type="button" class="theme" id="theme-toggle" aria-label="Switch between light and dark mode">Dark mode</button>
 </div></header>
 <main>
 <div data-l="en" lang="en">
 <section class="hero">
+<img class="mascot" src="assets/img/amt-penguin.png" alt="The AMT penguin with a book under its wing" width="210">
 <h1>Academic Meta Tool</h1>
 <p class="tag">Reasoning with vague knowledge</p>
 <p class="lead">AMT models relations that hold only to a degree and derives new relations from them by rules. It works on RDF graphs, in Python and in the browser.</p>
@@ -51,11 +54,20 @@ amt-runner examples/animals.ttl</code></pre>
 <h2>A name that only works in German</h2>
 <p><em>Amt</em> is the German word for an office or authority, and the cliché of the civil servant is that nothing seems to happen there. At mainzed we invented an AMT that, without doing anything itself, generates new knowledge by rules: semantic reasoning, or symbolic AI.</p>
 
+<h2>Part of a family</h2>
+<p>AMT is part of the Alpaka Research Framework, to which Alligator belongs as well. The penguin is the Academic Meta Tool.</p>
+<div class="family">
+<figure class="me"><img src="assets/img/amt-penguin.png" alt="" loading="lazy"><figcaption>AMT</figcaption></figure>
+<figure><img src="assets/img/alpaka.png" alt="" loading="lazy"><figcaption>Alpaka</figcaption></figure>
+<figure><img src="assets/img/alligator.png" alt="" loading="lazy"><figcaption>Alligator</figcaption></figure>
+</div>
+
 <h2>Cite</h2>
 <p>Software: <a href="https://doi.org/10.5281/zenodo.23669466">doi:10.5281/zenodo.23669466</a> (all versions). Method: Unold, M., Thiery, F. and Mees, A. (2019), <a href="https://doi.org/10.17175/sb004_004">Academic Meta Tool. Ein Web-Tool zur Modellierung von Vagheit</a>, Zeitschrift f&uuml;r digitale Geisteswissenschaften, Sonderband 4.</p>
 </div>
 <div data-l="de" lang="de">
 <section class="hero">
+<img class="mascot" src="assets/img/amt-penguin.png" alt="The AMT penguin with a book under its wing" width="210">
 <h1>Academic Meta Tool</h1>
 <p class="tag">Schlussfolgern mit unscharfem Wissen</p>
 <p class="lead">AMT modelliert Beziehungen, die nur bis zu einem gewissen Grad gelten, und leitet daraus regelbasiert neue Beziehungen ab. Es arbeitet auf RDF-Graphen, in Python und im Browser.</p>
@@ -90,6 +102,14 @@ amt-runner examples/animals.ttl</code></pre>
 <h2>Ein Name, der nur auf Deutsch funktioniert</h2>
 <p>Ein <em>Amt</em> ist eine Behörde, und das Klischee vom Beamten will, dass dort nichts zu passieren scheint. Im mainzed haben wir ein AMT erfunden, das &ndash; ohne selbst etwas zu tun &ndash; regelbasiert neues Wissen erzeugt: semantisches Schlussfolgern, also symbolische KI.</p>
 
+<h2>Teil einer Familie</h2>
+<p>AMT ist Teil des Alpaka Research Frameworks, zu dem auch Alligator gehört. Der Pinguin ist das Academic Meta Tool.</p>
+<div class="family">
+<figure class="me"><img src="assets/img/amt-penguin.png" alt="" loading="lazy"><figcaption>AMT</figcaption></figure>
+<figure><img src="assets/img/alpaka.png" alt="" loading="lazy"><figcaption>Alpaka</figcaption></figure>
+<figure><img src="assets/img/alligator.png" alt="" loading="lazy"><figcaption>Alligator</figcaption></figure>
+</div>
+
 <h2>Zitieren</h2>
 <p>Software: <a href="https://doi.org/10.5281/zenodo.23669466">doi:10.5281/zenodo.23669466</a> (alle Versionen). Methode: Unold, M., Thiery, F. und Mees, A. (2019), <a href="https://doi.org/10.17175/sb004_004">Academic Meta Tool. Ein Web-Tool zur Modellierung von Vagheit</a>, Zeitschrift f&uuml;r digitale Geisteswissenschaften, Sonderband 4.</p>
 </div>
@@ -97,6 +117,7 @@ amt-runner examples/animals.ttl</code></pre>
 <footer class="site">
 Academic Meta Tool &middot; amt-engine 0.3.1 &middot;
 <a href="https://github.com/n4o-rse/amt-engine">source</a><br>
+<img class="partners" src="assets/img/partners.png" alt="mainzed, i3mainz, LEIZA" height="40"><br>
 A <strong>mainzed</strong> project of i3mainz (Hochschule Mainz) and the RGZM (today LEIZA), developed further in
 NFDI4Objects, which is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) &ndash;
 project number 501836407.

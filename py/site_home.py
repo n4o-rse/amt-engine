@@ -85,6 +85,9 @@ TEXT = {
         "name_p": "<em>Amt</em> is the German word for an office or authority, and the cliché of the civil servant is "
                   "that nothing seems to happen there. At mainzed we invented an AMT that, without doing anything "
                   "itself, generates new knowledge by rules: semantic reasoning, or symbolic AI.",
+        "fam_h": "Part of a family",
+        "fam_p": "AMT is part of the Alpaka Research Framework, to which Alligator belongs as well. "
+                 "The penguin is the Academic Meta Tool.",
         "cite_h": "Cite",
         "cite_p": f'Software: <a href="{SOFTWARE_DOI}">doi:10.5281/zenodo.23669466</a> (all versions). '
                   f'Method: Unold, M., Thiery, F. and Mees, A. (2019), <a href="{ARTICLE_DOI}">Academic Meta Tool. '
@@ -149,6 +152,9 @@ TEXT = {
         "name_p": "Ein <em>Amt</em> ist eine Behörde, und das Klischee vom Beamten will, dass dort nichts zu passieren "
                   "scheint. Im mainzed haben wir ein AMT erfunden, das &ndash; ohne selbst etwas zu tun &ndash; "
                   "regelbasiert neues Wissen erzeugt: semantisches Schlussfolgern, also symbolische KI.",
+        "fam_h": "Teil einer Familie",
+        "fam_p": "AMT ist Teil des Alpaka Research Frameworks, zu dem auch Alligator gehört. "
+                 "Der Pinguin ist das Academic Meta Tool.",
         "cite_h": "Zitieren",
         "cite_p": f'Software: <a href="{SOFTWARE_DOI}">doi:10.5281/zenodo.23669466</a> (alle Versionen). '
                   f'Methode: Unold, M., Thiery, F. und Mees, A. (2019), <a href="{ARTICLE_DOI}">Academic Meta Tool. '
@@ -170,6 +176,7 @@ def _block(lang: str) -> str:
     )
     return f"""<div data-l="{lang}" lang="{lang}">
 <section class="hero">
+<img class="mascot" src="assets/img/amt-penguin.png" alt="The AMT penguin with a book under its wing" width="210">
 <h1>Academic Meta Tool</h1>
 <p class="tag">{escape(t["tag"])}</p>
 <p class="lead">{escape(t["lead"])}</p>
@@ -197,6 +204,14 @@ def _block(lang: str) -> str:
 
 <h2>{escape(t["name_h"])}</h2>
 <p>{t["name_p"]}</p>
+
+<h2>{escape(t["fam_h"])}</h2>
+<p>{escape(t["fam_p"])}</p>
+<div class="family">
+<figure class="me"><img src="assets/img/amt-penguin.png" alt="" loading="lazy"><figcaption>AMT</figcaption></figure>
+<figure><img src="assets/img/alpaka.png" alt="" loading="lazy"><figcaption>Alpaka</figcaption></figure>
+<figure><img src="assets/img/alligator.png" alt="" loading="lazy"><figcaption>Alligator</figcaption></figure>
+</div>
 
 <h2>{escape(t["cite_h"])}</h2>
 <p>{t["cite_p"]}</p>

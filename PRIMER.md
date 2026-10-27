@@ -150,6 +150,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S10 | Startseite (Englisch und Deutsch, Hell/Dunkel, Was AMT kann und nicht kann, Geschichte), Explorer nach `/explorer/` | amt-engine, amt-runner | S9 | erledigt 2026-10-26 |
 | S11a | Gemeinsamer JS-Reasoner (Port der Python-Engine, Paritätstest), Explorer mit Beispielliste und „TTL laden“, schlankes Layout | amt-engine | S10 | erledigt 2026-10-26 |
 | S11b | Playground (`leiza-rse/amt-playground`): nur Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden, mit dem gemeinsamen Reasoner | amt-playground | S11a | Patch geliefert (`patch-s11b-playground.zip`), nach Push erledigt |
+| S11c | Gestaltung: Farbwelt aus den Maskottchen (`design/palette.yaml`), Logos, Kopfleiste, Familien-Abschnitt, Explorer startet mit `animals` | amt-engine | S11a | Patch geliefert, nach Push erledigt |
 | S12 | w3id-Eintrag und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | offen |
 | S13 | D6 (Exit-Code) und Release 0.4.0 samt Zenodo | amt-engine, amt-runner | S10 bis S12 | offen |
 
@@ -357,6 +358,16 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - Die Namensgeschichte steht als Entwurf auf der Seite (D9): bitte im Wortlaut prüfen.
 - Das Logo kommt als zweiter Schritt, sobald es vorliegt.
 
+## S11c – Gestaltung: Farbwelt und Logos
+
+**Ziel:** Eine eigene AMT-Farbwelt (getrennt vom LEIZA-Blau des Playgrounds), die Maskottchen auf den Seiten, der Explorer startet mit `animals`.
+
+**Inhalt:** `design/palette.yaml` ist die einzige Quelle der Farben (Grün aus dem Fell, Bronze-Gold aus Bauch und Schnabel, Stahl-Blau aus dem Netzwerk, dazu Grund und Zustandsfarben, Tokens für Hell und Dunkel). `py/site_palette.py` erzeugt daraus `docs/assets/palette.css` (alle Seiten, auch der Explorer, binden sie vor `site.css` ein), `docs/assets/img/palette.svg|png` (die Palette als Bild) und die Hell-Werte der Abbildungen (`site_figures.TOKENS`). Schritt `site` erzeugt es mit; ein Test prüft, dass CSS, Bild und Abbildungen zur YAML passen. Logos in `docs/assets/img/`: Pinguin (groß und klein), Alpaka, Alligator, `partners.png` (mainzed, i3mainz, LEIZA, zugeschnitten aus dem alten `amt_logos.png`). Kopfleiste mit Pinguin, Startseite mit Maskottchen und Abschnitt „Teil einer Familie“ (AMT, Alpaka Research Framework, Alligator), Fuß mit Partnerlogos; Explorer in den neuen Farben, abgeleitete Kanten bleiben rot, „Reasoning: an“ ist bronze, Kanten gesetzt in Stahl. Neue Abhängigkeit PyYAML (nur Entwicklung).
+
+**Abnahme:** `python main.py`, danach `python main.py --strict` zweimal grün; Startseite und Explorer in Hell und Dunkel ansehen.
+
+**Offen:** Die Logos sind Pixelbilder (vektorisierte Fassungen folgen vom Autor und ersetzen sie); die Schrift ist weiter die Systemschrift (Entscheidung offen, siehe D10); der Satz im Abschnitt „Teil einer Familie“ ist ein Entwurf und braucht den Wortlaut des Autors; Links zu Alpaka und Alligator fehlen.
+
 ---
 
 ## Teil D – Offene Punkte
@@ -369,6 +380,6 @@ Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie
 - **D4** erledigt in S7: siehe A4 („Verhältnis zu `amt-explore`“).
 - **D5** erledigt in S7: Standard-Ref des Runners bleibt `main` (A4).
 - **D8** erledigt in S10: Ursache war `Dataset.contexts is deprecated` (rdflib 7.6, ausgelöst von pyshacl 0.26.0), jetzt gefiltert. Vorher: Unter Windows meldet `pytest` 63 Tests mit 204 Warnungen (Linux: keine). Offen: `python -m pytest tests -q -rw` in `C:\git\amt-engine` ausführen, die Warnungsarten ablesen und entscheiden, ob sie zu filtern oder zu beheben sind.
-- **D10** Gestaltung (angekündigt am 2026-10-26, noch nicht umgesetzt): eigene Farbwelt für das AMT, getrennt vom LEIZA-Forschungsblau (das beim leiza-Playground bleibt); neue Logos (auch das neue AMT-Logo) liefert der Autor für die Startseite; der Explorer startet mit dem Beispiel `animals.ttl`, das erleichtert das Erklären. Farbwelt: Gelb-Gold mit Schwarz und Grau. Schrift heute: Systemschrift (`system-ui`, Segoe UI, Roboto) auf Startseite und Seiten, im Explorer Roboto über Materialize; Monospace für Code. Offen: ob es eine eigene Schrift wird.
+- **D10** Gestaltung: Farbwelt und Logos umgesetzt in S11c (`design/palette.yaml`). Offen: vektorisierte Logos, Schrift (Systemschrift oder eigene Webschrift, z. B. Inter und IBM Plex Mono, dann lokal in `docs/assets`), Wortlaut und Links des Familien-Abschnitts. Der Explorer startet seit S11c mit `animals.ttl`.
 - **D11** Der Playground (`leiza-rse/amt-playground`) und der Explorer sind funktional fertig, dürfen aber später schöner und hübscher werden (Layout, Aufteilung, Startnetz mit echten Beispieldaten); der Playground bleibt im LEIZA-Blau.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.

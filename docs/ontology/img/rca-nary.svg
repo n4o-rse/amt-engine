@@ -1,29 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 270" role="img" aria-labelledby="t-rca-nary" font-family="Roboto, system-ui, -apple-system, Segoe UI, sans-serif">
 <title id="t-rca-nary">Role chain of n steps: antecedents is an RDF list of roles</title>
-<defs><linearGradient id="g-rca-nary" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--fig-node-top,#86bd63)"/><stop offset="1" style="stop-color:var(--fig-node-bottom,#5b9a34)"/></linearGradient></defs>
-<circle cx="90" cy="150" r="55" fill="url(#g-rca-nary)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
-<text x="90" y="167.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">1</tspan></text>
-<circle cx="340" cy="150" r="55" fill="url(#g-rca-nary)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
-<text x="340" y="167.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">2</tspan></text>
-<circle cx="590" cy="150" r="55" fill="url(#g-rca-nary)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
-<text x="590" y="167.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">3</tspan></text>
-<circle cx="910" cy="150" r="55" fill="url(#g-rca-nary)" stroke="var(--fig-node-edge,#4f8a2b)" stroke-width="2"/>
-<text x="910" y="167.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#d3e8c3)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">n</tspan></text>
-<path d="M148,150 L280,150" fill="none" stroke="var(--fig-line,#1b1b18)" stroke-width="2.2"/>
-<polygon points="280,150 268,155 268,145" fill="var(--fig-line,#1b1b18)"/>
-<rect x="196.4" y="122" width="35.2" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
-<text x="214" y="137.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">R</tspan><tspan font-size="8.2" dy="4.2">1</tspan></text>
-<path d="M398,150 L530,150" fill="none" stroke="var(--fig-line,#1b1b18)" stroke-width="2.2"/>
-<polygon points="530,150 518,155 518,145" fill="var(--fig-line,#1b1b18)"/>
-<rect x="446.4" y="122" width="35.2" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
-<text x="464" y="137.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">R</tspan><tspan font-size="8.2" dy="4.2">2</tspan></text>
-<path d="M648,150 L850,150" fill="none" stroke="var(--fig-line,#1b1b18)" stroke-width="2.2" stroke-dasharray="2 5" stroke-linecap="round"/>
-<polygon points="850,150 838,155 838,145" fill="var(--fig-line,#1b1b18)"/>
-<rect x="731.4" y="122" width="35.2" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
-<text x="749" y="137.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#1b1b18)"><tspan font-size="15" dy="0">R</tspan><tspan font-size="8.2" dy="4.2">n</tspan></text>
-<path d="M143.6,127.8 Q500,-20 854.6,127" fill="none" stroke="var(--fig-red,#d62828)" stroke-width="3.5" stroke-dasharray="11 7"/>
-<polygon points="854.6,127 841.6,127.1 845.4,117.8" fill="var(--fig-red,#d62828)"/>
-<rect x="423.1" y="27.7" width="152.8" height="20" rx="4" fill="var(--fig-bg,#ffffff)" fill-opacity="0.9"/>
-<text x="499.5" y="43" text-anchor="middle" font-size="15" fill="var(--fig-red,#d62828)"><tspan font-size="15" dy="0">consequent, logic</tspan></text>
-<text x="500" y="255.2" text-anchor="middle" font-size="15" fill="var(--fig-muted,#7a786b)"><tspan font-size="15" dy="0">amt:antecedents ( R1  R2  ...  Rn )</tspan></text>
+<defs><linearGradient id="g-rca-nary" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--fig-node-top,#4a9a82)"/><stop offset="1" style="stop-color:var(--fig-node-bottom,#1f6b57)"/></linearGradient></defs>
+<circle cx="90" cy="150" r="55" fill="url(#g-rca-nary)" stroke="var(--fig-node-edge,#184838)" stroke-width="2"/>
+<text x="90" y="167.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#e3f3ec)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">1</tspan></text>
+<circle cx="340" cy="150" r="55" fill="url(#g-rca-nary)" stroke="var(--fig-node-edge,#184838)" stroke-width="2"/>
+<text x="340" y="167.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#e3f3ec)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">2</tspan></text>
+<circle cx="590" cy="150" r="55" fill="url(#g-rca-nary)" stroke="var(--fig-node-edge,#184838)" stroke-width="2"/>
+<text x="590" y="167.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#e3f3ec)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">3</tspan></text>
+<circle cx="910" cy="150" r="55" fill="url(#g-rca-nary)" stroke="var(--fig-node-edge,#184838)" stroke-width="2"/>
+<text x="910" y="167.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#e3f3ec)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">n</tspan></text>
+<path d="M148,150 L280,150" fill="none" stroke="var(--fig-line,#17231f)" stroke-width="2.2"/>
+<polygon points="280,150 268,155 268,145" fill="var(--fig-line,#17231f)"/>
+<rect x="196.4" y="122" width="35.2" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="214" y="137.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#17231f)"><tspan font-size="15" dy="0">R</tspan><tspan font-size="8.2" dy="4.2">1</tspan></text>
+<path d="M398,150 L530,150" fill="none" stroke="var(--fig-line,#17231f)" stroke-width="2.2"/>
+<polygon points="530,150 518,155 518,145" fill="var(--fig-line,#17231f)"/>
+<rect x="446.4" y="122" width="35.2" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="464" y="137.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#17231f)"><tspan font-size="15" dy="0">R</tspan><tspan font-size="8.2" dy="4.2">2</tspan></text>
+<path d="M648,150 L850,150" fill="none" stroke="var(--fig-line,#17231f)" stroke-width="2.2" stroke-dasharray="2 5" stroke-linecap="round"/>
+<polygon points="850,150 838,155 838,145" fill="var(--fig-line,#17231f)"/>
+<rect x="731.4" y="122" width="35.2" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="749" y="137.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#17231f)"><tspan font-size="15" dy="0">R</tspan><tspan font-size="8.2" dy="4.2">n</tspan></text>
+<path d="M143.6,127.8 Q500,-20 854.6,127" fill="none" stroke="var(--fig-red,#c62828)" stroke-width="3.5" stroke-dasharray="11 7"/>
+<polygon points="854.6,127 841.6,127.1 845.4,117.8" fill="var(--fig-red,#c62828)"/>
+<rect x="423.1" y="27.7" width="152.8" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="499.5" y="43" text-anchor="middle" font-size="15" fill="var(--fig-red,#c62828)"><tspan font-size="15" dy="0">consequent, logic</tspan></text>
+<text x="500" y="255.2" text-anchor="middle" font-size="15" fill="var(--fig-muted,#6b7a74)"><tspan font-size="15" dy="0">amt:antecedents ( R1  R2  ...  Rn )</tspan></text>
 </svg>

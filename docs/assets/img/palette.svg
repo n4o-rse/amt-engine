@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1580 980" width="1580" height="980" role="img" aria-label="AMT colour palette" font-family="Roboto, system-ui, -apple-system, Segoe UI, sans-serif">
+<rect width="1580" height="980" fill="#f8f7f1"/>
+<text x="40" y="62" font-size="34" font-weight="700" fill="#184838">AMT colour palette</text>
+<text x="40" y="96" font-size="18" fill="#55625d">Derived from the penguin, the alpaca and the alligator</text>
+<text x="40" y="148" font-size="20" font-weight="700" fill="#184838">Green (primary)</text>
+<rect x="40" y="164" width="360" height="112" rx="10" fill="#184838" stroke="#000000" stroke-opacity="0.19"/>
+<text x="54" y="196" font-size="20" font-weight="700" fill="#ffffff">Deep green</text>
+<text x="54" y="226" font-size="18" fill="#ffffff">#184838</text>
+<text x="54" y="256" font-size="15" fill="#ffffff">Header bar, headings</text>
+<rect x="420" y="164" width="360" height="112" rx="10" fill="#1f6b57" stroke="#000000" stroke-opacity="0.19"/>
+<text x="434" y="196" font-size="20" font-weight="700" fill="#ffffff">Emerald</text>
+<text x="434" y="226" font-size="18" fill="#ffffff">#1f6b57</text>
+<text x="434" y="256" font-size="15" fill="#ffffff">Buttons, nodes</text>
+<rect x="800" y="164" width="360" height="112" rx="10" fill="#4a9a82" stroke="#000000" stroke-opacity="0.19"/>
+<text x="814" y="196" font-size="20" font-weight="700" fill="#ffffff">Teal</text>
+<text x="814" y="226" font-size="18" fill="#ffffff">#4a9a82</text>
+<text x="814" y="256" font-size="15" fill="#ffffff">Hover, accent areas</text>
+<rect x="1180" y="164" width="360" height="112" rx="10" fill="#cfe6dc" stroke="#000000" stroke-opacity="0.19"/>
+<text x="1194" y="196" font-size="20" font-weight="700" fill="#1b1b18">Light mint</text>
+<text x="1194" y="226" font-size="18" fill="#1b1b18">#cfe6dc</text>
+<text x="1194" y="256" font-size="15" fill="#1b1b18">Cards, backgrounds</text>
+<text x="40" y="316" font-size="20" font-weight="700" fill="#184838">Bronze-gold (accent)</text>
+<rect x="40" y="332" width="360" height="112" rx="10" fill="#8a5a1a" stroke="#000000" stroke-opacity="0.19"/>
+<text x="54" y="364" font-size="20" font-weight="700" fill="#ffffff">Dark bronze</text>
+<text x="54" y="394" font-size="18" fill="#ffffff">#8a5a1a</text>
+<text x="54" y="424" font-size="15" fill="#ffffff">Text accent, badges</text>
+<rect x="420" y="332" width="360" height="112" rx="10" fill="#c8833f" stroke="#000000" stroke-opacity="0.19"/>
+<text x="434" y="364" font-size="20" font-weight="700" fill="#1b1b18">Bronze</text>
+<text x="434" y="394" font-size="18" fill="#1b1b18">#c8833f</text>
+<text x="434" y="424" font-size="15" fill="#1b1b18">Highlights, reasoning on</text>
+<rect x="800" y="332" width="360" height="112" rx="10" fill="#e8b878" stroke="#000000" stroke-opacity="0.19"/>
+<text x="814" y="364" font-size="20" font-weight="700" fill="#1b1b18">Gold</text>
+<text x="814" y="394" font-size="18" fill="#1b1b18">#e8b878</text>
+<text x="814" y="424" font-size="15" fill="#1b1b18">Line under the header</text>
+<rect x="1180" y="332" width="360" height="112" rx="10" fill="#f6e6c6" stroke="#000000" stroke-opacity="0.19"/>
+<text x="1194" y="364" font-size="20" font-weight="700" fill="#1b1b18">Light gold</text>
+<text x="1194" y="394" font-size="18" fill="#1b1b18">#f6e6c6</text>
+<text x="1194" y="424" font-size="15" fill="#1b1b18">Backgrounds, axioms</text>
+<text x="40" y="484" font-size="20" font-weight="700" fill="#184838">Steel blue (structure)</text>
+<rect x="40" y="500" width="360" height="112" rx="10" fill="#2c3a52" stroke="#000000" stroke-opacity="0.19"/>
+<text x="54" y="532" font-size="20" font-weight="700" fill="#ffffff">Dark steel</text>
+<text x="54" y="562" font-size="18" fill="#ffffff">#2c3a52</text>
+<text x="54" y="592" font-size="15" fill="#ffffff">Text, edges</text>
+<rect x="420" y="500" width="360" height="112" rx="10" fill="#4a5a78" stroke="#000000" stroke-opacity="0.19"/>
+<text x="434" y="532" font-size="20" font-weight="700" fill="#ffffff">Steel</text>
+<text x="434" y="562" font-size="18" fill="#ffffff">#4a5a78</text>
+<text x="434" y="592" font-size="15" fill="#ffffff">Nodes, network, links</text>
+<rect x="800" y="500" width="360" height="112" rx="10" fill="#8fa3c4" stroke="#000000" stroke-opacity="0.19"/>
+<text x="814" y="532" font-size="20" font-weight="700" fill="#1b1b18">Light steel</text>
+<text x="814" y="562" font-size="18" fill="#1b1b18">#8fa3c4</text>
+<text x="814" y="592" font-size="15" fill="#1b1b18">Links (dark mode), lines</text>
+<rect x="1180" y="500" width="360" height="112" rx="10" fill="#dde4ef" stroke="#000000" stroke-opacity="0.19"/>
+<text x="1194" y="532" font-size="20" font-weight="700" fill="#1b1b18">Pale steel</text>
+<text x="1194" y="562" font-size="18" fill="#1b1b18">#dde4ef</text>
+<text x="1194" y="592" font-size="15" fill="#1b1b18">Logic areas</text>
+<text x="40" y="652" font-size="20" font-weight="700" fill="#184838">Ground</text>
+<rect x="40" y="668" width="360" height="112" rx="10" fill="#f8f7f1" stroke="#000000" stroke-opacity="0.19"/>
+<text x="54" y="700" font-size="20" font-weight="700" fill="#1b1b18">Paper</text>
+<text x="54" y="730" font-size="18" fill="#1b1b18">#f8f7f1</text>
+<text x="54" y="760" font-size="15" fill="#1b1b18">Background, light</text>
+<rect x="420" y="668" width="360" height="112" rx="10" fill="#0f1815" stroke="#000000" stroke-opacity="0.19"/>
+<text x="434" y="700" font-size="20" font-weight="700" fill="#ffffff">Night green</text>
+<text x="434" y="730" font-size="18" fill="#ffffff">#0f1815</text>
+<text x="434" y="760" font-size="15" fill="#ffffff">Background, dark</text>
+<rect x="800" y="668" width="360" height="112" rx="10" fill="#17231f" stroke="#000000" stroke-opacity="0.19"/>
+<text x="814" y="700" font-size="20" font-weight="700" fill="#ffffff">Ink</text>
+<text x="814" y="730" font-size="18" fill="#ffffff">#17231f</text>
+<text x="814" y="760" font-size="15" fill="#ffffff">Text, light</text>
+<rect x="1180" y="668" width="360" height="112" rx="10" fill="#e8eee9" stroke="#000000" stroke-opacity="0.19"/>
+<text x="1194" y="700" font-size="20" font-weight="700" fill="#1b1b18">Mist</text>
+<text x="1194" y="730" font-size="18" fill="#1b1b18">#e8eee9</text>
+<text x="1194" y="760" font-size="15" fill="#1b1b18">Text, dark</text>
+<text x="40" y="820" font-size="20" font-weight="700" fill="#184838">State</text>
+<rect x="40" y="836" width="360" height="112" rx="10" fill="#c62828" stroke="#000000" stroke-opacity="0.19"/>
+<text x="54" y="868" font-size="20" font-weight="700" fill="#ffffff">Red</text>
+<text x="54" y="898" font-size="18" fill="#ffffff">#c62828</text>
+<text x="54" y="928" font-size="15" fill="#ffffff">Inferred statements</text>
+<rect x="420" y="836" width="360" height="112" rx="10" fill="#78909c" stroke="#000000" stroke-opacity="0.19"/>
+<text x="434" y="868" font-size="20" font-weight="700" fill="#ffffff">Grey</text>
+<text x="434" y="898" font-size="18" fill="#ffffff">#78909c</text>
+<text x="434" y="928" font-size="15" fill="#ffffff">Reasoning off</text>
+<rect x="800" y="836" width="360" height="112" rx="10" fill="#2e7d32" stroke="#000000" stroke-opacity="0.19"/>
+<text x="814" y="868" font-size="20" font-weight="700" fill="#ffffff">Green (ok)</text>
+<text x="814" y="898" font-size="18" fill="#ffffff">#2e7d32</text>
+<text x="814" y="928" font-size="15" fill="#ffffff">Consistent</text>
+<rect x="1180" y="836" width="360" height="112" rx="10" fill="#e65100" stroke="#000000" stroke-opacity="0.19"/>
+<text x="1194" y="868" font-size="20" font-weight="700" fill="#ffffff">Orange</text>
+<text x="1194" y="898" font-size="18" fill="#ffffff">#e65100</text>
+<text x="1194" y="928" font-size="15" fill="#ffffff">Violation</text>
+</svg>

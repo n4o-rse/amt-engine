@@ -13,6 +13,24 @@ Zenodo.
 
 ## [Unreleased]
 
+### Added
+
+- `design/palette.yaml`, the colour palette of AMT (green, bronze-gold and steel
+  blue, taken from the mascots), and `py/site_palette.py`, which generates
+  `docs/assets/palette.css`, the palette picture `docs/assets/img/palette.svg|png`
+  and the fallback colours of the figures from it. PyYAML joins the development
+  requirements.
+- The penguin, the alpaca and the alligator on the pages: the penguin in the
+  header bar, on the start page and in the Explorer, a new "Part of a family"
+  section on the start page, the partner logos in the footer.
+
+### Changed
+
+- All pages, the figures and the Explorer use the new colours, in the light and
+  in the dark theme; inferred edges stay red, asserted edges are steel blue, the
+  reasoning switch is bronze when on.
+- The Explorer starts with the `animals` example.
+
 ### Notes
 
 - `docs/js/amt-reasoner.js` is also the source of the copy in

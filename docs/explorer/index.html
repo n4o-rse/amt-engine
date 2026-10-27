@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en" data-theme="light">
   <head>
     <title>AMT Explorer</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -29,6 +29,9 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet" />
 
+    <link rel="icon" type="image/png" href="../assets/img/amt-penguin-small.png" />
+    <link rel="stylesheet" href="../assets/palette.css" />
+
     <!-- AMT scripts (order matters: n3 -> amt -> amt-render -> amt-export) -->
     <script src="../js/amt-reasoner.js"></script>
     <script src="../js/amt.js"></script>
@@ -38,28 +41,32 @@
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { height: 100%; }
-      body { display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+      body { display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
       #bar {
         flex: none; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-        padding: 6px 14px; background: #4f628b; color: #fff; min-height: 52px;
+        padding: 6px 14px; background: var(--bar); color: var(--bar-fg); min-height: 56px;
+        border-bottom: 4px solid var(--accent);
       }
-      #bar a.home { color: #fff; font-weight: 600; text-decoration: none; margin-right: 6px; }
+      #bar a.home { color: #fff; font-weight: 600; text-decoration: none; margin-right: 6px; display: inline-flex; align-items: center; gap: 8px; }
+      #bar a.home img { height: 40px; width: auto; margin: -4px 0; }
+      #bar .btn-floating { background: var(--pal-green) !important; }
+      #bar .btn-floating:hover { background: var(--pal-green-teal) !important; }
       #bar .btn-floating { width: 36px; height: 36px; line-height: 36px; }
       #bar .btn-floating i { line-height: 36px; font-size: 20px; }
       #bar .grow { flex: 1; min-width: 0; }
       #title { font-weight: 600; }
       #status { font-size: 0.9em; margin-left: 10px; }
-      .legend { font-size: 0.85em; opacity: 0.9; white-space: nowrap; }
+      .legend { font-size: 0.85em; white-space: nowrap; background: var(--card); color: var(--fg); padding: 2px 10px; border-radius: 12px; }
       .legend b { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin: 0 4px 0 8px; }
-      #r-but { background: #78909c; color: #fff; border-radius: 18px; text-transform: none; font-weight: 600; padding: 0 14px; white-space: nowrap; }
-      #r-but.on { background: #e53935; }
+      #r-but { background: var(--pal-grey); color: #fff; border-radius: 18px; text-transform: none; font-weight: 600; padding: 0 14px; white-space: nowrap; }
+      #r-but.on { background: var(--pal-bronze); }
       #origin {
         position: fixed; right: 12px; bottom: 12px; z-index: 5; max-width: 340px;
-        background: #fff; border: 1px solid #4f628b; border-radius: 4px; padding: 8px 10px;
-        font-size: 12px; line-height: 1.4; color: #222; box-shadow: 0 1px 4px rgba(0,0,0,.25);
+        background: var(--card); border: 1px solid var(--pal-green-deep); border-radius: 4px; padding: 8px 10px;
+        font-size: 12px; line-height: 1.4; color: var(--fg); box-shadow: 0 1px 4px rgba(0,0,0,.25);
       }
-      #origin img { display: block; width: 100%; max-width: 150px; margin: 0 auto 6px; }
-      #origin a { color: #2a4a8a; }
+      #origin img.partners { display: block; height: 34px; width: auto; margin: 0 auto 6px; }
+      #origin a { color: var(--link); }
       #graph { flex: 1; min-height: 0; }
       .modal { max-height: 80% !important; width: 90% !important; }
       @media (max-width: 700px) { .legend, #origin img { display: none; } }
@@ -68,19 +75,19 @@
 
   <body>
     <div id="bar">
-      <a class="home" href="../" title="AMT start page">&larr; AMT</a>
+      <a class="home" href="../" title="AMT start page"><img src="../assets/img/amt-penguin-small.png" alt="" />AMT</a>
       <span id="title">loading...</span><span id="status"></span>
       <span class="grow"></span>
-      <span class="legend"><b style="background:#000"></b>asserted<b style="background:red"></b>inferred</span>
-      <a class="btn-floating blue" onclick="openGraphPropModal()" title="choose an example or load a Turtle file"><i class="material-icons">folder_open</i></a>
+      <span class="legend"><b style="background:var(--asserted)"></b>asserted<b style="background:var(--inferred)"></b>inferred</span>
+      <a class="btn-floating" onclick="openGraphPropModal()" title="choose an example or load a Turtle file"><i class="material-icons">folder_open</i></a>
       <a class="btn-small" id="r-but" onclick="toggleReasoning()" title="reasoning on/off">Reasoning: off</a>
-      <a class="btn-floating teal" onclick="exportTTL()" title="download Turtle (including inferred statements)"><i class="material-icons">file_download</i></a>
-      <a class="btn-floating purple" onclick="exportCypher()" title="download Cypher for Neo4j"><i class="material-icons">device_hub</i></a>
+      <a class="btn-floating" onclick="exportTTL()" title="download Turtle (including inferred statements)"><i class="material-icons">file_download</i></a>
+      <a class="btn-floating" onclick="exportCypher()" title="download Cypher for Neo4j"><i class="material-icons">device_hub</i></a>
     </div>
     <div id="graph"></div>
 
     <div id="origin">
-      <a href="../"><img src="../amt_logos.png" alt="Academic Meta Tool, mainzed, i3mainz, LEIZA" /></a>
+      <a href="../"><img class="partners" src="../assets/img/partners.png" alt="mainzed, i3mainz, LEIZA" /></a>
       The Academic Meta Tool is a <b>mainzed</b> project of <b>i3mainz</b> (Hochschule Mainz) and the
       <b>RGZM</b> (today <b>LEIZA</b>), developed further in <b>NFDI4Objects</b>.
       NFDI4Objects is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation)

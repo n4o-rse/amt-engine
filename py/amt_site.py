@@ -47,12 +47,14 @@ def page(*, title: str, body: str, depth: int, current: str, description: str = 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{escape(title)}</title>
-{desc}<link rel="stylesheet" href="{up}assets/site.css">
+{desc}<link rel="icon" type="image/png" href="{up}assets/img/amt-penguin-small.png">
+<link rel="stylesheet" href="{up}assets/palette.css">
+<link rel="stylesheet" href="{up}assets/site.css">
 <script src="{up}assets/site.js"></script>
 </head>
 <body>
 <header class="site"><div class="in">
-<a class="brand" href="{up}index.html">Academic Meta Tool</a>
+<a class="brand" href="{up}index.html"><img src="{up}assets/img/amt-penguin-small.png" alt="" width="34" height="48">Academic Meta Tool</a>
 <nav>{nav}</nav>
 {lang_btn}<button type="button" class="theme{theme_extra}" id="theme-toggle" aria-label="Switch between light and dark mode">Dark mode</button>
 </div></header>
@@ -62,6 +64,7 @@ def page(*, title: str, body: str, depth: int, current: str, description: str = 
 <footer class="site">
 Academic Meta Tool &middot; amt-engine {escape(RELEASE)} &middot;
 <a href="https://github.com/n4o-rse/amt-engine">source</a><br>
+<img class="partners" src="{up}assets/img/partners.png" alt="mainzed, i3mainz, LEIZA" height="40"><br>
 A <strong>mainzed</strong> project of i3mainz (Hochschule Mainz) and the RGZM (today LEIZA), developed further in
 NFDI4Objects, which is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) &ndash;
 project number 501836407.

@@ -206,7 +206,7 @@ var AMT = function () {
   var currentSource = function () {
     if (window.AMT_SOURCE) return window.AMT_SOURCE;
     var params = new URLSearchParams(window.location.search);
-    var p = params.get("ttl") || "data/PotterAttributionExample.ttl";
+    var p = params.get("ttl") || "data/animals.ttl";
     if (!/^(https?:|\.\.\/|\/)/.test(p)) p = "../" + p;
     return p;
   };

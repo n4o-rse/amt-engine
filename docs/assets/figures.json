@@ -1,12 +1,13 @@
 {
-  "docs/ontology/img/concept.svg": "48994e84effa345b407227b3268e435755a9352e90ba7f9156108fb32bacd39d",
-  "docs/ontology/img/da.svg": "e809249550fcebba1f292505e533f48a0be65e77dfa1bea91f0bcf0b0195e9da",
-  "docs/ontology/img/ia.svg": "a66b0d35d97072223d07ae55788e67247fbf8b8111fe6dd8e7b3c96010bb8336",
-  "docs/ontology/img/quadruple.svg": "bc17a39211cbfa88c650390193d7b3a43f63ce7d32727dfdb3a358c4a4460d5d",
-  "docs/ontology/img/rca-nary.svg": "f3f03e2dd83740dd1c402bdbd8c99d0e3696c6b8beefd876469eaa5a51d5a877",
-  "docs/ontology/img/rca.svg": "912f4d2309812073c121fbfc09f5612d20d3b674aa684cc41dc4db049918787f",
-  "docs/ontology/img/role.svg": "e1f0ad434735fb6b0aa378b76fb53c89269f02d43b1ccdf2d3a09f8792e6e700",
-  "docs/ontology/img/sda.svg": "fbdd9c60cb0dac75e5194a10786e6c0fe7bb7e69bae5fa3d68813476650d076b",
-  "docs/ontology/img/subsumption.svg": "15c9aeff3af7848aa61ff7d550c0742ce3b47a0b85dd21aae0fb545f08a5ddd4",
-  "docs/vocab/amt-overview.svg": "57e81ef1706f03cdd8bad6620f90b96adc84e1f4bebf56a5963d7dd8f91a49b4"
+  "docs/assets/img/palette.svg": "b3a2d7d269f521907e8c23e46271fe5af1b068788409c5d6f3fe90b0b4214535",
+  "docs/ontology/img/concept.svg": "d1dcbe229fd2baf0b9fa5f012bab548309477c9055d11a35008c0824e3b38985",
+  "docs/ontology/img/da.svg": "3e16affbc2a045f81039d051ad964ea75ebe23afca7777ddafcc765541c50e96",
+  "docs/ontology/img/ia.svg": "56a920cb34a0aa1ba3cbf8a7898d6d23e85b68d7ce75f212f1e6dd3b4745062a",
+  "docs/ontology/img/quadruple.svg": "ceeb2ae36da2a7edd435def6dac8b2fd0871c8166d671e0bc301ced0894bddbc",
+  "docs/ontology/img/rca-nary.svg": "81dfab35c33882014eb1784b67df852230e75593e5ace259bcbb783466c137bd",
+  "docs/ontology/img/rca.svg": "12b3221062848d87e55c512363cc9a5d628d25a8b411a0f70ff55e2ee53c5ceb",
+  "docs/ontology/img/role.svg": "f8c2f7f0ea7d3fda02b0d1d621a27459cd653bfaa85d634a1c30ca63505b25f4",
+  "docs/ontology/img/sda.svg": "d488ef5cdad26bc4ee63b145d7c61bba70a7535ec5db8c5e28b63e3cbef2d7e0",
+  "docs/ontology/img/subsumption.svg": "9d32e823f4c6bf1185d44d48d6182f8c6a52de28fdecf6fd8977cd603d9f6714",
+  "docs/vocab/amt-overview.svg": "bcd4ab71d84d541d75ed9a084546650f45bc073acd2db19f72826d667796806a"
 }

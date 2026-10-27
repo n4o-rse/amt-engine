@@ -21,14 +21,23 @@ _AMT.rdf       = "";
 // ------------------------------------------------------------
 // Colour palette – one entry per Concept (auto-assigned)
 // ------------------------------------------------------------
+// Node colours: the AMT palette (design/palette.yaml): teal, gold, steel, bronze, emerald, mint.
 var AMT_PALETTE = [
-    { bg: "coral",   border: "#c05a00", font: "#000" },
-    { bg: "#5b9bd5", border: "#2e75b6", font: "#fff" },
-    { bg: "#70ad47", border: "#538135", font: "#fff" },
-    { bg: "#ffc000", border: "#c07a00", font: "#000" },
-    { bg: "#7030a0", border: "#4b1a6e", font: "#fff" },
-    { bg: "#ed7d31", border: "#843c00", font: "#fff" }
+    { bg: "#4a9a82", border: "#184838", font: "#000" },
+    { bg: "#e8b878", border: "#8a5a1a", font: "#000" },
+    { bg: "#8fa3c4", border: "#2c3a52", font: "#000" },
+    { bg: "#c8833f", border: "#8a5a1a", font: "#000" },
+    { bg: "#1f6b57", border: "#184838", font: "#fff" },
+    { bg: "#cfe6dc", border: "#1f6b57", font: "#000" }
 ];
+
+// Edge colours come from the page's CSS variables (assets/palette.css), with the palette values as fallback.
+var amtColour = function(name, fallback) {
+    try {
+        var v = getComputedStyle(document.documentElement).getPropertyValue("--" + name).trim();
+        return v || fallback;
+    } catch (e) { return fallback; }
+};
 
 // ------------------------------------------------------------
 // styleNodes: assign colour/shape per concept (auto-palette)
@@ -100,7 +109,7 @@ var shortenURI = function(uri) {
 
 // ------------------------------------------------------------
 // styleEdges: uniform styling for all edges
-//   black  = original assertion
+//   steel  = original assertion
 //   red    = reasoned inference (set in amt.js updateReasoning)
 // ------------------------------------------------------------
 var styleEdges = function(edges) {
@@ -117,13 +126,13 @@ var styleEdges = function(edges) {
         edges[i].smooth  = { type: "dynamic" };
         edges[i].label   = roleShort + ": " + weightVal;
         edges[i].color   = {
-            color:     isReasoned ? "red" : "#000000",
+            color:     isReasoned ? amtColour("inferred", "#c62828") : amtColour("asserted", "#2c3a52"),
             highlight: "#555555"
         };
         edges[i].font = {
             align: "middle",
             size:  11,
-            color: isReasoned ? "red" : "#000000",
+            color: isReasoned ? amtColour("inferred", "#c62828") : amtColour("asserted", "#2c3a52"),
             face:  "monospace"
         };
     }
@@ -316,9 +325,9 @@ $(function() {
         var ttl = new URLSearchParams(window.location.search).get("ttl") || "";
         var file = ttl.replace(/^data\//, "");
         if (ttl) _AMT.title = file;
-        else chooseExample("PotterAttributionExample.ttl");
+        else chooseExample("animals.ttl");
         _examples.forEach(function(ex) { if (ex.file === file) _AMT.title = ex.title; });
-        $("#amt-viz").val(file || "PotterAttributionExample.ttl");
+        $("#amt-viz").val(file || "animals.ttl");
         $("#amt-viz").material_select();
         update();
     });

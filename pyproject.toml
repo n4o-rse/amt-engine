@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0", "Pillow>=10.1"]
+dev = ["pytest>=7.0", "Pillow>=10.1", "PyYAML>=6.0"]
 notebook = ["ipython", "ipywidgets"]
 
 [project.scripts]

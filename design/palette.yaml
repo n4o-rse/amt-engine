@@ -1,0 +1,109 @@
+# The colour palette of AMT: the single source for docs/assets/palette.css,
+# for the figures of the pages and for docs/assets/img/palette.svg|png.
+# Edit here, then run `python main.py` (step "site").
+#
+# The colours come from the three mascots (penguin, alpaca, alligator):
+# green fur, bronze-gold bellies and beaks, steel-blue network nodes.
+
+title: AMT colour palette
+subtitle: Derived from the penguin, the alpaca and the alligator
+
+groups:
+  - name: Green (primary)
+    colours:
+      - {id: green-deep,   hex: "#184838", name: Deep green,  use: "Header bar, headings"}
+      - {id: green,        hex: "#1f6b57", name: Emerald,     use: "Buttons, nodes"}
+      - {id: green-teal,   hex: "#4a9a82", name: Teal,        use: "Hover, accent areas"}
+      - {id: green-mint,   hex: "#cfe6dc", name: Light mint,   use: "Cards, backgrounds"}
+  - name: Bronze-gold (accent)
+    colours:
+      - {id: bronze-dark,  hex: "#8a5a1a", name: Dark bronze, use: "Text accent, badges"}
+      - {id: bronze,       hex: "#c8833f", name: Bronze,      use: "Highlights, reasoning on"}
+      - {id: gold,         hex: "#e8b878", name: Gold,        use: "Line under the header"}
+      - {id: gold-light,   hex: "#f6e6c6", name: Light gold,  use: "Backgrounds, axioms"}
+  - name: Steel blue (structure)
+    colours:
+      - {id: steel-dark,   hex: "#2c3a52", name: Dark steel,  use: "Text, edges"}
+      - {id: steel,        hex: "#4a5a78", name: Steel,       use: "Nodes, network, links"}
+      - {id: steel-light,  hex: "#8fa3c4", name: Light steel, use: "Links (dark mode), lines"}
+      - {id: steel-pale,   hex: "#dde4ef", name: Pale steel,  use: "Logic areas"}
+  - name: Ground
+    colours:
+      - {id: paper,        hex: "#f8f7f1", name: Paper,       use: "Background, light"}
+      - {id: night,        hex: "#0f1815", name: Night green, use: "Background, dark"}
+      - {id: ink,          hex: "#17231f", name: Ink,         use: "Text, light"}
+      - {id: mist,         hex: "#e8eee9", name: Mist,        use: "Text, dark"}
+  - name: State
+    colours:
+      - {id: red,          hex: "#c62828", name: Red,         use: "Inferred statements"}
+      - {id: grey,         hex: "#78909c", name: Grey,        use: "Reasoning off"}
+      - {id: ok,           hex: "#2e7d32", name: Green (ok),  use: "Consistent"}
+      - {id: warn,         hex: "#e65100", name: Orange,      use: "Violation"}
+
+# CSS variables of docs/assets/palette.css. A value is a colour id from above
+# or a hex colour. `light` is the default, `dark` overrides what differs.
+tokens:
+  light:
+    bg: paper
+    fg: ink
+    muted: "#55625d"
+    accent: gold
+    accent-strong: bronze-dark
+    bar: green-deep
+    bar-fg: "#eef2ee"
+    card: "#ffffff"
+    line: "#d9dccf"
+    code-bg: "#eef1e8"
+    link: steel
+    inferred: red
+    asserted: steel-dark
+    fig-line: ink
+    fig-muted: "#6b7a74"
+    fig-red: red
+    fig-bg: paper
+    fig-node-top: green-teal
+    fig-node-bottom: green
+    fig-node-text: "#e3f3ec"
+    fig-node-edge: green-deep
+    fig-white-fill: "#ffffff"
+    fig-white-text: green
+    fig-box-fill: "#ffffff"
+    fig-box-text: ink
+    fig-axiom-fill: gold-light
+    fig-logic-fill: steel-pale
+    fig-rule-fill: green-mint
+    fig-ext-fill: mist
+    fig-lit-fill: gold
+    fig-island-fill: "#ffffff"
+    fig-island-edge: green
+  dark:
+    bg: night
+    fg: mist
+    muted: "#9fb0a8"
+    accent-strong: gold
+    bar: "#0b2a21"
+    card: "#16231f"
+    line: "#2c3f38"
+    code-bg: "#1b2b26"
+    link: steel-light
+    inferred: "#ff7b7b"
+    asserted: steel-light
+    fig-line: mist
+    fig-muted: "#9fb0a8"
+    fig-red: "#ff7b7b"
+    fig-bg: night
+    fig-node-top: "#3f8f78"
+    fig-node-bottom: green
+    fig-node-text: "#e3f3ec"
+    fig-node-edge: green-teal
+    fig-white-fill: "#16231f"
+    fig-white-text: "#8fd1bb"
+    fig-box-fill: "#16231f"
+    fig-box-text: mist
+    fig-axiom-fill: "#5b4720"
+    fig-logic-fill: steel-dark
+    fig-rule-fill: "#1f4a3c"
+    fig-ext-fill: "#1f2c27"
+    fig-lit-fill: "#7a5a20"
+    fig-island-fill: "#16231f"
+    fig-island-edge: green-teal
