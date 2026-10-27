@@ -11,6 +11,7 @@ Two entry points:
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from pyvis.network import Network
@@ -39,6 +40,7 @@ def build_network(
     height: str = "600px",
     notebook: bool = False,
     reasoned_edges: list | None = None,
+    cdn_resources: str = "in_line",
 ) -> Network:
     """
     Build a configured :class:`pyvis.network.Network` for an AMT graph.
@@ -57,6 +59,9 @@ def build_network(
     notebook
         Pass ``True`` only when calling from inside a Jupyter notebook *and*
         you want pyvis to use its inline-iframe mode.
+    cdn_resources
+        pyvis option: ``"in_line"`` (default) embeds the library in the HTML,
+        ``"remote"`` loads it from a CDN, ``"local"`` writes a ``lib/`` folder.
     reasoned_edges
         An already-reasoned edge list. Pass it to draw a graph produced
         with non-default reasoning options (e.g. ``minimal=True``) instead
@@ -76,7 +81,7 @@ def build_network(
         notebook=notebook,
         bgcolor="#ffffff",
         font_color="#333333",
-        cdn_resources="remote",
+        cdn_resources=cdn_resources,
     )
     net.barnes_hut(
         gravity=-8000,
@@ -148,10 +153,16 @@ def render_to_html(
     axioms: list | None = None,
     height: str = "600px",
     reasoned_edges: list | None = None,
+    cdn_resources: str = "in_line",
 ) -> Path:
     """
     Build the network and write a self-contained HTML file.
     Returns the path that was written.
+
+    ``cdn_resources`` is handed to pyvis: ``"in_line"`` (the default) embeds the
+    visualisation library, so the file works offline and loads nothing from a
+    third party; ``"remote"`` writes a much smaller file that fetches the
+    library from a CDN when it is opened.
     """
     net = build_network(
         nodes,
@@ -162,10 +173,24 @@ def render_to_html(
         height=height,
         notebook=False,
         reasoned_edges=reasoned_edges,
+        cdn_resources=cdn_resources,
     )
     out = Path(output_path)
     net.save_graph(str(out))
+    if cdn_resources != "remote":
+        _drop_bootstrap(out)
     return out
+
+
+def _drop_bootstrap(path: Path) -> None:
+    """pyvis 0.3 always links Bootstrap from a CDN, though only its filter and select menus need it.
+
+    AMT draws neither, so the two tags are removed: the file then loads nothing from a third party.
+    """
+    text = path.read_text(encoding="utf-8")
+    text = re.sub(r"\s*<link\s+href=\"https://cdn\.jsdelivr\.net/npm/bootstrap[^>]*?/>", "", text, flags=re.S)
+    text = re.sub(r"\s*<script\s+src=\"https://cdn\.jsdelivr\.net/npm/bootstrap[^>]*?></script>", "", text, flags=re.S)
+    path.write_text(text, encoding="utf-8", newline="\n")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -1,6 +1,32 @@
-# Generated from deploy/redirects.yaml by py/site_redirects.py. Do not edit.
+# https://w3id.org/amt/ — permanent identifiers for the
+# Academic Meta Tool (AMT).
+#
+# Addresses in use:
+#
+#   /amt/          the start page of AMT
+#   /amt/vocab     the vocabulary (negotiated on Accept: Turtle, RDF/XML,
+#                    JSON-LD, otherwise the HTML page)
+#   /amt/explorer  the Explorer
+#   /amt/ontology  the data model page
+#   /amt/engine    the source code of amt-engine
+#   /amt/runner    the source code of amt-runner
+#   /amt/doi       the concept DOI of amt-engine (Zenodo)
+#
+# Everything leads to the pages on GitHub Pages of the NFDI4Objects organisation
+# (https://n4o-rse.github.io/amt-engine/) or to the repositories. The namespace
+# of the vocabulary itself is http://academic-meta-tool.xyz/vocab# and does not
+# change; this space only gives it, and the rest of AMT, an address that does
+# not depend on a domain or a host.
+#
+# ## Contact
+# This space is administered by:
+#
+# Florian Thiery
+# GitHub username: @florianthiery
+# email: florian.thiery@leiza.de
+
 RewriteEngine On
-RewriteBase /ids/amt/
+RewriteBase /amt/
 
 RewriteRule ^$ https://n4o-rse.github.io/amt-engine/ [R=302,L]
 

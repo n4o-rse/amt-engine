@@ -337,10 +337,26 @@ Python 3.10 and 3.13. The report of each job is kept as a workflow artefact.
 
 The namespace `http://academic-meta-tool.xyz/vocab#` never changes. The pages
 live on GitHub Pages; `academic-meta-tool.xyz` (Apache, `.htaccess`) and
-`https://w3id.org/ids/amt/` only redirect there, and `/vocab` answers Turtle,
+`https://w3id.org/amt/` only redirect there, and `/vocab` answers Turtle,
 RDF/XML or JSON-LD by content negotiation. Both redirect files are generated
 from `deploy/redirects.yaml`. After deploying them, `python py/check_redirects.py`
 asks the live servers and compares the answers with that file.
+
+### Offline and third-party code
+
+The Explorer loads nothing from a CDN: its libraries (N3.js, vis, jQuery, jQuery
+UI, Materialize, Material Icons) are copied unchanged into `docs/vendor/`, with
+their licences. The HTML graph from `amt --export-html` embeds the visualisation
+library too; `render_to_html(..., cdn_resources="remote")` gives the small file
+that loads it from a CDN instead.
+
+### Bibliography
+
+`data/bibliography.bib` lists works that use or describe AMT. The page
+`docs/bibliography/` (APA 7, with the BibTeX of each entry) and
+`docs/bibliography/amt.bib` are generated from it. To add a work, append a
+BibTeX entry (fields and the `kind` field are described at the top of the file)
+and run `python main.py`.
 
 The combined output is written to `build/pipeline_report.txt`. The product
 commands `amt` and `amt-runner` are independent of `main.py`. Changes are

@@ -109,6 +109,14 @@ Eigenschaften, die das Repo haben muss:
 | Startseite | `docs/index.html` aus `py/site_home.py`; Englisch bevorzugt, Deutsch umschaltbar, Hell/Dunkel; Explorer unter `/explorer/`, `docs/index.htm` leitet weiter; DFG-Projektnummer 501836407 bestätigt | 2026-10-26 |
 | Release 0.4.0 | erst am Ende (nach S13); die ungereleasten Änderungen aus S7 bis S13 gehören dazu | 2026-10-26 |
 | Zenodo | GitHub-Zenodo-Anbindung ist für beide Repos eingeschaltet; jedes GitHub-Release erzeugt eine Version mit DOI, ein bloßer Tag nicht; deshalb keine Releases für alte Versionen | 2026-10-26 |
+| Öffentliche w3id-Adresse | `https://w3id.org/amt/`, ohne `ids/`: der Ordner `ids/amt/` im Repo `perma-id/w3id.org` ist nur der Ablageort, `RewriteBase` ist `/amt/` (Erfahrung des Autors; am 2026-10-27 korrigiert, S12 hatte `/ids/amt/`) | 2026-10-27 |
+| w3id-Pull-Request | wir warten nicht auf den Merge; passt etwas nicht, gibt es einen Hotfix; Header der `.htaccess` (Adressliste, Namensraum, Kontakt) wird aus `deploy/redirects.yaml` erzeugt | 2026-10-27 |
+| Bibliografie | Quelle `data/bibliography.bib` (BibTeX, ein Eintrag je Werk, Feld `kind`: paper, talk, software, dataset, other); die Seite `docs/bibliography/` zeigt APA 7 (alphabetisch nach Erstautorin, dann Jahr) mit dem BibTeX je Eintrag und `amt.bib` zum Laden; eigener Parser und Formatter in `py/site_bib.py`, keine zusätzliche Abhängigkeit | 2026-10-27 |
+| Zitieren | `CITATION.cff`: `preferred-citation` ist der ZfdG-Artikel (Unold, Thiery, Mees 2019); die Software wird über die DOI zitiert | 2026-10-27 |
+| Keine Bibliotheken von CDNs | die Bibliotheken des Explorers (n3, vis, jQuery, jQuery UI, Materialize, Material Icons) liegen unverändert in `docs/vendor/` (Versionen und Lizenzen in `docs/vendor/README.md`); der pyvis-Export bettet vis ein und entfernt den Bootstrap-Verweis (Option `cdn_resources`, Standard `in_line`); `tests/test_offline.py` prüft, dass keine Seite etwas von fremden Servern lädt | 2026-10-27 |
+| Rechte, Impressum | Rechte an Logos und Maskottchen sind geklärt (Autor); Impressum und Datenschutzerklärung sind für diese Seiten nicht nötig (Autor) | 2026-10-27 |
+| Texte der Startseite | Namensgeschichte in der Fassung B („AMT steht für Academic Meta Tool. Der Name funktioniert eigentlich nur auf Deutsch …“); Familiensatz ohne Links, weil Alpaka und Alligator noch entstehen bzw. überarbeitet werden | 2026-10-27 |
+| Version des Runners | 0.3.0, zusammen mit der Engine 0.4.0 (schlankere Abhängigkeiten, Explorer-Hinweis) | 2026-10-27 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
 
@@ -152,7 +160,8 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S11b | Playground (`leiza-rse/amt-playground`): nur Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden, mit dem gemeinsamen Reasoner | amt-playground | S11a | Patch geliefert (`patch-s11b-playground.zip`), nach Push erledigt |
 | S11c | Gestaltung: Farbwelt aus den Maskottchen (`design/palette.yaml`), Logos, Kopfleiste, Familien-Abschnitt, Explorer startet mit `animals` | amt-engine | S11a | Patch geliefert, nach Push erledigt |
 | S11d | Logos der Institutionen und Förderer (mainzed, i3mainz, LEIZA, NFDI4Objects, NFDI, DFG) im Fuß aller Seiten; Explorer-Kasten mit Pinguin | amt-engine | S11c | Patch geliefert, nach Push erledigt |
-| S12 | w3id-Eintrag (`w3id.org/ids/amt/`) und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | Patch geliefert; danach Deployment und w3id-Pull-Request durch den Autor |
+| S12 | w3id-Eintrag (`w3id.org/amt/`) und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | erledigt 2026-10-27 (FTP live; w3id-PR gestellt) |
+| S14 | Texte (Namensgeschichte B, Familiensatz), Bibliografie, Bibliotheken lokal, w3id-Header aus der YAML und Adresse ohne `ids/`, `preferred-citation`, Seitentest | amt-engine | S12 | Patch geliefert, nach Push erledigt |
 | S13 | D6 (Exit-Code) und Release 0.4.0 samt Zenodo | amt-engine, amt-runner | S10 bis S12 | offen |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
@@ -379,7 +388,7 @@ Im Fuß jeder erzeugten Seite steht eine weiße Leiste mit den Logos von mainzed
 
 **Ziel:** Alle öffentlichen Adressen von AMT führen über zwei dünne Weiterleitungsschichten zu GitHub Pages; zieht das Repository um, ändert sich nur `pages` in `deploy/redirects.yaml`.
 
-**Beschlüsse:** Der Namensraum `http://academic-meta-tool.xyz/vocab#` ändert sich nie. Das FTP von academic-meta-tool.xyz (Apache) darf geleert werden; es enthält nur noch die `.htaccess`. Der w3id-Eintrag liegt wie bei den anderen Einträgen des Autors unter `ids/` (also `https://w3id.org/ids/amt/`), Kontakt Florian Thiery. w3id sichert den bestehenden Namensraum nicht gegen einen Verfall der Domain; es gibt neuen Zitaten und Links eine Adresse, die nicht an Domain und Hoster hängt. Die Vokabelseite wird per Content Negotiation bedient (Turtle, RDF/XML, JSON-LD, sonst HTML; 303 auf dem FTP, 302 bei w3id), die Anker der Termseite heißen wie die Terme.
+**Beschlüsse:** Der Namensraum `http://academic-meta-tool.xyz/vocab#` ändert sich nie. Das FTP von academic-meta-tool.xyz (Apache) darf geleert werden; es enthält nur noch die `.htaccess`. Der w3id-Eintrag liegt wie bei den anderen Einträgen des Autors unter `ids/` (öffentlich aber `https://w3id.org/amt/`: das `ids/` ist nur der Ordner im Repo, nicht Teil der Adresse; so fällt es 2026-10-27 auf und ist korrigiert), Kontakt Florian Thiery. w3id sichert den bestehenden Namensraum nicht gegen einen Verfall der Domain; es gibt neuen Zitaten und Links eine Adresse, die nicht an Domain und Hoster hängt. Die Vokabelseite wird per Content Negotiation bedient (Turtle, RDF/XML, JSON-LD, sonst HTML; 303 auf dem FTP, 302 bei w3id), die Anker der Termseite heißen wie die Terme.
 
 **Inhalt:** `deploy/redirects.yaml` ist die einzige Quelle. `py/site_redirects.py` erzeugt daraus (Schritt `site`) `deploy/academic-meta-tool.xyz/.htaccess`, `deploy/w3id/ids/amt/.htaccess` und `deploy/w3id/ids/amt/README.md`, und rechnet mit `resolve()`, was jede Adresse antworten muss. `py/check_redirects.py` fragt nach dem Deployment die echten Server (mit verschiedenen `Accept`-Headern) und vergleicht; `--base-url` prüft einen Testserver. `.gitattributes` hält die Dateien in `deploy/` auf LF. Tests: Ziele existieren in `docs/`, erzeugte Dateien aktuell, Aushandlung und Altadressen.
 
@@ -387,16 +396,28 @@ Im Fuß jeder erzeugten Seite steht eine weiße Leiste mit den Logos von mainzed
 
 **Deployment (Autor):** 1. FTP leeren, `deploy/academic-meta-tool.xyz/.htaccess` als `.htaccess` ins Wurzelverzeichnis; 2. `deploy/w3id/ids/amt/` als Ordner `ids/amt/` in einen Fork von `perma-id/w3id.org` kopieren und den Pull Request stellen; 3. `python py/check_redirects.py --follow`.
 
+### S14 – Texte, Bibliografie, Bibliotheken lokal
+
+**Ziel:** Die Seiten laden nichts mehr von fremden Servern, der Name und die Familie haben ihren Wortlaut, und es gibt eine Bibliografie, in die Vorträge, Paper und Code-Schnipsel kommen, die AMT nennen.
+
+**Inhalt:** (1) `docs/vendor/` enthält n3, vis, jQuery, jQuery UI, Materialize und Material Icons unverändert, mit Lizenzen und `README.md`; `docs/explorer/index.html` verweist darauf; die pyvis-HTML (`amt/viz.py`) bettet vis ein und lässt Bootstrap weg. (2) `data/bibliography.bib` mit den vier Arbeiten des Autors; `py/site_bib.py` liest sie und erzeugt `docs/bibliography/index.html` (APA 7, zweisprachige Überschriften, BibTeX je Eintrag) und `docs/bibliography/amt.bib`; Navigation und Startseite verweisen darauf. (3) Texte: Namensgeschichte B, Familiensatz ohne Links (D9). (4) `deploy/redirects.yaml` bekommt `contact`, `about` je Route und `w3id_header`; daraus entsteht der Header der w3id-`.htaccess` im Stil der Einträge archlink und cispdb; die öffentliche Adresse ist `https://w3id.org/amt/` (siehe A4). (5) `CITATION.cff`: `preferred-citation` ist der ZfdG-Artikel. (6) `tests/test_offline.py` (keine fremden Quellen, alle lokalen Links und `url(...)` lösen auf, Lizenzen der Bibliotheken), `tests/test_bibliography.py`, ein Test für den w3id-Header.
+
+**Gegenstück im Runner:** S6 im Primer von `amt-runner` (nur Laufzeit-Abhängigkeiten, Hinweis auf den Explorer); beide Patches ändern die Versionsnummern noch nicht, das macht S13.
+
+**Zu prüfen (Autor):** Angaben in `data/bibliography.bib` (Jahr 2023 und Titel von Thiery & Mees, Reihenfolge der Vornamen; Mees steht dort überall als „Allard W.“, in der Vorlage teils als „A.“); Vornamen von Tolle und Gampe fehlen (nur Initialen).
+
+**Abnahme:** `python main.py` und `python main.py --strict` zweimal grün, danach `git status` sauber; im Browser lädt der Explorer ohne eine einzige Anfrage an einen fremden Server; die Seite `/bibliography/` zeigt vier Einträge.
+
 ## Teil D – Offene Punkte
 
 - **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.
 - **D2** erledigt in S9: `amt.ttl` ist eine Obermenge der Fassung von 2018; die Veröffentlichung wird aus `amt.ttl` erzeugt.
-- **D9** Startseite (S10): die Geschichte hinter dem Namen („Wir wollten erst ein Amt errichten, das arbeitet …“) im Wortlaut vom Autor; bis dahin steht nur ein vorsichtiger Entwurf.
+- **D9** erledigt in S14: Namensgeschichte in der Fassung B (A4, 2026-10-27).
 - **D3** erledigt in S7: Ursache liegt in pyshacl und rdflib, die zwei Meldungen sind gefiltert.
 - **D7** erledigt in S7: Verstöße sind sortiert.
 - **D4** erledigt in S7: siehe A4 („Verhältnis zu `amt-explore`“).
 - **D5** erledigt in S7: Standard-Ref des Runners bleibt `main` (A4).
 - **D8** erledigt in S10: Ursache war `Dataset.contexts is deprecated` (rdflib 7.6, ausgelöst von pyshacl 0.26.0), jetzt gefiltert. Vorher: Unter Windows meldet `pytest` 63 Tests mit 204 Warnungen (Linux: keine). Offen: `python -m pytest tests -q -rw` in `C:\git\amt-engine` ausführen, die Warnungsarten ablesen und entscheiden, ob sie zu filtern oder zu beheben sind.
-- **D10** Gestaltung: Farbwelt und Logos umgesetzt in S11c (`design/palette.yaml`). Offen: vektorisierte Logos, Schrift (Systemschrift oder eigene Webschrift, z. B. Inter und IBM Plex Mono, dann lokal in `docs/assets`), Wortlaut und Links des Familien-Abschnitts. Der Explorer startet seit S11c mit `animals.ttl`.
+- **D10** Gestaltung: Farbwelt und Logos umgesetzt in S11c (`design/palette.yaml`). Wortlaut des Familien-Abschnitts erledigt in S14, Links bewusst keine (Alpaka und Alligator in Überarbeitung). Offen: vektorisierte Logos, Schrift (Systemschrift oder eigene Webschrift, z. B. Inter und IBM Plex Mono, dann lokal in `docs/assets`). Der Explorer startet seit S11c mit `animals.ttl`.
 - **D11** Der Playground (`leiza-rse/amt-playground`) und der Explorer sind funktional fertig, dürfen aber später schöner und hübscher werden (Layout, Aufteilung, Startnetz mit echten Beispieldaten); der Playground bleibt im LEIZA-Blau.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.

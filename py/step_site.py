@@ -9,6 +9,8 @@ Writes, below ``docs/``:
     vocab/amt.rdf             the same graph as RDF/XML
     vocab/amt.jsonld          the same graph as JSON-LD
     vocab/amt-overview.svg|png  overview figure, drawn from the ontology
+    bibliography/index.html   the bibliography (APA 7), from data/bibliography.bib
+    bibliography/amt.bib      a copy of data/bibliography.bib
     ontology/index.html       the data model page
     ontology/img/*.svg|png    the small figures of that page
     assets/palette.css        the colours of every page, from design/palette.yaml
@@ -52,6 +54,7 @@ try:
     import site_pages as pages
     import site_palette as palette
     import site_redirects as redirects
+    import site_bib as bib
     from site_home import home_page
 except ImportError:  # imported as py.step_site from the repository root
     from py.amt_dev_utils import DOCS_DIR, ONTOLOGY_DIR, ROOT, Report
@@ -59,6 +62,7 @@ except ImportError:  # imported as py.step_site from the repository root
     from py import site_pages as pages
     from py import site_palette as palette
     from py import site_redirects as redirects
+    from py import site_bib as bib
     from py.site_home import home_page
 
 MANIFEST = DOCS_DIR / "assets" / "figures.json"
@@ -155,6 +159,11 @@ def main() -> int:
     _write_text(rep, DOCS_DIR / "index.html", home_page(), counts)
     _write_text(rep, DOCS_DIR / "vocab" / "index.html", pages.vocab_page(g, svg["overview"]), counts)
     _write_text(rep, DOCS_DIR / "ontology" / "index.html", pages.ontology_page(g, inline), counts)
+    entries = bib.load()
+    for line in bib.check(entries):
+        rep.warn(f"bibliography: {line}")
+    _write_text(rep, DOCS_DIR / "bibliography" / "index.html", bib.bibliography_page(entries), counts)
+    _write_text(rep, DOCS_DIR / "bibliography" / "amt.bib", bib.BIB_FILE.read_text(encoding="utf-8"), counts)
     _write_text(rep, DOCS_DIR / "vocab" / "amt.ttl", ttl_path.read_text(encoding="utf-8"), counts)
     _write_graph(rep, DOCS_DIR / "vocab" / "amt.rdf", g, "pretty-xml", counts)
     _write_graph(rep, DOCS_DIR / "vocab" / "amt.jsonld", g, "json-ld", counts)

@@ -1,3 +1,5 @@
 # Apache reads these files on a server: keep LF line ends on every platform.
 deploy/**/.htaccess text eol=lf
 deploy/**/README.md text eol=lf
+# Third-party files are copied unchanged: no line-end conversion.
+docs/vendor/** -text

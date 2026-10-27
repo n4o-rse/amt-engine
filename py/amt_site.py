@@ -22,6 +22,7 @@ NAV = [
     ("Vocabulary", "vocab/", "vocab"),
     ("Data model", "ontology/", "ontology"),
     ("Explorer", "explorer/", "explorer"),
+    ("Bibliography", "bibliography/", "bibliography"),
     ("GitHub", "https://github.com/n4o-rse/amt-engine", "github"),
 ]
 

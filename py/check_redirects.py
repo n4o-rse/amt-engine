@@ -9,7 +9,7 @@ w3id.org entry went live. It needs network access (so it is not part of
     python py/check_redirects.py                 both sites
     python py/check_redirects.py --site w3id     one site
     python py/check_redirects.py --follow        also fetch every target (must answer 200)
-    python py/check_redirects.py --site w3id --base-url http://localhost:8090/ids/amt/   a test server
+    python py/check_redirects.py --site w3id --base-url http://localhost:8090/amt/   a test server
 
 For each route it asks the server with the Accept headers that matter (a
 browser, Turtle, RDF/XML, JSON-LD), without following the redirect, and

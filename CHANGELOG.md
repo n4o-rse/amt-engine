@@ -18,7 +18,7 @@ Zenodo.
 - `deploy/redirects.yaml` and `py/site_redirects.py`: the persistent addresses of
   AMT. They generate the `.htaccess` for academic-meta-tool.xyz (the vocabulary
   `/vocab` is negotiated: Turtle, RDF/XML, JSON-LD or the HTML page) and the entry
-  for `https://w3id.org/ids/amt/` (with its README), both in `deploy/`.
+  for `https://w3id.org/amt/` (with its README), both in `deploy/`.
   `py/check_redirects.py` compares the live servers with the file.
 - `design/palette.yaml`, the colour palette of AMT (green, bronze-gold and steel
   blue, taken from the mascots), and `py/site_palette.py`, which generates
@@ -29,8 +29,27 @@ Zenodo.
   header bar, on the start page and in the Explorer, a new "Part of a family"
   section on the start page, the partner logos in the footer.
 
+- A bibliography page, `docs/bibliography/`: works that use or describe AMT, in
+  APA 7 style with the BibTeX of each entry, generated from
+  `data/bibliography.bib` (`py/site_bib.py`); the BibTeX file is offered for download.
+- `CITATION.cff` names the ZfdG article (Unold, Thiery and Mees, 2019) as the
+  `preferred-citation`.
+- `docs/vendor/`: the libraries of the Explorer (N3.js, vis, jQuery, jQuery UI,
+  Materialize, Material Icons) with their licences.
+- `tests/test_offline.py`: no page or stylesheet loads anything from another server,
+  and every local link and file reference resolves.
+
 ### Changed
 
+- The Explorer no longer loads anything from a CDN. The HTML export of the
+  library (`render_to_html`, `amt --export-html`) embeds the visualisation library
+  and no longer links Bootstrap, so it works offline; `cdn_resources="remote"`
+  restores the small file that loads from a CDN.
+- The header of the w3id.org entry lists the addresses, the namespace note and
+  the contact and is generated from `deploy/redirects.yaml`. The public address is
+  `https://w3id.org/amt/` (the `ids/` is only the folder in the registry).
+- Start page: the story of the name (the name only works in German) and the
+  sentence about the Alpaka Research Framework have their final wording.
 - The footer of every page shows the logos of mainzed, i3mainz, LEIZA, NFDI4Objects,
   NFDI and DFG, linked; the box in the Explorer shows the penguin and the origin text.
 - All pages, the figures and the Explorer use the new colours, in the light and

@@ -2,7 +2,7 @@
 Persistent addresses of AMT, from ``deploy/redirects.yaml``.
 
 One YAML file describes two redirect layers (the FTP of academic-meta-tool.xyz
-and the entry at w3id.org/ids/amt/). From it come
+and the entry at w3id.org/amt/). From it come
 
 * the two ``.htaccess`` files and the README of the w3id entry (``render_*``), and
 * ``resolve()``: what a request must answer, as (status, Location). The
@@ -14,6 +14,7 @@ Nothing here reads the clock; the output depends on the YAML alone.
 from __future__ import annotations
 
 import re
+import textwrap
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -69,10 +70,38 @@ def _pattern(path: str) -> str:
     return "^$" if path == "" else f"^{esc}/?$"
 
 
+def render_header(cfg: dict, site: str) -> list[str]:
+    """The comment block at the top of the w3id.org entry: what it is, where it leads, who administers it."""
+    s = cfg["sites"][site]
+    c = cfg["contact"]
+    base = s["rewrite_base"]
+    shown = [base + r["path"] for r in s["routes"]]
+    col = max(len(x) for x in shown) + 2
+    L = [f"# https://w3id.org{base} \u2014 permanent identifiers for the", "# Academic Meta Tool (AMT).", "#",
+         "# Addresses in use:", "#"]
+    for x, r in zip(shown, s["routes"]):
+        lines = textwrap.wrap(r["about"], width=78 - 2 - col, break_on_hyphens=False) or [""]
+        L.append("#   " + x.ljust(col) + lines[0])
+        L += ["#   " + " " * col + "  " + extra for extra in lines[1:]]
+    L += ["#"]
+    L += ["# " + ln for ln in textwrap.wrap(cfg["w3id_header"], width=78, break_on_hyphens=False)]
+    L += ["#",
+          "# ## Contact",
+          "# This space is administered by:",
+          "#",
+          f"# {c['name']}",
+          f"# GitHub username: @{c['github']}",
+          f"# email: {c['email']}",
+          ""]
+    return L
+
+
 def render_htaccess(cfg: dict, site: str) -> str:
     s = cfg["sites"][site]
-    L = ["# Generated from deploy/redirects.yaml by py/site_redirects.py. Do not edit.",
-         "RewriteEngine On"]
+    if s.get("header"):
+        L = render_header(cfg, site) + ["RewriteEngine On"]
+    else:
+        L = ["# Generated from deploy/redirects.yaml by py/site_redirects.py. Do not edit.", "RewriteEngine On"]
     if "rewrite_base" in s:
         L.append(f"RewriteBase {s['rewrite_base']}")
     L.append("")
@@ -103,7 +132,8 @@ def render_w3id_readme(cfg: dict) -> str:
                         "by content negotiation |")
         else:
             rows.append(f"| {addr} | {_target(cfg, r['to'])} |")
-    contacts = "\n".join(f"* {c}" for c in m["contacts"])
+    c = cfg["contact"]
+    contacts = f"* {c['name']}, {c['email']}, @{c['github']}"
     return (f"## {m['title']}\n\n{m['text']}\n\n## Redirections\n\n" + "\n".join(rows) +
             f"\n\n## Contacts\n\n{contacts}\n")
 

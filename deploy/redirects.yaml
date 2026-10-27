@@ -34,19 +34,35 @@ sites:
       - {path: amt.rdf,     to: vocab/amt.rdf, status: 301}   # the old address of the RDF file
   w3id:
     file: deploy/w3id/ids/amt/.htaccess
+    header: true             # the metadata comment block that perma-id/w3id.org entries carry
     readme: deploy/w3id/ids/amt/README.md
-    base_url: https://w3id.org/ids/amt/
-    rewrite_base: /ids/amt/
+    base_url: https://w3id.org/amt/
+    rewrite_base: /amt/
     vocab_status: 302        # w3id.org asks for 302
     status: 302
     routes:
-      - {path: "",          to: ""}
-      - {path: vocab,       vocab: true}
-      - {path: explorer,    to: explorer/}
-      - {path: ontology,    to: ontology/}
-      - {path: engine,      to: "https://github.com/n4o-rse/amt-engine"}
-      - {path: runner,      to: "https://github.com/n4o-rse/amt-runner"}
-      - {path: doi,         to: "https://doi.org/10.5281/zenodo.23669466"}   # concept DOI of the engine
+      - {path: "",          to: "",          about: "the start page of AMT"}
+      - {path: vocab,       vocab: true,     about: "the vocabulary (negotiated on Accept: Turtle, RDF/XML, JSON-LD, otherwise the HTML page)"}
+      - {path: explorer,    to: explorer/,   about: "the Explorer"}
+      - {path: ontology,    to: ontology/,   about: "the data model page"}
+      - {path: engine,      to: "https://github.com/n4o-rse/amt-engine", about: "the source code of amt-engine"}
+      - {path: runner,      to: "https://github.com/n4o-rse/amt-runner", about: "the source code of amt-runner"}
+      - {path: doi,         to: "https://doi.org/10.5281/zenodo.23669466", about: "the concept DOI of amt-engine (Zenodo)"}
+
+# Who administers the w3id.org entry: written into the header of its .htaccess
+# and into its README.
+contact:
+  name: Florian Thiery
+  github: florianthiery
+  email: florian.thiery@leiza.de
+
+# The paragraph under the address list in the header of the w3id.org .htaccess.
+w3id_header: >-
+  Everything leads to the pages on GitHub Pages of the NFDI4Objects organisation
+  (https://n4o-rse.github.io/amt-engine/) or to the repositories. The namespace
+  of the vocabulary itself is http://academic-meta-tool.xyz/vocab# and does not
+  change; this space only gives it, and the rest of AMT, an address that does
+  not depend on a domain or a host.
 
 w3id_readme:
   title: Academic Meta Tool (AMT)
@@ -56,5 +72,3 @@ w3id_readme:
     page and the software repositories. The pages are hosted on GitHub Pages
     of the NFDI4Objects organisation (n4o-rse). The namespace of the vocabulary
     itself is http://academic-meta-tool.xyz/vocab# and does not change.
-  contacts:
-    - "Florian Thiery, florian.thiery@leiza.de, @florianthiery"

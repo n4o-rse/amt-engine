@@ -45,7 +45,7 @@ def test_htaccess_has_one_rule_set_per_route_and_no_catch_all():
         text = sr.render_htaccess(cfg, name)
         assert "RewriteEngine On" in text and "(.*)" not in text
         assert text.count("RewriteRule") == sum(4 if r.get("vocab") else 1 for r in cfg["sites"][name]["routes"])
-    assert "RewriteBase /ids/amt/" in sr.render_htaccess(cfg, "w3id")
+    assert "RewriteBase /amt/" in sr.render_htaccess(cfg, "w3id")
 
 
 def test_namespace_is_the_one_in_the_ontology():
@@ -53,3 +53,14 @@ def test_namespace_is_the_one_in_the_ontology():
     cfg = sr.load()
     assert "http://academic-meta-tool.xyz/vocab#" in ttl
     assert cfg["sites"]["academic-meta-tool.xyz"]["base_url"] + "vocab" == "http://academic-meta-tool.xyz/vocab"
+
+
+def test_w3id_header_names_every_address_and_the_contact():
+    cfg = sr.load()
+    text = sr.render_htaccess(cfg, "w3id")
+    head = text.split("RewriteEngine On")[0]
+    assert head.startswith("# https://w3id.org/amt/") and "ids/amt" not in text.replace("deploy/w3id/ids/amt", "")
+    for r in cfg["sites"]["w3id"]["routes"]:
+        assert "#   /amt/" + r["path"] in head
+    assert "GitHub username: @" + cfg["contact"]["github"] in head and cfg["contact"]["email"] in head
+    assert all(len(line) <= 100 for line in head.splitlines() if "redirects to" not in line)

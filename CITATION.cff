@@ -22,6 +22,23 @@ version: "0.3.1"
 date-released: "2026-10-26"
 repository-code: "https://github.com/n4o-rse/amt-engine"
 doi: "10.5281/zenodo.23669466"  # concept DOI: stands for all versions and resolves to the latest
+preferred-citation:
+  type: article
+  title: "Academic Meta Tool. Ein Web-Tool zur Modellierung von Vagheit"
+  authors:
+    - family-names: Unold
+      given-names: Martin
+    - family-names: Thiery
+      given-names: Florian
+      orcid: "https://orcid.org/0000-0002-3246-3531"
+    - family-names: Mees
+      given-names: Allard W.
+      orcid: "https://orcid.org/0000-0002-7634-5342"
+  journal: "ZfdG - Zeitschrift für digitale Geisteswissenschaften"
+  issue: "Sonderband 4"
+  year: 2019
+  doi: "10.17175/SB004_004"
+  notes: "The method paper. The software itself is cited with the DOI above."
 references:
   - type: software
     title: "Academic Meta Tool (AMT)"

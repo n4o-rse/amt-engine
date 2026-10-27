@@ -4,30 +4,23 @@
     <title>AMT Explorer</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
+    <!-- Third-party libraries: kept in ../vendor/ (see ../vendor/README.md), nothing is loaded from a CDN -->
     <!-- RDF parsing -->
-    <script src="https://cdn.jsdelivr.net/npm/n3@1.17.2/browser/n3.min.js"></script>
+    <script src="../vendor/n3/n3.min.js"></script>
 
     <!-- Graph visualisation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.0/vis.min.js"></script>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.0/vis.min.css"
-      rel="stylesheet" />
+    <script src="../vendor/vis/vis.min.js"></script>
+    <link href="../vendor/vis/vis.min.css" rel="stylesheet" />
 
     <!-- jQuery + jQuery UI -->
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+    <script src="../vendor/jquery/jquery.min.js"></script>
+    <script src="../vendor/jquery-ui/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="../vendor/jquery-ui/jquery-ui.min.css" />
 
-    <!-- Materialize -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet" />
+    <!-- Materialize and its icon font -->
+    <script src="../vendor/materialize/js/materialize.min.js"></script>
+    <link rel="stylesheet" href="../vendor/materialize/css/materialize.min.css" />
+    <link rel="stylesheet" href="../vendor/material-icons/material-icons.css" />
 
     <link rel="icon" type="image/png" href="../assets/img/amt-penguin-small.png" />
     <link rel="stylesheet" href="../assets/palette.css" />

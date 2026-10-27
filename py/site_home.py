@@ -82,17 +82,19 @@ TEXT = {
         "dfg": f"NFDI4Objects is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) "
                f"&ndash; project number {DFG_NUMBER}.",
         "name_h": "A name that only works in German",
-        "name_p": "<em>Amt</em> is the German word for an office or authority, and the cliché of the civil servant is "
-                  "that nothing seems to happen there. At mainzed we invented an AMT that, without doing anything "
-                  "itself, generates new knowledge by rules: semantic reasoning, or symbolic AI.",
+        "name_p": "<em>AMT</em> stands for <em>Academic Meta Tool</em>. The name only really works in German: an "
+                  "<em>Amt</em> is an office or authority, and there, as everyone knows, nothing seems to happen. Our "
+                  "AMT does nothing by itself either. It only applies rules, and that is exactly how new knowledge "
+                  "arises: semantic reasoning, or symbolic AI.",
         "fam_h": "Part of a family",
-        "fam_p": "AMT is part of the Alpaka Research Framework, to which Alligator belongs as well. "
+        "fam_p": "AMT is part of the Alpaka Research Framework, to which Alligator also belongs. "
                  "The penguin is the Academic Meta Tool.",
         "cite_h": "Cite",
         "cite_p": f'Software: <a href="{SOFTWARE_DOI}">doi:10.5281/zenodo.23669466</a> (all versions). '
                   f'Method: Unold, M., Thiery, F. and Mees, A. (2019), <a href="{ARTICLE_DOI}">Academic Meta Tool. '
                   'Ein Web-Tool zur Modellierung von Vagheit</a>, Zeitschrift f&uuml;r digitale '
-                  'Geisteswissenschaften, Sonderband 4.',
+                  'Geisteswissenschaften, Sonderband 4. More works that use AMT are listed in the '
+                  '<a href="bibliography/">bibliography</a>.',
         "more_h": "More",
     },
     "de": {
@@ -149,9 +151,10 @@ TEXT = {
         "dfg": f"NFDI4Objects wird von der Deutschen Forschungsgemeinschaft (DFG) gefördert &ndash; "
                f"Projektnummer {DFG_NUMBER}.",
         "name_h": "Ein Name, der nur auf Deutsch funktioniert",
-        "name_p": "Ein <em>Amt</em> ist eine Behörde, und das Klischee vom Beamten will, dass dort nichts zu passieren "
-                  "scheint. Im mainzed haben wir ein AMT erfunden, das &ndash; ohne selbst etwas zu tun &ndash; "
-                  "regelbasiert neues Wissen erzeugt: semantisches Schlussfolgern, also symbolische KI.",
+        "name_p": "<em>AMT</em> steht für <em>Academic Meta Tool</em>. Der Name funktioniert eigentlich nur auf "
+                  "Deutsch: Ein <em>Amt</em> ist eine Behörde, und dort passiert bekanntlich nichts. Unser AMT tut "
+                  "selbst auch nichts. Es wendet nur Regeln an, und genau dadurch entsteht neues Wissen: "
+                  "semantisches Schlussfolgern, also symbolische KI.",
         "fam_h": "Teil einer Familie",
         "fam_p": "AMT ist Teil des Alpaka Research Frameworks, zu dem auch Alligator gehört. "
                  "Der Pinguin ist das Academic Meta Tool.",
@@ -159,7 +162,8 @@ TEXT = {
         "cite_p": f'Software: <a href="{SOFTWARE_DOI}">doi:10.5281/zenodo.23669466</a> (alle Versionen). '
                   f'Methode: Unold, M., Thiery, F. und Mees, A. (2019), <a href="{ARTICLE_DOI}">Academic Meta Tool. '
                   'Ein Web-Tool zur Modellierung von Vagheit</a>, Zeitschrift f&uuml;r digitale '
-                  'Geisteswissenschaften, Sonderband 4.',
+                  'Geisteswissenschaften, Sonderband 4. Weitere Arbeiten, die AMT nutzen, stehen in der '
+                  '<a href="bibliography/">Bibliografie</a>.',
         "more_h": "Mehr",
     },
 }

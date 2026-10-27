@@ -6,13 +6,13 @@ Repository created to store the redirections for the Academic Meta Tool: the voc
 
 | Address | Leads to |
 |---|---|
-| https://w3id.org/ids/amt/ | https://n4o-rse.github.io/amt-engine/ |
-| https://w3id.org/ids/amt/vocab | https://n4o-rse.github.io/amt-engine/vocab/ (HTML); Turtle, RDF/XML and JSON-LD by content negotiation |
-| https://w3id.org/ids/amt/explorer | https://n4o-rse.github.io/amt-engine/explorer/ |
-| https://w3id.org/ids/amt/ontology | https://n4o-rse.github.io/amt-engine/ontology/ |
-| https://w3id.org/ids/amt/engine | https://github.com/n4o-rse/amt-engine |
-| https://w3id.org/ids/amt/runner | https://github.com/n4o-rse/amt-runner |
-| https://w3id.org/ids/amt/doi | https://doi.org/10.5281/zenodo.23669466 |
+| https://w3id.org/amt/ | https://n4o-rse.github.io/amt-engine/ |
+| https://w3id.org/amt/vocab | https://n4o-rse.github.io/amt-engine/vocab/ (HTML); Turtle, RDF/XML and JSON-LD by content negotiation |
+| https://w3id.org/amt/explorer | https://n4o-rse.github.io/amt-engine/explorer/ |
+| https://w3id.org/amt/ontology | https://n4o-rse.github.io/amt-engine/ontology/ |
+| https://w3id.org/amt/engine | https://github.com/n4o-rse/amt-engine |
+| https://w3id.org/amt/runner | https://github.com/n4o-rse/amt-runner |
+| https://w3id.org/amt/doi | https://doi.org/10.5281/zenodo.23669466 |
 
 ## Contacts
 
