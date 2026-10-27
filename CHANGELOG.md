@@ -13,6 +13,11 @@ Zenodo.
 
 ## [Unreleased]
 
+### Changed
+
+- `README.md`, "Citation": names the version DOI of 0.5.0,
+  `10.5281/zenodo.23691499`. The concept DOI is unchanged.
+
 ## [0.5.0] - 2026-10-27
 
 0.5.0 makes a failed run understandable. A file with a problem now ends with a message that

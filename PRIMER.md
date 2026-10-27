@@ -172,7 +172,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S15 | Schrift: Roboto lokal (Seiten und PNG-Figuren), Beschluss D10 | amt-engine | S13 | Patch geliefert |
 | S16 | Nutzerfreundliche Validierung: Diagnose (`AMT-E…`), SHACL-Meldungen mit Knoten, `--check-only`/`--strict`, viz ohne Absturz, How-To-Sektion | amt-engine, amt-runner | S15 | erledigt 2026-10-27 |
 | S17 | How-To-Seite „Run and look at the result“: klonen, Datei ablegen, prüfen, laufen lassen, Ergebnis lesen (Windows-`cmd`, Hinweise für Linux/macOS) | amt-engine | S16 | erledigt 2026-10-27 (Windows, Python 3.10) |
-| S18 | Release 0.5.0 (Engine) / 0.4.0 (Runner) samt Zenodo | amt-engine, amt-runner | S16, S17 | 18a als Patch geliefert |
+| S18 | Release 0.5.0 (Engine) / 0.4.0 (Runner) samt Zenodo | amt-engine, amt-runner | S16, S17 | 18a und 18b erledigt (Tag `v0.5.0`, Release, Zenodo); 18c als Patch geliefert |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -488,7 +488,7 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 
 **Teil 18b (manuell, nach dem Push von 18a):** je Repo ein annotierter Tag (`v0.5.0`, `v0.4.0`) auf dem Commit von 18a, `git push origin <tag>`, auf GitHub ein Release aus dem Tag; die Release-Notes aus dem CHANGELOG-Eintrag. Nur das Release löst bei Zenodo die Archivierung aus.
 
-**Teil 18c (Patch):** die Versions-DOIs in README (Abschnitt „Citation“) und CHANGELOG eintragen; die Concept-DOIs bleiben.
+**Teil 18c (Patch):** die Versions-DOIs in README (Abschnitt „Citation“) und CHANGELOG eintragen; die Concept-DOIs bleiben. Versions-DOI Engine 0.5.0: `10.5281/zenodo.23691499`; die des Runners 0.4.0 folgt mit 9c.
 
 **Abnahme:** `python main.py --strict` zweimal grün (Windows), `git status` sauber; `git tag` zeigt die neuen Tags; „Releases“ zeigt sie; auf zenodo.org steht je eine neue Version; nach 18c nennt die README die Versions-DOI.
 
