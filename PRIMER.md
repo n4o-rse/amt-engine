@@ -162,7 +162,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S11d | Logos der Institutionen und Förderer (mainzed, i3mainz, LEIZA, NFDI4Objects, NFDI, DFG) im Fuß aller Seiten; Explorer-Kasten mit Pinguin | amt-engine | S11c | Patch geliefert, nach Push erledigt |
 | S12 | w3id-Eintrag (`w3id.org/amt/`) und Umleitung des FTP (`.htaccess`) auf GitHub Pages | amt-engine | S9, S10 | erledigt 2026-10-27 (FTP live; w3id-PR gestellt) |
 | S14 | Texte (Namensgeschichte B, Familiensatz), Bibliografie, Bibliotheken lokal, w3id-Header aus der YAML und Adresse ohne `ids/`, `preferred-citation`, Seitentest | amt-engine | S12 | Patch geliefert, nach Push erledigt |
-| S13 | D6 (Exit-Code, unverändert) und Release 0.4.0 (Engine) / 0.3.0 (Runner) samt Zenodo | amt-engine, amt-runner | S10 bis S12, S14 | Patch geliefert; danach Tags, Releases, Zenodo, DOI-Patch durch den Autor |
+| S13 | D6 (Exit-Code, unverändert) und Release 0.4.0 (Engine) / 0.3.0 (Runner) samt Zenodo | amt-engine, amt-runner | S10 bis S12, S14 | 13a und 13b erledigt (Tag `v0.4.0`, Release, Zenodo); 13c als Patch geliefert |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -422,7 +422,7 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 
 **Teil 13b (manuell, nach dem Push von 13a):** je Repo ein annotierter Tag (`v0.4.0` in `amt-engine`, `v0.3.0` in `amt-runner`) auf dem Commit von 13a, `git push origin <tag>`, auf GitHub ein Release aus dem Tag. Nur das Release löst bei Zenodo die Archivierung aus.
 
-**Teil 13c (Patch):** die Versions-DOIs in README (Abschnitt „Citation“) und CHANGELOG eintragen; die Concept-DOIs bleiben.
+**Teil 13c (Patch):** die Versions-DOIs in README (Abschnitt „Citation“) und CHANGELOG eintragen; die Concept-DOIs bleiben. Versions-DOIs: Engine 0.4.0 `10.5281/zenodo.23688518`, Runner 0.3.0 `10.5281/zenodo.23688616`. Zugleich ist der CHANGELOG-Eintrag 0.4.0 neu geordnet (die Release-Notes auf GitHub waren aus dem zerfaserten Eintrag entstanden: Überschriften doppelt, Einleitung widersprach dem Inhalt); der Eintrag zu 0.3.1 nennt jetzt richtig, welche Actions auf Node 24 laufen. Die Release-Notes von v0.4.0 auf GitHub werden einmal aus dem neuen Eintrag ersetzt.
 
 **Abnahme:** `python main.py --strict` zweimal grün (Windows), `git status` sauber; `git tag` zeigt `v0.4.0` bzw. `v0.3.0`; „Releases“ zeigt es; auf zenodo.org steht je eine neue Version mit den Autoren aus `CITATION.cff`; nach 13c nennt die README die Versions-DOI.
 

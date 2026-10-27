@@ -372,6 +372,7 @@ Every release is archived on Zenodo.
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23669466.svg)](https://doi.org/10.5281/zenodo.23669466)
 
 - All versions (always resolves to the latest): <https://doi.org/10.5281/zenodo.23669466>
+- Version 0.4.0: <https://doi.org/10.5281/zenodo.23688518>
 - Version 0.3.1: <https://doi.org/10.5281/zenodo.23669467>
 
 Use the version DOI when you need to name the exact release your results
