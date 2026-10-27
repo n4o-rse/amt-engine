@@ -60,3 +60,20 @@ def test_pyvis_export_embeds_its_library_by_default(tmp_path):
     assert not re.search(r"<script[^>]+src=\"https?://", html) and not re.search(r"<link[^>]+href=\"https?://", html)
     remote = render_to_html(a["nodes"], a["edges"], a["concepts"], tmp_path / "r.html", cdn_resources="remote")
     assert re.search(r"<script[^>]+src=\"https?://", remote.read_text(encoding="utf-8"))
+
+
+def test_pyvis_export_does_not_depend_on_the_platform_encoding(tmp_path):
+    """On Windows pyvis writes with cp1252, which cannot hold the embedded library (found on the first Windows run)."""
+    import os
+    import subprocess
+    import sys
+    code = ("from amt import load_amt\nfrom amt.viz import render_to_html\n"
+            f"a = load_amt(r'{ROOT / 'docs' / 'data' / 'animals.ttl'}')\n"
+            f"render_to_html(a['nodes'], a['edges'], a['concepts'], r'{tmp_path / 'g.html'}')\n")
+    env = {**os.environ, "PYTHONUTF8": "0", "PYTHONCOERCECLOCALE": "0", "LC_ALL": "C", "LANG": "C",
+           "PYTHONPATH": str(ROOT)}
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env, cwd=tmp_path)
+    assert r.returncode == 0, r.stderr[-600:]
+    data = (tmp_path / "g.html").read_bytes()
+    data.decode("utf-8")
+    assert b"\r\n" not in data

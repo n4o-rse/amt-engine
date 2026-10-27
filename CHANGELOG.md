@@ -39,6 +39,13 @@ Zenodo.
 - `tests/test_offline.py`: no page or stylesheet loads anything from another server,
   and every local link and file reference resolves.
 
+### Fixed
+
+- `render_to_html` (and with it `amt --export-html` and the runner) failed on Windows
+  with a `UnicodeEncodeError`: pyvis writes the file in the platform's encoding
+  (cp1252), which cannot hold the embedded library. The page is now rendered by
+  the engine and written as UTF-8 with LF line ends on every platform.
+
 ### Changed
 
 - The Explorer no longer loads anything from a CDN. The HTML export of the

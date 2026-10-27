@@ -176,21 +176,25 @@ def render_to_html(
         cdn_resources=cdn_resources,
     )
     out = Path(output_path)
-    net.save_graph(str(out))
+    if cdn_resources == "local":
+        net.save_graph(str(out))             # pyvis also copies its lib/ folder next to the file
+        return out
+    # pyvis opens the file with the platform's default encoding (cp1252 on Windows),
+    # which cannot hold the embedded library: render the page ourselves, as UTF-8.
+    html = net.generate_html().replace("\r\n", "\n")
     if cdn_resources != "remote":
-        _drop_bootstrap(out)
+        html = _drop_bootstrap(html)
+    out.write_text(html, encoding="utf-8", newline="\n")
     return out
 
 
-def _drop_bootstrap(path: Path) -> None:
+def _drop_bootstrap(html: str) -> str:
     """pyvis 0.3 always links Bootstrap from a CDN, though only its filter and select menus need it.
 
     AMT draws neither, so the two tags are removed: the file then loads nothing from a third party.
     """
-    text = path.read_text(encoding="utf-8")
-    text = re.sub(r"\s*<link\s+href=\"https://cdn\.jsdelivr\.net/npm/bootstrap[^>]*?/>", "", text, flags=re.S)
-    text = re.sub(r"\s*<script\s+src=\"https://cdn\.jsdelivr\.net/npm/bootstrap[^>]*?></script>", "", text, flags=re.S)
-    path.write_text(text, encoding="utf-8", newline="\n")
+    html = re.sub(r"\s*<link\s+href=\"https://cdn\.jsdelivr\.net/npm/bootstrap[^>]*?/>", "", html, flags=re.S)
+    return re.sub(r"\s*<script\s+src=\"https://cdn\.jsdelivr\.net/npm/bootstrap[^>]*?></script>", "", html, flags=re.S)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

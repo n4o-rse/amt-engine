@@ -408,6 +408,10 @@ Im Fuß jeder erzeugten Seite steht eine weiße Leiste mit den Logos von mainzed
 
 **Abnahme:** `python main.py` und `python main.py --strict` zweimal grün, danach `git status` sauber; im Browser lädt der Explorer ohne eine einzige Anfrage an einen fremden Server; die Seite `/bibliography/` zeigt vier Einträge.
 
+### Nachtrag 2026-10-27 (Windows-Lauf)
+
+Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht zeigen konnte: `pyvis` schreibt die HTML-Datei mit der Standard-Kodierung der Plattform (cp1252), und die eingebettete vis-Bibliothek enthält Zeichen darüber hinaus (`UnicodeEncodeError` in `test_pyvis_export_embeds_its_library_by_default`). Betroffen war jede Ausgabe mit `render_to_html`, also auch `amt --export-html` und den Runner unter Windows. Behoben in `amt/viz.py`: die Seite wird mit `generate_html()` erzeugt und von uns als UTF-8 mit LF geschrieben. Neuer Test `test_pyvis_export_does_not_depend_on_the_platform_encoding` erzwingt eine ASCII-Plattform-Kodierung (`LC_ALL=C`, `PYTHONUTF8=0`) und schlug mit dem alten Code fehl. Lehre: Dateien, die Fremdcode öffnet, kann nur ein Test mit erzwungener Kodierung prüfen; ein grüner Lauf unter Linux sagt darüber nichts.
+
 ## Teil D – Offene Punkte
 
 - **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.
