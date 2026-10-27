@@ -87,3 +87,23 @@ def test_pages_link_each_other_and_the_nav_has_the_entry():
     index = howto.howto_index()
     assert 'href="create/"' in index and 'href="validate/"' in index
     assert 'aria-current="page"' in index and ">How-To<" in index
+
+
+def test_run_page_lists_every_file_a_full_run_writes(tmp_path):
+    """The table on the run page must match what the runner really writes."""
+    from amt.runner import run_all
+    src = tmp_path / "my.ttl"
+    src.write_text(howto.EXAMPLES["skeleton"]["turtle"], encoding="utf-8")
+    run_all(src, output_dir=tmp_path / "out", info=False)
+    written = sorted(p.name[len("my."):] for p in (tmp_path / "out").iterdir())
+    assert written == sorted(f for f, _ in howto.RUN_OUTPUTS)
+
+
+def test_run_page_is_linked_and_has_its_steps():
+    html = howto.howto_run()
+    for anchor in ("need", "clone", "file", "check", "run", "out", "graph", "explorer", "again", "trouble"):
+        assert f'id="{anchor}"' in html
+    assert "git clone https://github.com/n4o-rse/amt-runner.git" in html
+    assert "--check-only" in html and "--update" in html
+    assert 'href="run/"' in howto.howto_index()
+    assert 'href="../run/"' in howto.howto_validate()

@@ -27,6 +27,10 @@ Zenodo.
   traceback of an unexpected error.
 - `amt.format_violations()`: SHACL violations rendered with the node they are about and a hint
   on what to add.
+- How-To page "Run an AMT file and look at the result" (`docs/howto/run/`): from cloning the runner and
+  placing the file to the check, the full run, the files a run writes, reading the graph and loading it into
+  the Explorer, with a troubleshooting list. `tests/test_howto.py` checks that its list of output files equals
+  what a real run writes.
 - The How-To section of the website (`docs/howto/`): how to build an AMT file (including a
   tested SPARQL CONSTRUCT recipe for turning other RDF into AMT), how to check one, and every
   message explained with cause, fix and example. `py/site_howto.py` holds the examples and

@@ -327,8 +327,8 @@ Each guide starts from a small example you can copy.</p>
      "What an AMT file consists of, a complete file to start from, and how to turn existing RDF into AMT with a SPARQL CONSTRUCT query."),
     ("validate/", "Check an AMT file",
      "Run the checks, read what they say, and fix it. Every message is explained with the IRI it names, what causes it and what to add."),
-    ("https://n4o-rse.github.io/amt-engine/explorer/", "Look at the result",
-     "Load the <code>.reasoned.ttl</code> that a run writes into the Explorer. It runs in your browser; nothing is uploaded."),
+    ("run/", "Run it and look at the result",
+     "From nothing to a graph in your browser: clone the runner, where to put your file, which command to type, where the result appears."),
 ])}
 
 <h2>The short version</h2>
@@ -337,6 +337,7 @@ Each guide starts from a small example you can copy.</p>
 <li><strong>Make every end of every edge a node</strong> (<code>ex:c1 amt:instanceOf ex:Coin</code>), including the things your edges point <em>to</em>.</li>
 <li><strong>Write edges</strong> as a statement with <code>rdf:subject</code>, <code>rdf:predicate</code>, <code>rdf:object</code> and <code>amt:weight</code>.</li>
 <li><strong>Check</strong> before you reason: <code>python run_amt.py my.ttl --check-only</code>.</li>
+<li><strong>Run</strong> and open the graph: <code>python run_amt.py my.ttl</code>, then <code>out\latest\my.html</code>.</li>
 </ol>
 
 <h2>Which tool for which job</h2>
@@ -346,7 +347,7 @@ Each guide starts from a small example you can copy.</p>
 <tr><td>try a file once, without installing anything but Python and git</td><td><a href="https://github.com/n4o-rse/amt-runner"><code>amt-runner</code></a> &rarr; <code>python run_amt.py my.ttl</code></td></tr>
 <tr><td>check a file quickly while you build it</td><td><code>python run_amt.py my.ttl --check-only</code> (or <code>amt-runner my.ttl --check-only</code> with the engine installed)</td></tr>
 <tr><td>run it inside your own Python project</td><td><code>pip install -e .</code> from <a href="https://github.com/n4o-rse/amt-engine">amt-engine</a>, then <code>from amt import load_amt, diagnose</code></td></tr>
-<tr><td>look at the graph and the inferred edges</td><td><a href="../explorer/">The Explorer</a> in your browser</td></tr>
+<tr><td>look at the graph and the inferred edges</td><td>the HTML file of a run, or <a href="../explorer/">the Explorer</a> in your browser (<a href="run/">step by step</a>)</td></tr>
 </tbody></table>
 <p class="note">The two things called <em>amt-runner</em>: the repository <code>amt-runner</code> is a small wrapper
 (<code>run_amt.py</code>) that fetches the engine for you; the engine itself also has a command <code>amt-runner</code>.
@@ -431,7 +432,8 @@ produce <strong>three things</strong>, in this order of importance:</p>
 sample first, then on the whole file.</p>
 
 <h2 id="then">6. Then check it</h2>
-<p>Save the result as <code>my.ttl</code> and continue with <a href="../validate/">how to check an AMT file</a>.</p>
+<p>Save the result as <code>my.ttl</code> and continue with <a href="../validate/">how to check an AMT file</a>,
+then <a href="../run/">run it and look at the result</a>.</p>
 """
     return page(title="Build an AMT file – How-To – AMT", body=body, depth=2, current="howto",
                 description="How to write an Academic Meta Tool file: concepts, nodes, weighted edges, and how to generate one with SPARQL.")
@@ -498,7 +500,8 @@ amt my.ttl --validate-only</code></pre>
 <li><code>--check-only</code> validates, loads and diagnoses, and <strong>writes nothing</strong>.</li>
 <li><code>--strict</code> turns diagnostic errors into exit code 1, useful in scripts and CI.</li>
 <li><code>amt --validate-only</code> runs only the SHACL validation.</li>
-<li>A full run (<code>python run_amt.py my.ttl</code>) additionally reasons and writes Turtle, Cypher, CSV, an HTML graph and a report.</li>
+<li>A full run (<code>python run_amt.py my.ttl</code>) additionally reasons and writes Turtle, Cypher, CSV, an HTML graph and a report;
+<a href="../run/">step by step, from cloning to the graph</a>.</li>
 <li><code>--debug</code> shows the Python traceback if something unexpected fails.</li>
 </ul>
 <p><strong>In Python:</strong></p>
@@ -577,8 +580,144 @@ and open an issue at <a href="https://github.com/n4o-rse/amt-engine/issues">amt-
                 description="How to validate an Academic Meta Tool file, read the messages and fix what they name.")
 
 
+# Files a full run writes (tests/test_howto.py compares this list with a real run).
+RUN_OUTPUTS = [
+    ("reasoned.ttl", "Your graph plus everything the rules inferred, as Turtle. Load this one into the Explorer."),
+    ("html", "The interactive graph. Double-click it; it opens in your browser and works offline."),
+    ("report.md", "A readable record of the run: validation, diagnostics, counts, every inferred edge, options."),
+    ("nodes.csv", "One row per node, for spreadsheets."),
+    ("edges.csv", "One row per edge with its weight, whether it was inferred, and which axioms produced it."),
+    ("cypher", "The same graph as Neo4j Cypher statements, if you want it in a graph database."),
+]
+
+
+def howto_run() -> str:
+    rows = "".join(f"<tr><td><code>&hellip;{escape(f)}</code></td><td>{escape(t)}</td></tr>" for f, t in RUN_OUTPUTS)
+    # Python 3.10 does not allow a backslash inside the braces of an f-string, so the Windows path is made here.
+    activate_cmd = _code(".venv\\Scripts\\activate")
+    body = f"""
+<h1>Run an AMT file and look at the result</h1>
+<p class="lead">From nothing to a graph in your browser: what to install, what to clone, where to put your file,
+which command to type and where the result appears. The commands are for the Windows command prompt;
+Linux and macOS differences are noted.</p>
+
+<ul class="toc">
+<li><a href="#need">1. What you need</a></li>
+<li><a href="#clone">2. Get the runner</a></li>
+<li><a href="#file">3. Put your file somewhere</a></li>
+<li><a href="#check">4. Check it</a></li>
+<li><a href="#run">5. Run it</a></li>
+<li><a href="#out">6. Find the result</a></li>
+<li><a href="#graph">7. Look at the graph</a></li>
+<li><a href="#explorer">8. Or use the Explorer</a></li>
+<li><a href="#again">9. Change the file and run again</a></li>
+<li><a href="#trouble">10. If something goes wrong</a></li>
+</ul>
+
+<h2 id="need">1. What you need</h2>
+<p>Two programs, once:</p>
+<ul>
+<li><strong>Python 3.10 or newer.</strong> Check with <code>python --version</code> (on Windows <code>py --version</code> also works).</li>
+<li><strong>git.</strong> Check with <code>git --version</code>.</li>
+</ul>
+<p>Nothing else: the runner fetches the engine and installs the three Python packages it needs
+(<code>rdflib</code>, <code>pyshacl</code>, <code>pyvis</code>) the first time you run it.</p>
+
+<h2 id="clone">2. Get the runner</h2>
+<p>Open a command prompt in the folder where you keep your projects (for example <code>C:\\git</code>) and clone the runner:</p>
+{_code("git clone https://github.com/n4o-rse/amt-runner.git")}
+{_code("cd amt-runner")}
+<p>Optional, but tidy: keep the packages out of your global Python with a virtual environment.</p>
+{_code("python -m venv .venv")}
+{activate_cmd}
+<p class="note">Linux and macOS: <code>source .venv/bin/activate</code>. On recent Debian and Ubuntu a virtual environment is required.</p>
+
+<h2 id="file">3. Put your file somewhere</h2>
+<p>Anywhere you can name by path. Two easy choices:</p>
+<ul>
+<li><strong>Next to the runner:</strong> copy <code>my.ttl</code> into the <code>amt-runner</code> folder and use <code>my.ttl</code> in the commands below.</li>
+<li><strong>Anywhere else:</strong> keep it where it is and give the path, for example <code>C:/tmp/my.ttl</code>
+(forward slashes work on Windows; put the path in quotes if it contains spaces).</li>
+</ul>
+<p>The results are not written next to your file but into <code>amt-runner\\out\\</code> (section 6).
+No file of yours is changed.</p>
+<p>Not sure your file is an AMT file yet? <a href="../create/">How to build an AMT file</a> has a complete one to start from.</p>
+
+<h2 id="check">4. Check it</h2>
+<p>This validates and diagnoses and writes nothing, so it is the command to repeat while you build:</p>
+{_code("python run_amt.py my.ttl --check-only")}
+<p>The first time it also clones the engine into <code>.amt-cache\\</code> and installs the packages, which takes about half a minute.
+You should see <code>OK Validation passed.</code> and a count such as <code>2 Concepts | 0 Roles | 11 Nodes | 7 Edges | 0 Axioms</code>.
+If it prints <code>ERR</code> lines, fix them first: <a href="../validate/">how to check an AMT file</a> explains each one.</p>
+<p><strong>Use <code>--update</code> now and then</strong>, and always after someone tells you the engine has changed. The runner keeps its own copy
+of the engine and does not update it by itself:</p>
+{_code("python run_amt.py my.ttl --check-only --update")}
+
+<h2 id="run">5. Run it</h2>
+<p>The same command without <code>--check-only</code>:</p>
+{_code("python run_amt.py my.ttl")}
+<p>It validates, loads, checks consistency, infers new edges with your axioms (none if you have no axioms), and writes the result.
+The last lines of the output name the folder:</p>
+<pre><code>&#10003; Outputs written to C:\\git\\amt-runner\\out\\run-20261027-130638
+  (also accessible via C:\\git\\amt-runner\\out\\latest)</code></pre>
+
+<h2 id="out">6. Find the result</h2>
+<p>Every run gets its own folder <code>out\\run-&lt;date&gt;-&lt;time&gt;\\</code>, so earlier results are kept. <code>out\\latest\\</code> always points at
+the newest one. The files are named after your file:</p>
+<table><thead><tr><th>File</th><th>What it is</th></tr></thead><tbody>{rows}</tbody></table>
+
+<h2 id="graph">7. Look at the graph</h2>
+<p>Open <code>out\\latest\\my.html</code> by double-click. What you see:</p>
+<ul>
+<li><strong>One dot per node</strong>, coloured by its concept: all nodes of the first concept in orange, the second in blue, and so on.</li>
+<li><strong>Arrows are edges</strong>, labelled <code>role: weight</code>. The thicker the arrow, the higher the weight.</li>
+<li><strong>Red dashed arrows</strong> are edges the engine inferred from your axioms. Black ones are what you wrote.</li>
+<li><strong>A grey dot</strong> is an IRI that an edge points to but that was never declared as a node. That is the problem
+<a href="../validate/#AMT-E101"><code>AMT-E101</code></a> reports; add an <code>amt:instanceOf</code> for it.</li>
+<li>Hover over a node for its concept, over an edge for <em>asserted</em> or <em>inferred</em>. Drag nodes to rearrange them, scroll to zoom.</li>
+</ul>
+
+<h2 id="explorer">8. Or use the Explorer</h2>
+<p>The <a href="../../explorer/">AMT Explorer</a> loads a Turtle file and shows it in your browser. Open it, press the folder button and choose
+<code>out\\latest\\my.reasoned.ttl</code>. It opens in your browser; the file is not uploaded anywhere.</p>
+
+<h2 id="again">9. Change the file and run again</h2>
+<ol>
+<li>Edit <code>my.ttl</code>.</li>
+<li><code>python run_amt.py my.ttl --check-only</code> until it is clean.</li>
+<li><code>python run_amt.py my.ttl</code> for a new result in a new folder under <code>out\\</code>.</li>
+</ol>
+<p>Old run folders are never deleted by the runner. Delete the ones you do not need.</p>
+
+<h2 id="trouble">10. If something goes wrong</h2>
+<dl class="meta">
+<dt><code>'git' is not recognized</code> / <code>'python' is not recognized</code></dt>
+<dd>The program is not installed or not on the <code>PATH</code>. Install it, open a <em>new</em> command prompt and try again.
+On Windows <code>py run_amt.py my.ttl</code> may work where <code>python</code> does not.</dd>
+<dt><code>FAIL The cached AMT.engine does not know --check-only</code></dt>
+<dd>The engine copy in <code>.amt-cache\\</code> is old. Add <code>--update</code>.</dd>
+<dt>A Python traceback ending in <code>AssertionError</code> or something else</dt>
+<dd>Almost always an old cached engine as well: add <code>--update</code>. If it stays, add <code>--debug</code> and
+open an issue at <a href="https://github.com/n4o-rse/amt-engine/issues">amt-engine</a> with your file.</dd>
+<dt><code>FAIL Validation failed</code></dt>
+<dd>Your file is not valid AMT. Each message names the node and what to add: <a href="../validate/#shacl">the messages explained</a>.</dd>
+<dt><code>ERR [AMT-E101]</code> or another code</dt>
+<dd>Your file is valid but does not say what you probably meant. <a href="../validate/#catalogue">The messages explained</a>.</dd>
+<dt>The graph is empty or has too few nodes</dt>
+<dd>Look at the counts in the <code>OK</code> line and at the diagnostics; see the questions at the end of
+<a href="../validate/#faq">how to check an AMT file</a>.</dd>
+<dt>I have the engine installed and do not want the runner</dt>
+<dd>With <code>pip install -e .</code> in a clone of <a href="https://github.com/n4o-rse/amt-engine">amt-engine</a> the same options work as
+<code>amt-runner my.ttl --check-only</code> and <code>amt-runner my.ttl</code>; the result goes into an <code>out</code> folder next to your file.</dd>
+</dl>
+"""
+    return page(title="Run an AMT file – How-To – AMT", body=body, depth=2, current="howto",
+                description="Step by step: clone the runner, check and run an AMT file, find the result and look at the graph.")
+
+
 PAGES = {
     "howto/index.html": howto_index,
     "howto/create/index.html": howto_create,
     "howto/validate/index.html": howto_validate,
+    "howto/run/index.html": howto_run,
 }

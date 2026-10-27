@@ -22,7 +22,7 @@
 <p class="lead">Practical guides for working with AMT files: build one, check it, and understand what the messages mean.
 Each guide starts from a small example you can copy.</p>
 
-<div class="cols"><div class="term"><h3><a href="create/">Build an AMT file</a></h3><p>What an AMT file consists of, a complete file to start from, and how to turn existing RDF into AMT with a SPARQL CONSTRUCT query.</p></div><div class="term"><h3><a href="validate/">Check an AMT file</a></h3><p>Run the checks, read what they say, and fix it. Every message is explained with the IRI it names, what causes it and what to add.</p></div><div class="term"><h3><a href="https://n4o-rse.github.io/amt-engine/explorer/">Look at the result</a></h3><p>Load the <code>.reasoned.ttl</code> that a run writes into the Explorer. It runs in your browser; nothing is uploaded.</p></div></div>
+<div class="cols"><div class="term"><h3><a href="create/">Build an AMT file</a></h3><p>What an AMT file consists of, a complete file to start from, and how to turn existing RDF into AMT with a SPARQL CONSTRUCT query.</p></div><div class="term"><h3><a href="validate/">Check an AMT file</a></h3><p>Run the checks, read what they say, and fix it. Every message is explained with the IRI it names, what causes it and what to add.</p></div><div class="term"><h3><a href="run/">Run it and look at the result</a></h3><p>From nothing to a graph in your browser: clone the runner, where to put your file, which command to type, where the result appears.</p></div></div>
 
 <h2>The short version</h2>
 <ol>
@@ -30,6 +30,7 @@ Each guide starts from a small example you can copy.</p>
 <li><strong>Make every end of every edge a node</strong> (<code>ex:c1 amt:instanceOf ex:Coin</code>), including the things your edges point <em>to</em>.</li>
 <li><strong>Write edges</strong> as a statement with <code>rdf:subject</code>, <code>rdf:predicate</code>, <code>rdf:object</code> and <code>amt:weight</code>.</li>
 <li><strong>Check</strong> before you reason: <code>python run_amt.py my.ttl --check-only</code>.</li>
+<li><strong>Run</strong> and open the graph: <code>python run_amt.py my.ttl</code>, then <code>out\latest\my.html</code>.</li>
 </ol>
 
 <h2>Which tool for which job</h2>
@@ -39,7 +40,7 @@ Each guide starts from a small example you can copy.</p>
 <tr><td>try a file once, without installing anything but Python and git</td><td><a href="https://github.com/n4o-rse/amt-runner"><code>amt-runner</code></a> &rarr; <code>python run_amt.py my.ttl</code></td></tr>
 <tr><td>check a file quickly while you build it</td><td><code>python run_amt.py my.ttl --check-only</code> (or <code>amt-runner my.ttl --check-only</code> with the engine installed)</td></tr>
 <tr><td>run it inside your own Python project</td><td><code>pip install -e .</code> from <a href="https://github.com/n4o-rse/amt-engine">amt-engine</a>, then <code>from amt import load_amt, diagnose</code></td></tr>
-<tr><td>look at the graph and the inferred edges</td><td><a href="../explorer/">The Explorer</a> in your browser</td></tr>
+<tr><td>look at the graph and the inferred edges</td><td>the HTML file of a run, or <a href="../explorer/">the Explorer</a> in your browser (<a href="run/">step by step</a>)</td></tr>
 </tbody></table>
 <p class="note">The two things called <em>amt-runner</em>: the repository <code>amt-runner</code> is a small wrapper
 (<code>run_amt.py</code>) that fetches the engine for you; the engine itself also has a command <code>amt-runner</code>.

@@ -169,7 +169,8 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S14 | Texte (Namensgeschichte B, Familiensatz), Bibliografie, Bibliotheken lokal, w3id-Header aus der YAML und Adresse ohne `ids/`, `preferred-citation`, Seitentest | amt-engine | S12 | Patch geliefert, nach Push erledigt |
 | S13 | D6 (Exit-Code, unverändert) und Release 0.4.0 (Engine) / 0.3.0 (Runner) samt Zenodo | amt-engine, amt-runner | S10 bis S12, S14 | 13a und 13b erledigt (Tag `v0.4.0`, Release, Zenodo); 13c als Patch geliefert |
 | S15 | Schrift: Roboto lokal (Seiten und PNG-Figuren), Beschluss D10 | amt-engine | S13 | Patch geliefert |
-| S16 | Nutzerfreundliche Validierung: Diagnose (`AMT-E…`), SHACL-Meldungen mit Knoten, `--check-only`/`--strict`, viz ohne Absturz, How-To-Sektion | amt-engine, amt-runner | S15 | Patch geliefert |
+| S16 | Nutzerfreundliche Validierung: Diagnose (`AMT-E…`), SHACL-Meldungen mit Knoten, `--check-only`/`--strict`, viz ohne Absturz, How-To-Sektion | amt-engine, amt-runner | S15 | erledigt 2026-10-27 |
+| S17 | How-To-Seite „Run and look at the result“: klonen, Datei ablegen, prüfen, laufen lassen, Ergebnis lesen (Windows-`cmd`, Hinweise für Linux/macOS) | amt-engine | S16 | Patch geliefert |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -461,7 +462,19 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 
 - Sandbox: 142 Tests grün (vorher 115), `python main.py` ok (7 Schritte), Determinismus unverändert. Die Beispiele der How-To-Seiten sind getestet; das CONSTRUCT-Rezept erzeugt aus der Beispieleingabe zwei Konzepte, sieben Knoten und vier Kanten (0,5; 0,5; 0,6; 1,0), die validieren.
 - Beim Bau aufgefallen: heißt das Modul wie die Funktion (`amt/diagnose.py` und `diagnose`), liefert `import amt.diagnose as d` die Funktion statt des Moduls. Deshalb `diagnostics.py`.
-- Noch nicht geprüft: Windows-Lauf, Lauf mit Karstens vollständiger Datei im Original (nur `AFE_all_cases_asAMT.ttl` aus dem Anhang).
+- Windows-Lauf am selben Tag: `python main.py` und zweimal `--strict` grün (142 Tests), CI grün (`6373b35`); mit dem Wrapper `run_amt.py --check-only --update` und einem vollen Lauf auf der reparierten AFE-Datei geprüft (11 Knoten, 7 Kanten, Graph-HTML ohne Fehler). Noch nicht geprüft: Karstens eigene Query im Original (nur `AFE_all_cases_asAMT.ttl` aus dem Anhang).
+
+### S17 – How-To: Run and look at the result
+
+**Ziel:** Wer nur eine `.ttl`-Datei hat, kommt von „nichts installiert“ bis zum Graphen im Browser, ohne zu raten.
+
+**Anlass:** Rückfrage nach dem Windows-Lauf von S16: der volle Lauf stand im How-To nur als Halbsatz (wohin die Ausgabe geht, wie man den Graphen öffnet).
+
+**Inhalt:** `howto/run/` aus `py/site_howto.py` (`howto_run()`, `RUN_OUTPUTS`): Voraussetzungen, Runner klonen, optionale venv, Datei ablegen (neben dem Runner oder per Pfad), `--check-only`, `--update`, voller Lauf, Ausgabeordner `out/run-…` und `out/latest`, Tabelle der Dateien, Graph lesen (Farben je Konzept, Dicke = Gewicht, rot gestrichelt = inferiert, grau = nicht deklariert), Explorer, erneut laufen, Fehlersuche. Verweise von `howto/`, `howto/create/` und `howto/validate/`.
+
+**Beschluss:** Die Befehle der Seite sind für Windows-`cmd` geschrieben (A3), Linux und macOS stehen als Hinweise daneben. Die Liste der Ausgabedateien auf der Seite wird gegen einen echten Lauf getestet.
+
+**Abnahme:** `python main.py` einmal, danach `--strict` zweimal grün, `git status` sauber; `tests/test_howto.py` prüft die Dateiliste und die Anker; die Seite `/howto/run/` lädt ohne Anfrage an fremde Server.
 
 ## Teil D – Offene Punkte
 
@@ -476,4 +489,4 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 - **D10** Gestaltung: Farbwelt und Logos umgesetzt in S11c (`design/palette.yaml`). Wortlaut des Familien-Abschnitts erledigt in S14, Links bewusst keine (Alpaka und Alligator in Überarbeitung). Schrift erledigt in S15 (Roboto, lokal). Offen: vektorisierte Logos (die Logos der Institutionen bleiben bis auf Weiteres Pixelbilder; Pinguin, Alpaka und Alligator sind eigene Entwürfe des Autors, erstellt mit Google Gemini). Der Explorer startet seit S11c mit `animals.ttl`.
 - **D11** Der Playground (`leiza-rse/amt-playground`) und der Explorer sind funktional fertig, dürfen aber später schöner und hübscher werden (Layout, Aufteilung, Startnetz mit echten Beispieldaten); der Playground bleibt im LEIZA-Blau.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.
-- **D12** Weitere How-To-Unterseiten (Rezepte: Rollen und Axiome Schritt für Schritt, AMT-Datei aus Wikibase/Wikidata, Ergebnis im Explorer lesen) und ein Beispiel `examples/afe-coins.ttl` mit dem AFE-Fall; wartet auf Rückmeldung von Karsten und Lasse, ob das Rezept auf `howto/create/` für ihre Daten reicht.
+- **D12** Weitere How-To-Unterseiten (Rezepte: Rollen und Axiome Schritt für Schritt, AMT-Datei aus Wikibase/Wikidata; „Ergebnis lesen“ ist mit S17 erledigt) und ein Beispiel `examples/afe-coins.ttl` mit dem AFE-Fall; wartet auf Rückmeldung von Karsten und Lasse, ob das Rezept auf `howto/create/` für ihre Daten reicht.

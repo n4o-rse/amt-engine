@@ -12,7 +12,7 @@ Writes, below ``docs/``:
     bibliography/index.html   the bibliography (APA 7), from data/bibliography.bib
     bibliography/amt.bib      a copy of data/bibliography.bib
     ontology/index.html       the data model page
-    howto/index.html, howto/create/index.html, howto/validate/index.html   the How-To pages
+    howto/index.html, howto/create/index.html, howto/validate/index.html, howto/run/index.html   the How-To pages
     ontology/img/*.svg|png    the small figures of that page
     assets/palette.css        the colours of every page, from design/palette.yaml
     assets/img/palette.svg|png  the palette as a picture
