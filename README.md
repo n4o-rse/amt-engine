@@ -205,7 +205,8 @@ for finding in diagnose(load_amt("my.ttl")):
 ```
 
 The [How-To pages](https://n4o-rse.github.io/amt-engine/howto/) explain how to build a file
-(including a SPARQL CONSTRUCT recipe) and what every message means. Exit codes of `amt-runner`:
+(including a SPARQL CONSTRUCT recipe), what every message means and
+[how to run a file and look at the result](https://n4o-rse.github.io/amt-engine/howto/run/), step by step. Exit codes of `amt-runner`:
 0 done, 1 validation or `--strict` failed, 2 input not found, 3 unexpected error (`--debug` for the traceback).
 
 ## Role subsumption

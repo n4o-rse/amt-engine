@@ -1,9 +1,10 @@
 """
-The How-To pages (``docs/howto/``): how to build an AMT file, and how to check one.
+The How-To pages (``docs/howto/``): how to build an AMT file, how to check one and how to run it.
 
     howto/index.html      what to read first, which tool for which job
     howto/create/         build an AMT file from scratch or from other RDF (SPARQL CONSTRUCT)
     howto/validate/       check a file, read the messages, fix what they name
+    howto/run/            run a file and look at the result, from cloning to the graph
 
 Every piece of Turtle and SPARQL on these pages lives in ``EXAMPLES`` below, not in
 the HTML text, so that ``tests/test_howto.py`` can run it: a "good" example must

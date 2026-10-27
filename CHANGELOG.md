@@ -13,6 +13,13 @@ Zenodo.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-27
+
+0.5.0 makes a failed run understandable. A file with a problem now ends with a message that
+names the IRI and says what to add, not with a traceback, and the website has a How-To section
+for building, checking and running a file. The reasoner, the results of a run and the exit
+code 0 for consistency violations are unchanged.
+
 ### Added
 
 - `amt/diagnostics.py`: plain-language checks that SHACL cannot make, run after loading by
@@ -35,7 +42,6 @@ Zenodo.
   tested SPARQL CONSTRUCT recipe for turning other RDF into AMT), how to check one, and every
   message explained with cause, fix and example. `py/site_howto.py` holds the examples and
   `tests/test_howto.py` runs them. "How-To" is in the navigation and on the start page.
-
 - Roboto, the house typeface of mainzed, as the typeface of the static pages: the
   files are in `docs/vendor/roboto/` (400, 500 and 700; Latin and Latin Extended;
   SIL OFL 1.1) and `docs/assets/site.css` declares them, so the pages show the same
@@ -324,7 +330,8 @@ continuous integration.
 - The formal ontology: `ontology/amt.ttl`, `ontology/amt-shapes.ttl`, valid and
   invalid example files, `validate_examples.py` and an ontology README.
 
-[Unreleased]: https://github.com/n4o-rse/amt-engine/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/n4o-rse/amt-engine/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/n4o-rse/amt-engine/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/n4o-rse/amt-engine/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/n4o-rse/amt-engine/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/n4o-rse/amt-engine/compare/v0.2.0...v0.3.0

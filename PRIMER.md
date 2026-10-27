@@ -108,6 +108,7 @@ Eigenschaften, die das Repo haben muss:
 | Playground-Ziel | in der Engine heißt die Anwendung weiter **Explorer** (`/explorer/`, kein eigenes `/playground/`), mit allen Beispielen aus `docs/data/` und „TTL laden“; `leiza-rse/amt-playground` bleibt der **Playground** mit nur dem Personen-Interessen-Netzwerk, ohne Triplestore und ohne Datei laden; beide nutzen denselben JS-Reasoner (Engine ist Quelle, der Playground bekommt eine Kopie) | 2026-10-26 |
 | JS-Reasoner | `docs/js/amt-reasoner.js` ist ein Port von `amt/reasoning.py` und `amt/logic.py` (Entailment-Lesart, ohne `minimal`); `tests/test_js_reasoner.py` vergleicht beide auf allen Beispielen (Node nötig, sonst übersprungen); Änderungen an der Python-Logik ziehen den JS-Port nach | 2026-10-26 |
 | Startseite | `docs/index.html` aus `py/site_home.py`; Englisch bevorzugt, Deutsch umschaltbar, Hell/Dunkel; Explorer unter `/explorer/`, `docs/index.htm` leitet weiter; DFG-Projektnummer 501836407 bestätigt | 2026-10-26 |
+| Release 0.5.0 | mit S18 (Patch 18a): Engine 0.5.0, Runner 0.4.0; Anlass sind Diagnose, `--check-only` und die How-To-Sektion (S16, S17); Tag, Release und Zenodo danach durch den Autor, die Versions-DOIs kommen als Patch 18c | 2026-10-27 |
 | Release 0.4.0 | mit S13 (Patch 13a); die ungereleasten Änderungen aus S7 bis S14 gehören dazu; Tag, Release und Zenodo danach durch den Autor | 2026-10-27 |
 | Zenodo | GitHub-Zenodo-Anbindung ist für beide Repos eingeschaltet; jedes GitHub-Release erzeugt eine Version mit DOI, ein bloßer Tag nicht; deshalb keine Releases für alte Versionen | 2026-10-26 |
 | Öffentliche w3id-Adresse | `https://w3id.org/amt/`, ohne `ids/`: der Ordner `ids/amt/` im Repo `perma-id/w3id.org` ist nur der Ablageort, `RewriteBase` ist `/amt/` (Erfahrung des Autors; am 2026-10-27 korrigiert, S12 hatte `/ids/amt/`) | 2026-10-27 |
@@ -170,7 +171,8 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S13 | D6 (Exit-Code, unverändert) und Release 0.4.0 (Engine) / 0.3.0 (Runner) samt Zenodo | amt-engine, amt-runner | S10 bis S12, S14 | 13a und 13b erledigt (Tag `v0.4.0`, Release, Zenodo); 13c als Patch geliefert |
 | S15 | Schrift: Roboto lokal (Seiten und PNG-Figuren), Beschluss D10 | amt-engine | S13 | Patch geliefert |
 | S16 | Nutzerfreundliche Validierung: Diagnose (`AMT-E…`), SHACL-Meldungen mit Knoten, `--check-only`/`--strict`, viz ohne Absturz, How-To-Sektion | amt-engine, amt-runner | S15 | erledigt 2026-10-27 |
-| S17 | How-To-Seite „Run and look at the result“: klonen, Datei ablegen, prüfen, laufen lassen, Ergebnis lesen (Windows-`cmd`, Hinweise für Linux/macOS) | amt-engine | S16 | Patch geliefert |
+| S17 | How-To-Seite „Run and look at the result“: klonen, Datei ablegen, prüfen, laufen lassen, Ergebnis lesen (Windows-`cmd`, Hinweise für Linux/macOS) | amt-engine | S16 | erledigt 2026-10-27 (Windows, Python 3.10) |
+| S18 | Release 0.5.0 (Engine) / 0.4.0 (Runner) samt Zenodo | amt-engine, amt-runner | S16, S17 | 18a als Patch geliefert |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -475,6 +477,20 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 **Beschluss:** Die Befehle der Seite sind für Windows-`cmd` geschrieben (A3), Linux und macOS stehen als Hinweise daneben. Die Liste der Ausgabedateien auf der Seite wird gegen einen echten Lauf getestet.
 
 **Abnahme:** `python main.py` einmal, danach `--strict` zweimal grün, `git status` sauber; `tests/test_howto.py` prüft die Dateiliste und die Anker; die Seite `/howto/run/` lädt ohne Anfrage an fremde Server.
+
+### S18 – Release 0.5.0 (Engine) und 0.4.0 (Runner)
+
+**Ziel:** Diagnose, `--check-only` und die How-To-Sektion sind veröffentlicht, archiviert und zitierbar.
+
+**Versionsentscheidung:** Neue Funktionen ohne Bruch, daher je ein Minor-Sprung: Engine 0.4.0 → 0.5.0, Runner 0.3.0 → 0.4.0. Der Reasoner und die Ergebnisdateien sind unverändert; Exit-Code 0 bei Konsistenzverletzungen bleibt (D6).
+
+**Teil 18a (Patch):** Version in `pyproject.toml`, `amt/__init__.py`, `CITATION.cff` (mit `date-released`), `py/amt_dev_utils.py` und `CHANGELOG.md` (`[Unreleased]` wird `[0.5.0] - 2026-10-27`, Vergleichslinks); die Fußzeile der erzeugten Seiten nennt die neue Version, deshalb gehören die vier Seiten mit Fußzeile in den Commit. Im Runner `run_amt.py` (`__version__`, Pinning-Beispiel `v0.5.0`), `CITATION.cff` und `CHANGELOG.md`; der Hinweis zu `--check-only` verlangt dort Engine 0.5.0 oder neuer.
+
+**Teil 18b (manuell, nach dem Push von 18a):** je Repo ein annotierter Tag (`v0.5.0`, `v0.4.0`) auf dem Commit von 18a, `git push origin <tag>`, auf GitHub ein Release aus dem Tag; die Release-Notes aus dem CHANGELOG-Eintrag. Nur das Release löst bei Zenodo die Archivierung aus.
+
+**Teil 18c (Patch):** die Versions-DOIs in README (Abschnitt „Citation“) und CHANGELOG eintragen; die Concept-DOIs bleiben.
+
+**Abnahme:** `python main.py --strict` zweimal grün (Windows), `git status` sauber; `git tag` zeigt die neuen Tags; „Releases“ zeigt sie; auf zenodo.org steht je eine neue Version; nach 18c nennt die README die Versions-DOI.
 
 ## Teil D – Offene Punkte
 
