@@ -30,7 +30,7 @@ Dog  --isSubclassOf (0.85)-->  Pet
 
   inferred:  Rex  --isInstanceOf (0.85)-->  Pet      Goedel logic: min(1.00, 0.85)"""
 
-QUICKSTART = """git clone https://github.com/n4o-rse/amt-engine
+QUICKSTART = """git clone https://github.com/alpaca-fair-framework/amt-engine
 cd amt-engine
 pip install -e .
 amt-runner examples/animals.ttl"""
@@ -168,7 +168,7 @@ TEXT = {
     },
 }
 
-LINKS = ["explorer/", "howto/", "vocab/", "ontology/", "https://github.com/n4o-rse/amt-engine"]
+LINKS = ["explorer/", "howto/", "vocab/", "ontology/", "https://github.com/alpaca-fair-framework/amt-engine"]
 
 
 def _block(lang: str) -> str:

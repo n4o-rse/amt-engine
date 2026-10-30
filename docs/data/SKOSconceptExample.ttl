@@ -4,7 +4,7 @@
 @prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
 @prefix skosplus: <http://w3id.org/skos-plus/> .
-@prefix ex:       <http://github.com/n4o-rse/amt-explore/> .
+@prefix ex:       <http://github.com/alpaca-fair-framework/amt-explore/> .
 
 # =============================================================================
 # AMT data file: SKOS concept matching with custom MatchStar role

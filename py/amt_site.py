@@ -24,7 +24,7 @@ NAV = [
     ("How-To", "howto/", "howto"),
     ("Explorer", "explorer/", "explorer"),
     ("Bibliography", "bibliography/", "bibliography"),
-    ("GitHub", "https://github.com/n4o-rse/amt-engine", "github"),
+    ("GitHub", "https://github.com/alpaca-fair-framework/amt-engine", "github"),
 ]
 
 
@@ -80,7 +80,7 @@ def page(*, title: str, body: str, depth: int, current: str, description: str = 
 </main>
 <footer class="site">
 Academic Meta Tool &middot; amt-engine {escape(RELEASE)} &middot;
-<a href="https://github.com/n4o-rse/amt-engine">source</a><br>
+<a href="https://github.com/alpaca-fair-framework/amt-engine">source</a><br>
 {logos}
 A <strong>mainzed</strong> project of i3mainz (Hochschule Mainz) and the RGZM (today LEIZA), developed further in
 NFDI4Objects, which is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) &ndash;

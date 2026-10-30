@@ -345,9 +345,9 @@ Each guide starts from a small example you can copy.</p>
 <table>
 <thead><tr><th>You want to&hellip;</th><th>Use</th></tr></thead>
 <tbody>
-<tr><td>try a file once, without installing anything but Python and git</td><td><a href="https://github.com/n4o-rse/amt-runner"><code>amt-runner</code></a> &rarr; <code>python run_amt.py my.ttl</code></td></tr>
+<tr><td>try a file once, without installing anything but Python and git</td><td><a href="https://github.com/alpaca-fair-framework/amt-runner"><code>amt-runner</code></a> &rarr; <code>python run_amt.py my.ttl</code></td></tr>
 <tr><td>check a file quickly while you build it</td><td><code>python run_amt.py my.ttl --check-only</code> (or <code>amt-runner my.ttl --check-only</code> with the engine installed)</td></tr>
-<tr><td>run it inside your own Python project</td><td><code>pip install -e .</code> from <a href="https://github.com/n4o-rse/amt-engine">amt-engine</a>, then <code>from amt import load_amt, diagnose</code></td></tr>
+<tr><td>run it inside your own Python project</td><td><code>pip install -e .</code> from <a href="https://github.com/alpaca-fair-framework/amt-engine">amt-engine</a>, then <code>from amt import load_amt, diagnose</code></td></tr>
 <tr><td>look at the graph and the inferred edges</td><td>the HTML file of a run, or <a href="../explorer/">the Explorer</a> in your browser (<a href="run/">step by step</a>)</td></tr>
 </tbody></table>
 <p class="note">The two things called <em>amt-runner</em>: the repository <code>amt-runner</code> is a small wrapper
@@ -488,12 +488,12 @@ not after. Every message names the IRI it is about and says what to add.</p>
 
 <h2 id="run">2. Run the check</h2>
 <p><strong>With the wrapper</strong> (needs Python and git; it fetches the engine itself):</p>
-<pre><code>git clone https://github.com/n4o-rse/amt-runner
+<pre><code>git clone https://github.com/alpaca-fair-framework/amt-runner
 cd amt-runner
 python run_amt.py my.ttl --check-only</code></pre>
 <p>If you get <em>"does not know --check-only"</em> or a Python traceback, the engine copy cached in <code>.amt-cache/</code> is old:</p>
 <pre><code>python run_amt.py my.ttl --check-only --update</code></pre>
-<p><strong>With the engine installed</strong> (<code>pip install -e .</code> in <a href="https://github.com/n4o-rse/amt-engine">amt-engine</a>):</p>
+<p><strong>With the engine installed</strong> (<code>pip install -e .</code> in <a href="https://github.com/alpaca-fair-framework/amt-engine">amt-engine</a>):</p>
 <pre><code>amt-runner my.ttl --check-only
 amt-runner my.ttl --check-only --strict
 amt my.ttl --validate-only</code></pre>
@@ -533,7 +533,7 @@ That was this same problem; it is now reported up front, and the graph shows suc
 {_catalogue_rows()}
 </div>
 <h3 id="shacl">Validation (SHACL)</h3>
-<p>These come from <a href="https://github.com/n4o-rse/amt-engine/blob/main/ontology/amt-shapes.ttl"><code>ontology/amt-shapes.ttl</code></a>.
+<p>These come from <a href="https://github.com/alpaca-fair-framework/amt-engine/blob/main/ontology/amt-shapes.ttl"><code>ontology/amt-shapes.ttl</code></a>.
 The line above each message is the IRI it is about, followed by a hint on what to add.</p>
 <div class="cols" style="grid-template-columns:1fr">
 {_shacl_rows()}
@@ -574,7 +574,7 @@ or something you pointed at by mistake (often <code>amt:Concept</code> itself).<
 <dd>No. It checks that the file is valid <em>AMT</em>. Whether your concepts and roles make sense for your domain is yours to decide.</dd>
 <dt>It ends with a Python traceback.</dt>
 <dd>Update the engine (<code>--update</code> with the wrapper, <code>git pull</code> otherwise) and run again. If it persists, run with <code>--debug</code>
-and open an issue at <a href="https://github.com/n4o-rse/amt-engine/issues">amt-engine</a> with the file attached.</dd>
+and open an issue at <a href="https://github.com/alpaca-fair-framework/amt-engine/issues">amt-engine</a> with the file attached.</dd>
 </dl>
 """
     return page(title="Check an AMT file – How-To – AMT", body=body, depth=2, current="howto",
@@ -626,7 +626,7 @@ Linux and macOS differences are noted.</p>
 
 <h2 id="clone">2. Get the runner</h2>
 <p>Open a command prompt in the folder where you keep your projects (for example <code>C:\\git</code>) and clone the runner:</p>
-{_code("git clone https://github.com/n4o-rse/amt-runner.git")}
+{_code("git clone https://github.com/alpaca-fair-framework/amt-runner.git")}
 {_code("cd amt-runner")}
 <p>Optional, but tidy: keep the packages out of your global Python with a virtual environment.</p>
 {_code("python -m venv .venv")}
@@ -699,7 +699,7 @@ On Windows <code>py run_amt.py my.ttl</code> may work where <code>python</code> 
 <dd>The engine copy in <code>.amt-cache\\</code> is old. Add <code>--update</code>.</dd>
 <dt>A Python traceback ending in <code>AssertionError</code> or something else</dt>
 <dd>Almost always an old cached engine as well: add <code>--update</code>. If it stays, add <code>--debug</code> and
-open an issue at <a href="https://github.com/n4o-rse/amt-engine/issues">amt-engine</a> with your file.</dd>
+open an issue at <a href="https://github.com/alpaca-fair-framework/amt-engine/issues">amt-engine</a> with your file.</dd>
 <dt><code>FAIL Validation failed</code></dt>
 <dd>Your file is not valid AMT. Each message names the node and what to add: <a href="../validate/#shacl">the messages explained</a>.</dd>
 <dt><code>ERR [AMT-E101]</code> or another code</dt>
@@ -708,7 +708,7 @@ open an issue at <a href="https://github.com/n4o-rse/amt-engine/issues">amt-engi
 <dd>Look at the counts in the <code>OK</code> line and at the diagnostics; see the questions at the end of
 <a href="../validate/#faq">how to check an AMT file</a>.</dd>
 <dt>I have the engine installed and do not want the runner</dt>
-<dd>With <code>pip install -e .</code> in a clone of <a href="https://github.com/n4o-rse/amt-engine">amt-engine</a> the same options work as
+<dd>With <code>pip install -e .</code> in a clone of <a href="https://github.com/alpaca-fair-framework/amt-engine">amt-engine</a> the same options work as
 <code>amt-runner my.ttl --check-only</code> and <code>amt-runner my.ttl</code>; the result goes into an <code>out</code> folder next to your file.</dd>
 </dl>
 """

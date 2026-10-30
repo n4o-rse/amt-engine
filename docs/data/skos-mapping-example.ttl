@@ -6,7 +6,7 @@
 @prefix skosplus: <http://w3id.org/skos-plus/> .
 @prefix aat:      <http://vocab.getty.edu/aat/> .
 @prefix wd:       <http://www.wikidata.org/entity/> .
-@prefix ex:       <http://github.com/n4o-rse/amt-explore/> .
+@prefix ex:       <http://github.com/alpaca-fair-framework/amt-explore/> .
 
 # =============================================================================
 # AMT data file: SKOS concept mappings across archaeological vocabularies

@@ -420,7 +420,7 @@ class TestAnimalsExample:
 # ─────────────────────────────────────────────────────────────────────────
 # Subsumption: amt:SubsumptionAxiom in both readings
 # ─────────────────────────────────────────────────────────────────────────
-DEMO_NS = "http://github.com/n4o-rse/amt-engine/subsumption-demo/"
+DEMO_NS = "http://github.com/alpaca-fair-framework/amt-engine/subsumption-demo/"
 
 
 def _demo(name: str) -> str:

@@ -23,7 +23,7 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parent.parent
 BIB_FILE = ROOT / "data" / "bibliography.bib"
-REPO_BIB_URL = "https://github.com/n4o-rse/amt-engine/blob/main/data/bibliography.bib"
+REPO_BIB_URL = "https://github.com/alpaca-fair-framework/amt-engine/blob/main/data/bibliography.bib"
 
 # order of the groups on the page: (kind, English heading, German heading)
 KINDS = [

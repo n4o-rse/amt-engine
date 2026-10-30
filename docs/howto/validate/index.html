@@ -13,7 +13,7 @@
 <body>
 <header class="site"><div class="in">
 <a class="brand" href="../../index.html"><img src="../../assets/img/amt-penguin-small.png" alt="" width="34" height="48">Academic Meta Tool</a>
-<nav><a href="../../index.html">Home</a><a href="../../vocab/">Vocabulary</a><a href="../../ontology/">Data model</a><a href="../../howto/" aria-current="page">How-To</a><a href="../../explorer/">Explorer</a><a href="../../bibliography/">Bibliography</a><a href="https://github.com/n4o-rse/amt-engine">GitHub</a></nav>
+<nav><a href="../../index.html">Home</a><a href="../../vocab/">Vocabulary</a><a href="../../ontology/">Data model</a><a href="../../howto/" aria-current="page">How-To</a><a href="../../explorer/">Explorer</a><a href="../../bibliography/">Bibliography</a><a href="https://github.com/alpaca-fair-framework/amt-engine">GitHub</a></nav>
 <button type="button" class="theme push" id="theme-toggle" aria-label="Switch between light and dark mode">Dark mode</button>
 </div></header>
 <main>
@@ -43,12 +43,12 @@ not after. Every message names the IRI it is about and says what to add.</p>
 
 <h2 id="run">2. Run the check</h2>
 <p><strong>With the wrapper</strong> (needs Python and git; it fetches the engine itself):</p>
-<pre><code>git clone https://github.com/n4o-rse/amt-runner
+<pre><code>git clone https://github.com/alpaca-fair-framework/amt-runner
 cd amt-runner
 python run_amt.py my.ttl --check-only</code></pre>
 <p>If you get <em>"does not know --check-only"</em> or a Python traceback, the engine copy cached in <code>.amt-cache/</code> is old:</p>
 <pre><code>python run_amt.py my.ttl --check-only --update</code></pre>
-<p><strong>With the engine installed</strong> (<code>pip install -e .</code> in <a href="https://github.com/n4o-rse/amt-engine">amt-engine</a>):</p>
+<p><strong>With the engine installed</strong> (<code>pip install -e .</code> in <a href="https://github.com/alpaca-fair-framework/amt-engine">amt-engine</a>):</p>
 <pre><code>amt-runner my.ttl --check-only
 amt-runner my.ttl --check-only --strict
 amt my.ttl --validate-only</code></pre>
@@ -137,7 +137,7 @@ ex:a amt:instanceOf ex:C . ex:b amt:instanceOf ex:C .
 </div>
 </div>
 <h3 id="shacl">Validation (SHACL)</h3>
-<p>These come from <a href="https://github.com/n4o-rse/amt-engine/blob/main/ontology/amt-shapes.ttl"><code>ontology/amt-shapes.ttl</code></a>.
+<p>These come from <a href="https://github.com/alpaca-fair-framework/amt-engine/blob/main/ontology/amt-shapes.ttl"><code>ontology/amt-shapes.ttl</code></a>.
 The line above each message is the IRI it is about, followed by a hint on what to add.</p>
 <div class="cols" style="grid-template-columns:1fr">
 <div class="term"><h3><code>Each Concept must have at least one rdfs:label.</code></h3><p>A concept has no label. The message names the IRI. Beware: every object of amt:instanceOf counts as a concept, so this message also appears when you write <code>amt:instanceOf amt:Concept</code> or point at an undeclared class.</p><pre><code>ex:Coins a amt:Concept .                       # no rdfs:label
@@ -185,13 +185,13 @@ or something you pointed at by mistake (often <code>amt:Concept</code> itself).<
 <dd>No. It checks that the file is valid <em>AMT</em>. Whether your concepts and roles make sense for your domain is yours to decide.</dd>
 <dt>It ends with a Python traceback.</dt>
 <dd>Update the engine (<code>--update</code> with the wrapper, <code>git pull</code> otherwise) and run again. If it persists, run with <code>--debug</code>
-and open an issue at <a href="https://github.com/n4o-rse/amt-engine/issues">amt-engine</a> with the file attached.</dd>
+and open an issue at <a href="https://github.com/alpaca-fair-framework/amt-engine/issues">amt-engine</a> with the file attached.</dd>
 </dl>
 
 </main>
 <footer class="site">
 Academic Meta Tool &middot; amt-engine 0.5.0 &middot;
-<a href="https://github.com/n4o-rse/amt-engine">source</a><br>
+<a href="https://github.com/alpaca-fair-framework/amt-engine">source</a><br>
 <div class="logos"><a href="https://www.mainzed.org" title="mainzed"><img src="../../assets/img/logos/mainzed.png" alt="mainzed" height="28"></a><a href="https://i3mainz.hs-mainz.de" title="i3mainz"><img src="../../assets/img/logos/i3mainz.png" alt="i3mainz" height="54"></a><a href="https://www.leiza.de" title="LEIZA"><img src="../../assets/img/logos/leiza.png" alt="LEIZA" height="54"></a><a href="https://www.nfdi4objects.net" title="NFDI4Objects"><img src="../../assets/img/logos/nfdi4objects.png" alt="NFDI4Objects" height="54"></a><a href="https://www.nfdi.de" title="Nationale Forschungsdateninfrastruktur (NFDI), in cooperation with"><img src="../../assets/img/logos/nfdi.png" alt="Nationale Forschungsdateninfrastruktur (NFDI), in cooperation with" height="66"></a><a href="https://www.dfg.de" title="Deutsche Forschungsgemeinschaft (DFG), funded by"><img src="../../assets/img/logos/dfg.png" alt="Deutsche Forschungsgemeinschaft (DFG), funded by" height="66"></a></div>
 A <strong>mainzed</strong> project of i3mainz (Hochschule Mainz) and the RGZM (today LEIZA), developed further in
 NFDI4Objects, which is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) &ndash;

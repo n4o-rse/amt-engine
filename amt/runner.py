@@ -447,7 +447,7 @@ def run_all(
         for f in findings:
             print(f.format())
         if any(f.level == "error" for f in findings):
-            print("     (see https://n4o-rse.github.io/amt-engine/howto/validate/ for what each code means)")
+            print("     (see https://alpaca-fair-framework.github.io/amt-engine/howto/validate/ for what each code means)")
     if strict and has_errors(findings):
         if write_report:
             _write_report_safely(report, out_dir, stem)
@@ -633,7 +633,7 @@ def main(argv: list[str] | None = None) -> int:
             raise
         print(f"FAIL  Unexpected error: {type(e).__name__}: {e}", file=sys.stderr)
         print("      Run with --debug for the full traceback. If the input validated, please report this at "
-              "https://github.com/n4o-rse/amt-engine/issues together with the input file.", file=sys.stderr)
+              "https://github.com/alpaca-fair-framework/amt-engine/issues together with the input file.", file=sys.stderr)
         return 3
     return 0
 

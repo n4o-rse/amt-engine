@@ -17,6 +17,18 @@ Zenodo.
 
 - `README.md`, "Citation": names the version DOI of 0.5.0,
   `10.5281/zenodo.23691499`. The concept DOI is unchanged.
+- The repository now lives under `alpaca-fair-framework`. Every link to the repository, the issue tracker
+  and the GitHub Pages site (`https://alpaca-fair-framework.github.io/amt-engine/`) is updated in
+  `CITATION.cff`, `README.md`, the hint texts of `amt-runner`, the site generators and the reference links of
+  this file.
+- `deploy/redirects.yaml` names the new Pages address and the new repository addresses; the redirect files
+  generated from it (`deploy/academic-meta-tool.xyz/.htaccess`, `deploy/w3id/ids/amt/`) lead there. They have
+  to be deployed again: the `.htaccess` of `academic-meta-tool.xyz` by FTP, the `w3id.org/amt/` entry by a new
+  pull request at `perma-id/w3id.org`.
+- The instance namespaces of the bundled examples change from `http://github.com/n4o-rse/amt-explore/` and
+  `http://github.com/n4o-rse/amt-engine/subsumption-demo/` to the same paths under `alpaca-fair-framework`;
+  the mirror in `docs/data/` and the expected IRIs in the tests follow. Files that use the old namespace still
+  load and validate.
 
 ## [0.5.0] - 2026-10-27
 
@@ -335,10 +347,10 @@ continuous integration.
 - The formal ontology: `ontology/amt.ttl`, `ontology/amt-shapes.ttl`, valid and
   invalid example files, `validate_examples.py` and an ontology README.
 
-[Unreleased]: https://github.com/n4o-rse/amt-engine/compare/v0.5.0...HEAD
-[0.5.0]: https://github.com/n4o-rse/amt-engine/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/n4o-rse/amt-engine/compare/v0.3.1...v0.4.0
-[0.3.1]: https://github.com/n4o-rse/amt-engine/compare/v0.3.0...v0.3.1
-[0.3.0]: https://github.com/n4o-rse/amt-engine/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/n4o-rse/amt-engine/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/n4o-rse/amt-engine/commit/3357cde
+[Unreleased]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/alpaca-fair-framework/amt-engine/commit/3357cde

@@ -10,7 +10,7 @@
 # live on GitHub Pages; the two sites below only point there, so a move of the
 # repository means changing `pages` here and nothing else.
 
-pages: https://n4o-rse.github.io/amt-engine/
+pages: https://alpaca-fair-framework.github.io/amt-engine/
 
 # The vocabulary is a hash namespace: the server sees /vocab, the fragment stays
 # in the browser. Content negotiation on the Accept header (first match wins).
@@ -45,8 +45,8 @@ sites:
       - {path: vocab,       vocab: true,     about: "the vocabulary (negotiated on Accept: Turtle, RDF/XML, JSON-LD, otherwise the HTML page)"}
       - {path: explorer,    to: explorer/,   about: "the Explorer"}
       - {path: ontology,    to: ontology/,   about: "the data model page"}
-      - {path: engine,      to: "https://github.com/n4o-rse/amt-engine", about: "the source code of amt-engine"}
-      - {path: runner,      to: "https://github.com/n4o-rse/amt-runner", about: "the source code of amt-runner"}
+      - {path: engine,      to: "https://github.com/alpaca-fair-framework/amt-engine", about: "the source code of amt-engine"}
+      - {path: runner,      to: "https://github.com/alpaca-fair-framework/amt-runner", about: "the source code of amt-runner"}
       - {path: doi,         to: "https://doi.org/10.5281/zenodo.23669466", about: "the concept DOI of amt-engine (Zenodo)"}
 
 # Who administers the w3id.org entry: written into the header of its .htaccess
@@ -58,8 +58,8 @@ contact:
 
 # The paragraph under the address list in the header of the w3id.org .htaccess.
 w3id_header: >-
-  Everything leads to the pages on GitHub Pages of the NFDI4Objects organisation
-  (https://n4o-rse.github.io/amt-engine/) or to the repositories. The namespace
+  Everything leads to the pages on GitHub Pages of the alpaca-fair-framework
+  organisation (https://alpaca-fair-framework.github.io/amt-engine/) or to the repositories. The namespace
   of the vocabulary itself is http://academic-meta-tool.xyz/vocab# and does not
   change; this space only gives it, and the rest of AMT, an address that does
   not depend on a domain or a host.
@@ -70,5 +70,5 @@ w3id_readme:
     Repository created to store the redirections for the Academic Meta Tool:
     the vocabulary (with content negotiation), the Explorer, the data model
     page and the software repositories. The pages are hosted on GitHub Pages
-    of the NFDI4Objects organisation (n4o-rse). The namespace of the vocabulary
+    of the alpaca-fair-framework organisation. The namespace of the vocabulary
     itself is http://academic-meta-tool.xyz/vocab# and does not change.

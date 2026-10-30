@@ -103,7 +103,7 @@ def test_run_page_is_linked_and_has_its_steps():
     html = howto.howto_run()
     for anchor in ("need", "clone", "file", "check", "run", "out", "graph", "explorer", "again", "trouble"):
         assert f'id="{anchor}"' in html
-    assert "git clone https://github.com/n4o-rse/amt-runner.git" in html
+    assert "git clone https://github.com/alpaca-fair-framework/amt-runner.git" in html
     assert "--check-only" in html and "--update" in html
     assert 'href="run/"' in howto.howto_index()
     assert 'href="../run/"' in howto.howto_validate()

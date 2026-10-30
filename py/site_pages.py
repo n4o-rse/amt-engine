@@ -418,7 +418,7 @@ count; the <a href="../vocab/#logics">vocabulary page</a> has a usage hint for e
 <table><thead><tr><th>Operator</th><th>Formula</th><th>Arity</th></tr></thead><tbody>{logic_rows}</tbody></table>
 
 <h2 id="validation">Checking a file</h2>
-<p>The shapes in <a href="https://github.com/n4o-rse/amt-engine/blob/main/ontology/amt-shapes.ttl"><code>ontology/amt-shapes.ttl</code></a>
+<p>The shapes in <a href="https://github.com/alpaca-fair-framework/amt-engine/blob/main/ontology/amt-shapes.ttl"><code>ontology/amt-shapes.ttl</code></a>
 check that weights lie in [0, 1], that axioms have the properties they need and that role chains do not mix the two
 forms. The AMT engine runs them before it loads a file.</p>
 """
