@@ -206,7 +206,7 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S20 | Hextupel: Festlegungen, kein Code (Datentyp der Gewichte, Konfliktfall, Diagnose-Codes, Methode bei Inverse und Subsumption, Mehrfachableitung, Evidenz) | amt-engine | – | Patch geliefert, nach Push erledigt |
 | S21 | Hextupel in der Python-Engine: laden, Reasoning, Export, SHACL, Diagnose, How-To, Tests, Roundtrip-Beispiel | amt-engine | S19, S20 | erledigt 2026-10-30 (Windows, Python 3.10, `a451995`) |
 | S22 | Hextupel im JS-Port und im Explorer, Paritätstest | amt-engine | S21 | erledigt 2026-10-30 (zusammen mit S21) |
-| S23 | Runner (Beispiel, Dokumentation, Versions-Hinweis), Release Engine 0.6.0 und Runner 0.5.0 samt Zenodo | amt-engine, amt-runner | S21, S22 | 23a Patch geliefert; 23b und 23c offen |
+| S23 | Runner (Beispiel, Dokumentation, Versions-Hinweis), Release Engine 0.6.0 und Runner 0.5.0 samt Zenodo | amt-engine, amt-runner | S21, S22 | 23a und 23b erledigt (Tag `v0.6.0`, Release, Zenodo); 23c als Patch geliefert |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -629,7 +629,12 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 - Runner 0.5.0: siehe S11 im Primer des Runners.
 - Zusätzlich: `py/step_site.py` zeigt bei zwei gescheiterten Importen den ursprünglichen Fehler (Anlass: auf dem Rechner des Autors fehlten `py/site_pages.py` und `CITATION.cff`, die Meldung `'py' is not a package` verdeckte das). Die anderen Schritte haben dasselbe Muster, sind aber nicht geändert.
 - Geprüft: Engine `python main.py --strict` zweimal grün, `git status` stabil (14 Einträge: 6 Quellen, 8 erzeugte Seiten); Runner siehe dort. Das Datum 2026-10-30 gilt, wenn Tag und Release am selben Tag folgen; sonst `RELEASE_DATE` und `date-released` in einem Folgepatch anpassen.
-- Offen: 23b (manuell, siehe `PATCH-README.md` von Patch 3), 23c (Versions-DOIs), D16, D17.
+- Offen: D16, D17 (23b und 23c siehe unten).
+
+### Erledigt 2026-10-30 (23b, 23c)
+
+- 23b (durch den Autor): Commit `f0c69df`, annotierter Tag `v0.6.0`, GitHub-Release, Zenodo. Versions-DOI Engine 0.6.0: `10.5281/zenodo.23809706`; die Concept-DOI `10.5281/zenodo.23669466` bleibt. Der Ordnername im Zenodo-Archiv (`…-amt-engine-6f5690d`) ist die Kennung des annotierten Tags, nicht die des Commits `f0c69df` (`git rev-parse v0.6.0` gibt `6f5690d`, `git rev-parse v0.6.0^{}` gibt `f0c69df`); der Inhalt ist der Commit.
+- 23c (Patch): die Versions-DOI in README (Abschnitt „Citation“) und unter `[Unreleased]` im CHANGELOG. Der Runner-Teil (`10.5281/zenodo.23809732`) steht im Primer des Runners (S11).
 
 ## Teil D – Offene Punkte
 

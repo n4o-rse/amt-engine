@@ -13,6 +13,11 @@ Zenodo.
 
 ## [Unreleased]
 
+### Changed
+
+- `README.md`, "Citation": names the version DOI of 0.6.0,
+  `10.5281/zenodo.23809706`. The concept DOI is unchanged.
+
 ## [0.6.0] - 2026-10-30
 
 0.6.0 makes a statement a hextuple: besides its weight it can say what kind of fuzziness the weight expresses
