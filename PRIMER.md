@@ -204,9 +204,9 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S18 | Release 0.5.0 (Engine) / 0.4.0 (Runner) samt Zenodo | amt-engine, amt-runner | S16, S17 | 18a und 18b erledigt (Tag `v0.5.0`, Release, Zenodo); 18c als Patch geliefert |
 | S19 | Adressen auf `alpaca-fair-framework` umstellen (Quellen, erzeugte Seiten, Tests, `CITATION.cff`, Weiterleitungen) | amt-engine, amt-runner | S18 | erledigt 2026-10-30 (Push, `.htaccess`, Zenodo durch den Autor gemeldet) |
 | S20 | Hextupel: Festlegungen, kein Code (Datentyp der Gewichte, Konfliktfall, Diagnose-Codes, Methode bei Inverse und Subsumption, Mehrfachableitung, Evidenz) | amt-engine | – | Patch geliefert, nach Push erledigt |
-| S21 | Hextupel in der Python-Engine: laden, Reasoning, Export, SHACL, Diagnose, How-To, Tests, Roundtrip-Beispiel | amt-engine | S19, S20 | Patch geliefert (zusammen mit S22) |
-| S22 | Hextupel im JS-Port und im Explorer, Paritätstest | amt-engine | S21 | Patch geliefert (zusammen mit S21) |
-| S23 | Runner (Beispiel, Dokumentation, Versions-Hinweis), Release Engine 0.6.0 und Runner 0.5.0 samt Zenodo | amt-engine, amt-runner | S21, S22 | offen |
+| S21 | Hextupel in der Python-Engine: laden, Reasoning, Export, SHACL, Diagnose, How-To, Tests, Roundtrip-Beispiel | amt-engine | S19, S20 | erledigt 2026-10-30 (Windows, Python 3.10, `a451995`) |
+| S22 | Hextupel im JS-Port und im Explorer, Paritätstest | amt-engine | S21 | erledigt 2026-10-30 (zusammen mit S21) |
+| S23 | Runner (Beispiel, Dokumentation, Versions-Hinweis), Release Engine 0.6.0 und Runner 0.5.0 samt Zenodo | amt-engine, amt-runner | S21, S22 | 23a Patch geliefert; 23b und 23c offen |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
 
@@ -622,6 +622,14 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 **Inhalt:** nach dem Muster von S18: 23a (Patch) Versionen in `pyproject.toml`, `amt/__init__.py`, `CITATION.cff`, `py/amt_dev_utils.py`, `CHANGELOG.md` (Engine 0.6.0; Runner 0.5.0 in `run_amt.py`, `CITATION.cff`, `py/amt_runner_dev_utils.py`, `CHANGELOG.md`); im Runner das Beispiel samt `.md`, ein README-Abschnitt und der Hinweis, dass Typ und Methode die Engine 0.6.0 brauchen (`--update`); 23b (manuell) Tag, GitHub-Release, Zenodo; 23c (Patch) Versions-DOIs.
 
 **Abnahme:** wie S18: `python main.py --strict` zweimal grün in beiden Repos, `git status` sauber, `python main.py --only smoke --strict` im Runner gegen die Engine `main`, Tags und Releases sichtbar, Versions-DOIs nach 23c in der README.
+
+### Erledigt 2026-10-30 (23a)
+
+- Engine 0.6.0: `pyproject.toml`, `amt/__init__.py`, `CITATION.cff` (`date-released` 2026-10-30), `py/amt_dev_utils.py` (`RELEASE`, `RELEASE_DATE`), `CHANGELOG.md` (`[Unreleased]` wird `[0.6.0] - 2026-10-30`, Vergleichslinks). Die Fußzeile der erzeugten Seiten nennt die neue Version, die acht Seiten gehören in den Commit.
+- Runner 0.5.0: siehe S11 im Primer des Runners.
+- Zusätzlich: `py/step_site.py` zeigt bei zwei gescheiterten Importen den ursprünglichen Fehler (Anlass: auf dem Rechner des Autors fehlten `py/site_pages.py` und `CITATION.cff`, die Meldung `'py' is not a package` verdeckte das). Die anderen Schritte haben dasselbe Muster, sind aber nicht geändert.
+- Geprüft: Engine `python main.py --strict` zweimal grün, `git status` stabil (14 Einträge: 6 Quellen, 8 erzeugte Seiten); Runner siehe dort. Das Datum 2026-10-30 gilt, wenn Tag und Release am selben Tag folgen; sonst `RELEASE_DATE` und `date-released` in einem Folgepatch anpassen.
+- Offen: 23b (manuell, siehe `PATCH-README.md` von Patch 3), 23c (Versions-DOIs), D16, D17.
 
 ## Teil D – Offene Punkte
 

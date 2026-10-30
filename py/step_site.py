@@ -59,16 +59,20 @@ try:
     import site_howto as howto
     from site_fonts import fonts_digest
     from site_home import home_page
-except ImportError:  # imported as py.step_site from the repository root
-    from py.amt_dev_utils import DOCS_DIR, ONTOLOGY_DIR, ROOT, Report
-    from py import site_figures as figs
-    from py import site_pages as pages
-    from py import site_palette as palette
-    from py import site_redirects as redirects
-    from py import site_bib as bib
-    from py import site_howto as howto
-    from py.site_fonts import fonts_digest
-    from py.site_home import home_page
+except ImportError as _first_error:  # imported as py.step_site from the repository root
+    try:
+        from py.amt_dev_utils import DOCS_DIR, ONTOLOGY_DIR, ROOT, Report
+        from py import site_figures as figs
+        from py import site_pages as pages
+        from py import site_palette as palette
+        from py import site_redirects as redirects
+        from py import site_bib as bib
+        from py import site_howto as howto
+        from py.site_fonts import fonts_digest
+        from py.site_home import home_page
+    except ImportError:
+        # Show the first failure: it names the file or package that is really missing.
+        raise _first_error from None
 
 MANIFEST = DOCS_DIR / "assets" / "figures.json"
 

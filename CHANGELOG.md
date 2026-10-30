@@ -13,6 +13,12 @@ Zenodo.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-30
+
+0.6.0 makes a statement a hextuple: besides its weight it can say what kind of fuzziness the weight expresses
+(`fw:hasType`) and how it was obtained (`fw:hasMethod`), with the vocabulary of the FW ontology. A file without
+either behaves as in 0.5.0 and has the same edges. The repository now lives under `alpaca-fair-framework`.
+
 ### Added
 
 - Type and method of a statement (the hextuple, PRIMER S21/S22). Besides `amt:weight` a statement can carry
@@ -40,6 +46,8 @@ Zenodo.
 
 ### Changed
 
+- A failed import in a step of the development pipeline (`py/step_site.py`) now shows the original error. Before,
+  the fallback import hid it behind `'py' is not a package` when the real cause was a missing file or package.
 - The Turtle output writes `amt:weight` as `xsd:decimal` instead of `xsd:double` (in Python and in the Explorer
   export), as `amt:WeightShape` requires. Before, the reasoned output of every example failed the shapes (152
   violations for `animals.reasoned.ttl`). The output of every example changes once because of this.
@@ -383,7 +391,8 @@ continuous integration.
 - The formal ontology: `ontology/amt.ttl`, `ontology/amt-shapes.ttl`, valid and
   invalid example files, `validate_examples.py` and an ontology README.
 
-[Unreleased]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/alpaca-fair-framework/amt-engine/compare/v0.3.0...v0.3.1
