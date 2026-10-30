@@ -31,6 +31,7 @@ PREFIXES = """@prefix amt:  <http://academic-meta-tool.xyz/vocab#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix fw:   <http://w3id.org/fw_ontology/> .
 @prefix ex:   <http://example.org/> .
 """
 
@@ -62,6 +63,22 @@ ex:mary    amt:instanceOf ex:Person ; rdfs:label "Mary Somerville" .
    rdf:predicate ex:knows ;
    rdf:object    ex:mary ;
    amt:weight    "0.6"^^xsd:decimal .
+""",
+    },
+    "hextuple": {
+        "kind": "good",
+        "turtle": PREFIXES + """
+ex:Person a amt:Concept ; rdfs:label "Person" .
+ex:ada     amt:instanceOf ex:Person ; rdfs:label "Ada Lovelace" .
+ex:charles amt:instanceOf ex:Person ; rdfs:label "Charles Babbage" .
+
+# The weight 0.5 is an uncertainty (one of two readings is right), obtained by an equal share.
+[] rdf:subject   ex:ada ;
+   rdf:predicate ex:knows ;
+   rdf:object    ex:charles ;
+   amt:weight    "0.5"^^xsd:decimal ;
+   fw:hasType    fw:Uncertainty ;
+   fw:hasMethod  fw:EqualShareRule .
 """,
     },
     "role": {
@@ -254,7 +271,7 @@ CATALOGUE = [
      "Declare the concept once with a label and point to it.",
      "bad-undeclared-concept"),
     ("AMT-E103", "error", "A statement with amt:weight lacks rdf:subject / rdf:predicate / rdf:object",
-     "A weighted edge needs all four properties together. A statement with a missing part is ignored.",
+     "A weighted edge needs its four required properties together (subject, predicate, object, weight). A statement with a missing part is ignored.",
      "Add the missing property.",
      "bad-incomplete"),
     ("AMT-E104", "error", "The statement ... has amt:weight X and fw:hasDegreeOfConnection Y",
@@ -353,7 +370,7 @@ Each guide starts from a small example you can copy.</p>
 <ol>
 <li><strong>Declare concepts</strong> (<code>ex:Coin a amt:Concept ; rdfs:label "Coin"</code>).</li>
 <li><strong>Make every end of every edge a node</strong> (<code>ex:c1 amt:instanceOf ex:Coin</code>), including the things your edges point <em>to</em>.</li>
-<li><strong>Write edges</strong> as a statement with <code>rdf:subject</code>, <code>rdf:predicate</code>, <code>rdf:object</code> and <code>amt:weight</code>.</li>
+<li><strong>Write edges</strong> as a statement with <code>rdf:subject</code>, <code>rdf:predicate</code>, <code>rdf:object</code> and <code>amt:weight</code>. If it matters, add <code>fw:hasType</code> and <code>fw:hasMethod</code>.</li>
 <li><strong>Check</strong> before you reason: <code>python run_amt.py my.ttl --check-only</code>.</li>
 <li><strong>Run</strong> and open the graph: <code>python run_amt.py my.ttl</code>, then <code>out\latest\my.html</code>.</li>
 </ol>
@@ -386,8 +403,9 @@ The most common mistake is to forget that <em>both ends</em> of an edge have to 
 <li><a href="#start">2. A complete file to start from</a></li>
 <li><a href="#rules">3. Seven rules</a></li>
 <li><a href="#roles">4. Roles and axioms (optional)</a></li>
-<li><a href="#convert">5. From existing RDF with SPARQL CONSTRUCT</a></li>
-<li><a href="#then">6. Then check it</a></li>
+<li><a href="#type">5. Type and method (optional)</a></li>
+<li><a href="#convert">6. From existing RDF with SPARQL CONSTRUCT</a></li>
+<li><a href="#then">7. Then check it</a></li>
 </ul>
 
 <h2 id="parts">1. The parts</h2>
@@ -397,6 +415,8 @@ The most common mistake is to forget that <em>both ends</em> of an edge have to 
 <tr><td><strong>Concept</strong></td><td>a kind of thing (Person, Coin, Authority)</td><td><code>ex:Coin a amt:Concept ; rdfs:label "Coin" .</code></td></tr>
 <tr><td><strong>Node</strong></td><td>one thing of that kind</td><td><code>ex:c1 amt:instanceOf ex:Coin ; rdfs:label "coin 1" .</code></td></tr>
 <tr><td><strong>Edge</strong></td><td>a relation between two nodes that holds to a degree</td><td>a statement with <code>rdf:subject</code>, <code>rdf:predicate</code>, <code>rdf:object</code>, <code>amt:weight</code></td></tr>
+<tr><td>Type</td><td>what kind of fuzziness the weight expresses (optional; default vagueness)</td><td><code>fw:hasType fw:Uncertainty</code></td></tr>
+<tr><td>Method</td><td>how the weight was obtained (optional)</td><td><code>fw:hasMethod fw:EqualShareRule</code></td></tr>
 <tr><td>Role</td><td>names an edge type and says what it may connect (optional until an axiom needs it)</td><td><code>ex:knows a amt:Role ; rdfs:domain ex:Person ; rdfs:range ex:Person .</code></td></tr>
 <tr><td>Axiom</td><td>a rule that derives new edges (optional)</td><td>see the <a href="../../ontology/">data model</a></td></tr>
 </tbody></table>
@@ -413,7 +433,7 @@ The most common mistake is to forget that <em>both ends</em> of an edge have to 
 <li><strong>Every end of every edge is a node</strong>: it has <code>amt:instanceOf</code>. This includes the thing an edge points <em>to</em>
 (the emperor, the place, the other person). A label alone does not make it a node.</li>
 <li><strong>Never write <code>amt:instanceOf amt:Concept</code>.</strong> amt:Concept is the class of concepts. Point at a concept of your own.</li>
-<li><strong>An edge is a statement with four properties</strong>, all together. The subject and object must be IRIs, not literals.</li>
+<li><strong>An edge is a statement with four required properties</strong>, all together: subject, predicate, object and weight. The subject and object must be IRIs, not literals. Type and method are optional (<a href="#type">section 5</a>).</li>
 <li><strong>Weights are decimals from 0 to 1</strong> (<code>0.8</code> or <code>"0.8"^^xsd:decimal</code>). 1 means certain, 0 means not at all.</li>
 <li><strong>Give nodes labels.</strong> Without one, the end of the IRI is shown, which is unreadable for IRIs like <code>.../coin?afeid=15661</code>.</li>
 <li><strong>Extra triples are fine.</strong> AMT reads the parts above and ignores the rest. A link such as <code>lado:hasAMT</code> from a coin
@@ -431,7 +451,18 @@ a domain and a range:</p>
 {_ex("role")}
 <p>All axiom types, with a figure and an example each, are on the <a href="../../ontology/">data model page</a>.</p>
 
-<h2 id="convert">5. From existing RDF with SPARQL CONSTRUCT</h2>
+<h2 id="type">5. Type and method (optional)</h2>
+<p>An edge with subject, predicate, object and weight is a quadruple and is complete. Two more parts from the
+<a href="http://w3id.org/fw_ontology/">FW ontology</a> make it a hextuple: <code>fw:hasType</code> (<code>fw:Vagueness</code>,
+<code>fw:Uncertainty</code> or <code>fw:FuzzinessWobbliness</code>) and <code>fw:hasMethod</code> (how the weight was obtained).
+Add the prefix <code>fw:</code> and write them on the edge:</p>
+{_ex("hextuple")}
+<p>Without <code>fw:hasType</code> an edge is a vagueness edge, also at weight 1. A type without a method is allowed, but the engine
+points it out (<a href="../validate/#AMT-N303"><code>AMT-N303</code></a>); a type it does not know is reported as
+<a href="../validate/#AMT-W205"><code>AMT-W205</code></a>. The reasoner gives inferred edges a method and a type as well; the
+<a href="../../ontology/#type-method">data model page</a> says how.</p>
+
+<h2 id="convert">6. From existing RDF with SPARQL CONSTRUCT</h2>
 <p>If your data is already RDF, you do not write the file by hand: a <code>CONSTRUCT</code> query produces it. The query has to
 produce <strong>three things</strong>, in this order of importance:</p>
 <ol>
@@ -604,7 +635,7 @@ RUN_OUTPUTS = [
     ("html", "The interactive graph. Double-click it; it opens in your browser and works offline."),
     ("report.md", "A readable record of the run: validation, diagnostics, counts, every inferred edge, options."),
     ("nodes.csv", "One row per node, for spreadsheets."),
-    ("edges.csv", "One row per edge with its weight, whether it was inferred, and which axioms produced it."),
+    ("edges.csv", "One row per edge with its weight, whether it was inferred, which axioms produced it, and its type and method (empty if there is none)."),
     ("cypher", "The same graph as Neo4j Cypher statements, if you want it in a graph database."),
 ]
 

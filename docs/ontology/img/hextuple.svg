@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 400" role="img" aria-labelledby="t-hextuple" font-family="Roboto, system-ui, -apple-system, Segoe UI, sans-serif">
+<title id="t-hextuple">A weighted edge: subject, role, object and a weight in [0;1]; optionally a type and a method from the FW ontology</title>
+<defs><linearGradient id="g-hextuple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--fig-node-top,#4a9a82)"/><stop offset="1" style="stop-color:var(--fig-node-bottom,#1f6b57)"/></linearGradient></defs>
+<ellipse cx="550" cy="70" rx="130" ry="37" fill="var(--fig-white-fill,#ffffff)" stroke="var(--fig-node-edge,#184838)" stroke-width="2"/>
+<text x="550" y="80.9" text-anchor="middle" font-size="31.1" font-weight="700" fill="var(--fig-white-text,#1f6b57)"><tspan font-size="31.1" dy="0">edge</tspan></text>
+<circle cx="90" cy="300" r="55" fill="url(#g-hextuple)" stroke="var(--fig-node-edge,#184838)" stroke-width="2"/>
+<text x="90" y="317.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#e3f3ec)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">1</tspan></text>
+<circle cx="270" cy="300" r="55" fill="url(#g-hextuple)" stroke="var(--fig-node-edge,#184838)" stroke-width="2"/>
+<text x="270" y="317.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#e3f3ec)"><tspan font-size="50.6" dy="0">R</tspan></text>
+<circle cx="450" cy="300" r="55" fill="url(#g-hextuple)" stroke="var(--fig-node-edge,#184838)" stroke-width="2"/>
+<text x="450" y="317.7" text-anchor="middle" font-size="50.6" font-weight="700" fill="var(--fig-node-text,#e3f3ec)"><tspan font-size="50.6" dy="0">C</tspan><tspan font-size="27.8" dy="14.2">2</tspan></text>
+<circle cx="630" cy="300" r="50" fill="var(--fig-white-fill,#ffffff)" stroke="var(--fig-node-edge,#184838)" stroke-width="2"/>
+<text x="630" y="316.1" text-anchor="middle" font-size="46" font-weight="700" fill="var(--fig-white-text,#1f6b57)"><tspan font-size="46" dy="0">[0;1]</tspan></text>
+<rect x="755" y="272" width="150" height="56" rx="9" fill="var(--fig-box-fill,#ffffff)" stroke="var(--fig-node-edge,#184838)" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="830" y="305.9" text-anchor="middle" font-size="17" font-weight="700" fill="var(--fig-box-text,#17231f)"><tspan font-size="17" dy="0">type</tspan></text>
+<rect x="935" y="272" width="150" height="56" rx="9" fill="var(--fig-box-fill,#ffffff)" stroke="var(--fig-node-edge,#184838)" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="1010" y="305.9" text-anchor="middle" font-size="17" font-weight="700" fill="var(--fig-box-text,#17231f)"><tspan font-size="17" dy="0">method</tspan></text>
+<path d="M483,103.5 L143.7,273.2" fill="none" stroke="var(--fig-line,#17231f)" stroke-width="2.2"/>
+<polygon points="143.7,273.2 152.1,263.3 156.7,272.3" fill="var(--fig-line,#17231f)"/>
+<rect x="262.1" y="172.3" width="102.4" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="313.3" y="187.6" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#17231f)"><tspan font-size="15" dy="0">rdf:subject</tspan></text>
+<path d="M505.1,106.9 L316.4,261.9" fill="none" stroke="var(--fig-line,#17231f)" stroke-width="2.2"/>
+<polygon points="316.4,261.9 322.4,250.4 328.8,258.2" fill="var(--fig-line,#17231f)"/>
+<rect x="351.1" y="168.4" width="119.2" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="410.7" y="183.6" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#17231f)"><tspan font-size="15" dy="0">rdf:predicate</tspan></text>
+<path d="M532.8,109.5 L473.9,245" fill="none" stroke="var(--fig-line,#17231f)" stroke-width="2.2"/>
+<polygon points="473.9,245 474.1,232 483.3,236" fill="var(--fig-line,#17231f)"/>
+<rect x="456.4" y="161.2" width="94" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="503.4" y="176.5" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#17231f)"><tspan font-size="15" dy="0">rdf:object</tspan></text>
+<path d="M563.8,109.7 L611.9,248.1" fill="none" stroke="var(--fig-line,#17231f)" stroke-width="2.2"/>
+<polygon points="611.9,248.1 603.2,238.4 612.7,235.1" fill="var(--fig-line,#17231f)"/>
+<rect x="540.9" y="162.9" width="94" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="587.9" y="178.1" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#17231f)"><tspan font-size="15" dy="0">amt:weight</tspan></text>
+<path d="M594.9,106.9 L792,268.8" fill="none" stroke="var(--fig-line,#17231f)" stroke-width="3.5" stroke-dasharray="11 7"/>
+<polygon points="792,268.8 779.6,265.1 786,257.3" fill="var(--fig-line,#17231f)"/>
+<rect x="656.3" y="179.9" width="94" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="703.3" y="195.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#17231f)"><tspan font-size="15" dy="0">fw:hasType</tspan></text>
+<path d="M617,103.5 L949.5,269.8" fill="none" stroke="var(--fig-line,#17231f)" stroke-width="3.5" stroke-dasharray="11 7"/>
+<polygon points="949.5,269.8 936.5,268.9 941,259.9" fill="var(--fig-line,#17231f)"/>
+<rect x="744.5" y="178.9" width="110.8" height="20" rx="4" fill="var(--fig-bg,#f8f7f1)" fill-opacity="0.9"/>
+<text x="799.9" y="194.2" text-anchor="middle" font-size="15" fill="var(--fig-box-text,#17231f)"><tspan font-size="15" dy="0">fw:hasMethod</tspan></text>
+<text x="550" y="390.2" text-anchor="middle" font-size="15" fill="var(--fig-muted,#6b7a74)"><tspan font-size="15" dy="0">dashed: optional. Without fw:hasType the statement is a vagueness statement.</tspan></text>
+</svg>

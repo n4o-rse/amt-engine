@@ -28,7 +28,7 @@ Each guide starts from a small example you can copy.</p>
 <ol>
 <li><strong>Declare concepts</strong> (<code>ex:Coin a amt:Concept ; rdfs:label "Coin"</code>).</li>
 <li><strong>Make every end of every edge a node</strong> (<code>ex:c1 amt:instanceOf ex:Coin</code>), including the things your edges point <em>to</em>.</li>
-<li><strong>Write edges</strong> as a statement with <code>rdf:subject</code>, <code>rdf:predicate</code>, <code>rdf:object</code> and <code>amt:weight</code>.</li>
+<li><strong>Write edges</strong> as a statement with <code>rdf:subject</code>, <code>rdf:predicate</code>, <code>rdf:object</code> and <code>amt:weight</code>. If it matters, add <code>fw:hasType</code> and <code>fw:hasMethod</code>.</li>
 <li><strong>Check</strong> before you reason: <code>python run_amt.py my.ttl --check-only</code>.</li>
 <li><strong>Run</strong> and open the graph: <code>python run_amt.py my.ttl</code>, then <code>out\latest\my.html</code>.</li>
 </ol>

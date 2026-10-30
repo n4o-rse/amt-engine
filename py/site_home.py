@@ -47,6 +47,7 @@ TEXT = {
         "can_h": "What AMT can do",
         "can": [
             "Weighted relations between concepts, in plain RDF (Turtle).",
+            "Type and method of each weight from the FW ontology (vagueness, uncertainty; how it was obtained), so that a statement is a hextuple.",
             "Rule-based inference to a fixed point: role chains of any length, inverse roles and role subsumption.",
             "Consistency checks: roles that exclude each other, roles that must not point back at their own node.",
             "Six fuzzy logics to combine weights: Gödel, product, Łukasiewicz, Einstein, geometric mean and Hamacher.",
@@ -109,6 +110,7 @@ TEXT = {
         "can_h": "Was AMT kann",
         "can": [
             "Gewichtete Beziehungen zwischen Konzepten, in schlichtem RDF (Turtle).",
+            "Typ und Methode jedes Gewichts aus der FW-Ontologie (Vagheit, Unsicherheit; wie es zustande kam), sodass eine Aussage ein Hextupel ist.",
             "Regelbasiertes Ableiten bis zum Fixpunkt: Rollenketten beliebiger Länge, inverse Rollen und "
             "Rollen-Subsumtion.",
             "Konsistenzprüfungen: Rollen, die sich ausschließen, und Rollen, die nicht auf den eigenen Knoten "

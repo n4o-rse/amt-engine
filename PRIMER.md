@@ -636,6 +636,21 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 - 23b (durch den Autor): Commit `f0c69df`, annotierter Tag `v0.6.0`, GitHub-Release, Zenodo. Versions-DOI Engine 0.6.0: `10.5281/zenodo.23809706`; die Concept-DOI `10.5281/zenodo.23669466` bleibt. Der Ordnername im Zenodo-Archiv (`…-amt-engine-6f5690d`) ist die Kennung des annotierten Tags, nicht die des Commits `f0c69df` (`git rev-parse v0.6.0` gibt `6f5690d`, `git rev-parse v0.6.0^{}` gibt `f0c69df`); der Inhalt ist der Commit.
 - 23c (Patch): die Versions-DOI in README (Abschnitt „Citation“) und unter `[Unreleased]` im CHANGELOG. Der Runner-Teil (`10.5281/zenodo.23809732`) steht im Primer des Runners (S11).
 
+### S24 – Dokumentationsseiten auf das Hextupel bringen
+
+**Ziel:** Die erzeugten Seiten (Datenmodell, How-To, Vokabular, Startseite) beschreiben die Kante als Hextupel, nicht mehr als Quadrupel.
+
+**Anlass:** Prüfung am 2026-10-30: S20 bis S23 hatten Code, README, Beispiel und Explorer nachgezogen, die Texte und die Grafik der Seiten nicht.
+
+**Inhalt:** `py/site_pages.py` (Abschnitt „Weighted edges“, Unterabschnitt „Type and method“, Vokabularabschnitt `#fw`, Tabelle „By release“, Präfix `fw:`), `py/site_figures.py` (Grafik `hextuple` statt `quadruple`), `py/site_howto.py` (Teile-Tabelle, Regel 4, Abschnitt 5, Beispiel `hextuple`, `edges.csv`), `py/site_home.py` (en und de). Keine Änderung an `amt/`, an der Ontologie oder an der Version.
+
+**Abnahme:** `python main.py --strict` zweimal grün, `git status` stabil; `grep -ri quadruple docs/` findet nur den Kern („Four parts are required … a quadruple“); das neue How-To-Beispiel besteht SHACL und Diagnose (`tests/test_howto.py`).
+
+### Erledigt 2026-10-30 (S24)
+
+- Umgesetzt wie beschrieben; 172 Tests grün. Die Datei `docs/assets/figures.json` und die Bilder unter `docs/ontology/img/` entstehen neu.
+- Offen: Randtext im Explorer-Dialog (RDF-Export) nicht geprüft.
+
 ## Teil D – Offene Punkte
 
 - **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.

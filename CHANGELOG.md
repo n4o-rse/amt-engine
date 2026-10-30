@@ -15,6 +15,15 @@ Zenodo.
 
 ### Changed
 
+- Documentation site brought up to the hextuple (S24). The pages still described an edge as a quadruple.
+  Data model: "Weighted edges" now shows the core (subject, role, object, weight) and the optional `fw:hasType`
+  and `fw:hasMethod`, with a new figure `hextuple` (replaces `quadruple`), an example with evidence, and a
+  section "Type and method" (default vagueness, `fw:hasDegreeOfConnection`, how inferred edges get type and
+  method). How-To "Build an AMT file": type and method in the parts table, rule 4 and a new section 5 with a tested example.
+  Vocabulary: section "Terms from the FW ontology" and a table of changes by release tag (`v0.1.0` to `v0.6.0`).
+  Run page: `edges.csv` columns. Start page (English and German): one more line under "What AMT can do".
+  The prefix `fw:` is part of the prefixes shown on the pages. No change to `amt/`, the ontology or the version.
+
 - `README.md`, "Citation": names the version DOI of 0.6.0,
   `10.5281/zenodo.23809706`. The concept DOI is unchanged.
 

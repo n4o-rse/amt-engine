@@ -40,6 +40,7 @@ PREFIXES = """@prefix amt:  <http://academic-meta-tool.xyz/vocab#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix fw:   <http://w3id.org/fw_ontology/> .
 @prefix ex:   <http://example.org/> .
 """
 
@@ -62,6 +63,14 @@ ex:charles amt:instanceOf ex:Person ;
    rdf:predicate ex:connectedWith ;
    rdf:object    ex:charles ;
    amt:weight    "0.8"^^xsd:decimal .""",
+    "hextuple": """[] rdf:subject    ex:ada ;
+   rdf:predicate  ex:connectedWith ;
+   rdf:object     ex:charles ;
+   amt:weight     "0.5"^^xsd:decimal ;
+   fw:hasType     fw:Uncertainty ;
+   fw:hasMethod   fw:EqualShareRule ;
+   fw:derivedFrom [ a fw:TextEvidence ;
+                    fw:sourceString "Letter damaged: Charles or Mary." ] .""",
     "rca": """ex:RCA a amt:RoleChainAxiom ;
     amt:antecedents ( ex:connectedWith ex:connectedWith ) ;
     amt:consequent  ex:connectedWith ;
@@ -223,6 +232,28 @@ def _term_card(g: Graph, iri: str, extra_rows: list[tuple[str, str]] = ()) -> st
 # --------------------------------------------------------------------------- #
 # vocabulary page
 # --------------------------------------------------------------------------- #
+FW_SECTION = (
+    '<h2 id="fw">Terms from the FW ontology</h2>'
+    '<p>A statement can carry two more parts from the <a href="http://w3id.org/fw_ontology/">FW ontology</a> '
+    '(<code>http://w3id.org/fw_ontology/</code>, prefix <code>fw:</code>), which turns the quadruple into a hextuple. '
+    'These terms are defined there, not in <code>amt.ttl</code>; AMT reads and writes them as follows.</p>'
+    '<table><thead><tr><th>Term</th><th>Use in AMT</th></tr></thead><tbody>'
+    '<tr><td><code>fw:hasType</code></td><td>Kind of fuzziness of the weight: <code>fw:Vagueness</code> (default), '
+    '<code>fw:Uncertainty</code> or <code>fw:FuzzinessWobbliness</code>.</td></tr>'
+    '<tr><td><code>fw:hasMethod</code></td><td>How the weight was obtained, for example <code>fw:EqualShareRule</code>. '
+    'On an inferred edge it is the logic of the role chain axiom.</td></tr>'
+    '<tr><td><code>fw:hasDegreeOfConnection</code></td><td>The FW name for the weight. Read like <code>amt:weight</code>; '
+    'the engine writes <code>amt:weight</code>.</td></tr>'
+    '<tr><td><code>fw:derivedFrom</code>, <code>fw:TextEvidence</code>, <code>fw:sourceString</code></td>'
+    '<td>Optional evidence for a statement. Passed through unchanged.</td></tr>'
+    '<tr><td><code>fw:PropagationMethod</code></td><td>Each fuzzy logic above is declared as one in <code>amt.ttl</code>, '
+    'so that it can be named in <code>fw:hasMethod</code>.</td></tr>'
+    '</tbody></table>'
+    '<p>How type and method are used and passed on by the rules is described on the '
+    '<a href="../ontology/#type-method">ontology page</a>.</p>'
+)
+
+
 def vocab_page(g: Graph, overview_svg: str) -> str:
     onto = ONTOLOGY_IRI
     title = _lit(g, onto, URIRef(DCT + "title")) or "Academic Meta Tool Ontology"
@@ -258,6 +289,7 @@ def vocab_page(g: Graph, overview_svg: str) -> str:
 
     toc = ('<ul class="toc"><li><a href="#classes">Classes</a></li><li><a href="#properties">Properties</a></li>'
            '<li><a href="#logics">Fuzzy logics</a></li><li><a href="#rules">Reasoning rules</a></li>'
+           '<li><a href="#fw">FW ontology terms</a></li>'
            '<li><a href="#changes">Changes since 2018</a></li></ul>')
 
     parts = [
@@ -308,6 +340,7 @@ def vocab_page(g: Graph, overview_svg: str) -> str:
         if eff:
             rows2.append(("Effect", escape(eff)))
         parts.append(_term_card(g, r, rows2))
+    parts.append(FW_SECTION)
     parts.append('<h2 id="changes">Changes since 2018</h2>'
                  '<p>The 2018 vocabulary ("Penny Edition") had 25 terms. All of them are still here with the same '
                  'identifiers; nothing was removed or renamed. What changed:</p><ul>'
@@ -319,7 +352,19 @@ def vocab_page(g: Graph, overview_svg: str) -> str:
                  'also typed them as <code>owl:Class</code>, <code>owl:ObjectProperty</code> and '
                  '<code>owl:DatatypeProperty</code>.</li>'
                  '<li>The ontology resource is <code>http://academic-meta-tool.xyz/vocab</code> (without the hash).</li>'
-                 '</ul>')
+                 '<li>Each fuzzy operator is also an <code>fw:PropagationMethod</code> of the FW ontology '
+                 '(<a href="#fw">FW ontology terms</a>).</li>'
+                 '</ul><h3 id="by-version">By release</h3>'
+                 '<p>The vocabulary grew with the engine. The tags are in the '
+                 '<a href="https://github.com/alpaca-fair-framework/amt-engine/tags">repository</a>; details are in the '
+                 '<a href="https://github.com/alpaca-fair-framework/amt-engine/blob/main/CHANGELOG.md">changelog</a>.</p>'
+                 '<table><thead><tr><th>Tag</th><th>Date</th><th>Vocabulary</th></tr></thead><tbody>'
+                 '<tr><td><code>v0.1.0</code></td><td>2026-04-28</td><td>the formal ontology <code>amt.ttl</code> with SHACL shapes</td></tr>'
+                 '<tr><td><code>v0.2.0</code></td><td>2026-05-05</td><td><code>amt:antecedents</code>: role chains of any length (the 2018 pair <code>antecedent1</code>/<code>antecedent2</code> stays valid)</td></tr>'
+                 '<tr><td><code>v0.3.0</code></td><td>2026-08-29</td><td><code>amt:SubsumptionAxiom</code></td></tr>'
+                 '<tr><td><code>v0.4.0</code></td><td>2026-10-27</td><td>this page; creators, licence and source on the ontology resource; downloads as Turtle, RDF/XML and JSON-LD</td></tr>'
+                 '<tr><td><code>v0.6.0</code></td><td>2026-10-30</td><td>prefix <code>fw:</code>; the six logics are also <code>fw:PropagationMethod</code>; <code>fw:hasType</code>, <code>fw:hasMethod</code> and evidence are read and written</td></tr>'
+                 '</tbody></table>')
     return page(title=f"{title.replace('Ontology', 'Vocabulary')} – AMT", body="\n".join(parts),
                 depth=1, current="vocab",
                 description="Classes, properties, fuzzy logics and reasoning rules of the Academic Meta Tool vocabulary.")
@@ -371,10 +416,33 @@ should look like.</p>
 {_code("role")}
 
 <h2 id="edges">Weighted edges</h2>
-<p>An edge is a quadruple: a subject, a role, an object and a weight between 0 and 1 in <code>amt:weight</code>.
-It is written as a reified statement, so that the weight has something to attach to.</p>
-{fig("quadruple", "A weighted edge: subject, role, object and weight in [0;1].")}
+<p>An edge is written as a reified statement, so that the weight has something to attach to. Four parts are required:
+a subject, a role, an object and a weight between 0 and 1 in <code>amt:weight</code>. This is the core, a quadruple.</p>
 {_code("quadruple")}
+<p>The <a href="http://w3id.org/fw_ontology/">FW ontology</a> (prefix <code>fw:</code>) adds two optional parts, which make
+the edge a <strong>hextuple</strong>: <code>fw:hasType</code> says what kind of fuzziness the weight expresses and
+<code>fw:hasMethod</code> says how the weight was obtained. A quadruple stays valid; nothing has to be added.</p>
+{fig("hextuple", "A weighted edge: subject, role, object and weight, and optionally a type and a method.")}
+{_code("hextuple")}
+
+<h3 id="type-method">Type and method</h3>
+<table><thead><tr><th>Part</th><th>Values</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>fw:hasType</code></td><td><code>fw:Vagueness</code></td><td>the relation holds to a degree (the default)</td></tr>
+<tr><td></td><td><code>fw:Uncertainty</code></td><td>the relation holds or not, and we do not know which</td></tr>
+<tr><td></td><td><code>fw:FuzzinessWobbliness</code></td><td>both at once; also the type of an inferred edge whose antecedents differ in type</td></tr>
+<tr><td><code>fw:hasMethod</code></td><td>for example <code>fw:EqualShareRule</code></td><td>how the weight was obtained; for an inferred edge, the logic that computed it</td></tr>
+</tbody></table>
+<ul>
+<li><strong>Default.</strong> A statement without <code>fw:hasType</code> is a vagueness statement, also at weight 1. The engine does not
+write this default into its output unless it was in the input.</li>
+<li><strong>Evidence.</strong> <code>fw:derivedFrom</code> (for example a <code>fw:TextEvidence</code> with a
+<code>fw:sourceString</code>) is optional and is passed through unchanged.</li>
+<li><strong>Another name for the weight.</strong> <code>fw:hasDegreeOfConnection</code> is read like <code>amt:weight</code>; the
+engine writes <code>amt:weight</code>.</li>
+<li><strong>Inferred edges.</strong> A role chain gives the edge the logic as its method and the common type of the antecedents,
+or <code>fw:FuzzinessWobbliness</code> if they differ. An inverse or subsumed edge has no method and takes the type of the edge it comes from.
+If several paths lead to the same edge, the highest weight wins; at equal weight the choice is fixed, so the result does not change between runs.</li>
+</ul>
 
 <h2 id="axioms">Axioms</h2>
 <p>Axioms are statements about roles, not about individuals. Inference axioms derive new edges, integrity axioms
@@ -382,7 +450,7 @@ describe edges that must not exist.</p>
 
 <h3 id="rca">Role chain axiom</h3>
 <p>If a chain of edges exists, an edge between its two ends is inferred. Its weight is computed from the weights along the
-chain by the fuzzy logic named in <code>amt:logic</code>. <code>amt:antecedents</code> takes a list of any length; the
+chain by the fuzzy logic named in <code>amt:logic</code>; that logic is also the method of the new edge (<a href="#type-method">type and method</a>). <code>amt:antecedents</code> takes a list of any length; the
 older two-step form with <code>amt:antecedent1</code> and <code>amt:antecedent2</code> is still valid.</p>
 {fig("rca", "Two steps: the consequent holds between the two ends of the chain.")}
 {_code("rca")}
@@ -392,7 +460,7 @@ older two-step form with <code>amt:antecedent1</code> and <code>amt:antecedent2<
 {_code("rca-param")}
 
 <h3 id="inverse">Inverse axiom</h3>
-<p>An edge with the antecedent role implies the reverse edge with the inverse role, at the same weight.</p>
+<p>An edge with the antecedent role implies the reverse edge with the inverse role, at the same weight. Its type is that of the edge it comes from; it has no method.</p>
 {fig("ia", "Two roles that are the inverse of each other.")}
 {_code("inverse")}
 
@@ -414,7 +482,8 @@ Only the direct step is declared; the engine computes the transitive closure.</p
 
 <h2 id="logics">Fuzzy logics</h2>
 <p>The operators below combine the weights along a chain. Which one fits depends on how you want the length of a chain to
-count; the <a href="../vocab/#logics">vocabulary page</a> has a usage hint for each.</p>
+count; the <a href="../vocab/#logics">vocabulary page</a> has a usage hint for each. Each operator is also a
+<code>fw:PropagationMethod</code> of the FW ontology.</p>
 <table><thead><tr><th>Operator</th><th>Formula</th><th>Arity</th></tr></thead><tbody>{logic_rows}</tbody></table>
 
 <h2 id="validation">Checking a file</h2>
@@ -423,4 +492,4 @@ check that weights lie in [0, 1], that axioms have the properties they need and 
 forms. The AMT engine runs them before it loads a file.</p>
 """
     return page(title="The AMT data model – AMT", body=body, depth=1, current="ontology",
-                description="How an Academic Meta Tool data file is built: concepts, roles, weighted edges and axioms.")
+                description="How an Academic Meta Tool data file is built: concepts, roles, weighted edges with type and method, and axioms.")

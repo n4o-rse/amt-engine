@@ -104,7 +104,7 @@ ex:vespasian rdfs:label &quot;vespasian&quot; .          # a label does not make
 <div class="term" id="AMT-E103">
 <h3><code>AMT-E103</code> <span class="badge">error</span></h3>
 <p><strong>A statement with amt:weight lacks rdf:subject / rdf:predicate / rdf:object</strong></p>
-<p><em>Cause.</em> A weighted edge needs all four properties together. A statement with a missing part is ignored.</p>
+<p><em>Cause.</em> A weighted edge needs its four required properties together (subject, predicate, object, weight). A statement with a missing part is ignored.</p>
 <p><em>Fix.</em> Add the missing property.</p>
 <h4>Example</h4><pre><code>ex:C a amt:Concept ; rdfs:label &quot;C&quot; .
 ex:a amt:instanceOf ex:C .

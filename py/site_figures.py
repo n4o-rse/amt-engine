@@ -499,17 +499,23 @@ def fig_role() -> Scene:
     return s
 
 
-def fig_quadruple() -> Scene:
-    s = Scene("quadruple", 900, 380, "A weighted edge: a quadruple of subject, role, object and a weight in [0;1]")
-    s.ellipse("e", 450, 70, 260, 74, "edge")
-    s.circle("a", 130, 290, "C_1", d=110)
-    s.circle("r", 370, 290, "R", d=110)
-    s.circle("b", 610, 290, "C_2", d=110)
-    s.circle("w", 810, 290, "[0;1]", d=100, style="white")
+def fig_hextuple() -> Scene:
+    s = Scene("hextuple", 1100, 400,
+              "A weighted edge: subject, role, object and a weight in [0;1]; optionally a type and a method from the FW ontology")
+    s.ellipse("e", 550, 70, 260, 74, "edge")
+    s.circle("a", 90, 300, "C_1", d=110)
+    s.circle("r", 270, 300, "R", d=110)
+    s.circle("b", 450, 300, "C_2", d=110)
+    s.circle("w", 630, 300, "[0;1]", d=100, style="white")
+    s.box("t", 830, 300, 150, 56, "type", dashed=True)
+    s.box("m", 1010, 300, 150, 56, "method", dashed=True)
     s.edge("e", "a", "rdf:subject", label_at=0.5, label_dy=-6)
     s.edge("e", "r", "rdf:predicate", label_at=0.5, label_dy=-6)
     s.edge("e", "b", "rdf:object", label_at=0.5, label_dy=-6)
     s.edge("e", "w", "amt:weight", label_at=0.5, label_dy=-6)
+    s.edge("e", "t", "fw:hasType", style="dashed", label_at=0.55, label_dy=-6)
+    s.edge("e", "m", "fw:hasMethod", style="dashed", label_at=0.55, label_dy=-6)
+    s.text(550, 385, "dashed: optional. Without fw:hasType the statement is a vagueness statement.", 15)
     return s
 
 
@@ -577,7 +583,7 @@ def fig_subsumption() -> Scene:
 
 
 SMALL_FIGURES = {
-    "concept": fig_concept, "role": fig_role, "quadruple": fig_quadruple, "rca": fig_rca,
+    "concept": fig_concept, "role": fig_role, "hextuple": fig_hextuple, "rca": fig_rca,
     "rca-nary": fig_rca_nary, "ia": fig_inverse, "da": fig_disjoint, "sda": fig_self_disjoint,
     "subsumption": fig_subsumption,
 }
@@ -663,7 +669,7 @@ def overview_scene(graph) -> Scene:
         if dname is None:
             if rname in classes:                    # e.g. instanceOf: points back at its range
                 loops.append((rname, name))
-            continue                                # e.g. weight: drawn in the quadruple figure
+            continue                                # e.g. weight: drawn in the hextuple figure
         if dname in ("Logic", "ReasoningRule") and rname in ("xsd:string", "xsd:boolean"):
             extra.setdefault(dname, []).append(name)
             continue
