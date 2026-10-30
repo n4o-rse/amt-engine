@@ -125,6 +125,11 @@ var styleEdges = function(edges) {
         edges[i].length  = 350;
         edges[i].smooth  = { type: "dynamic" };
         edges[i].label   = roleShort + ": " + weightVal;
+        // Hover text: asserted or inferred, the type (vagueness unless the
+        // statement says otherwise) and, if there is one, the method.
+        edges[i].title   = (isReasoned ? "inferred" : "asserted") +
+            " | type: " + (edges[i].type ? shortenURI(edges[i].type) : "Vagueness") +
+            (edges[i].method ? " | method: " + shortenURI(edges[i].method) : "");
         edges[i].color   = {
             color:     isReasoned ? amtColour("inferred", "#c62828") : amtColour("asserted", "#2c3a52"),
             highlight: "#555555"
@@ -298,7 +303,9 @@ var exportRDF = function() {
         out += blank + " rdf:subject   ex:" + e.from.replace(ex, "")  + " .\r\n";
         out += blank + " rdf:predicate ex:" + e.role.replace(ex, "")  + " .\r\n";
         out += blank + " rdf:object    ex:" + e.to.replace(ex, "")    + " .\r\n";
-        out += blank + " amt:weight    \"" + w + "\"^^<http://www.w3.org/2001/XMLSchema#double> .\r\n";
+        out += blank + " amt:weight    \"" + w + "\"^^<http://www.w3.org/2001/XMLSchema#decimal>" +
+               (e.type ? " ;\r\n    <http://w3id.org/fw_ontology/hasType> <" + e.type + ">" : "") +
+               (e.method ? " ;\r\n    <http://w3id.org/fw_ontology/hasMethod> <" + e.method + ">" : "") + " .\r\n";
     }
     out = out.replace(/Infinity/g, "1.0");
 

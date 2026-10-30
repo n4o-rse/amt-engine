@@ -20,6 +20,7 @@ from pathlib import Path
 from pyshacl import validate as _pyshacl_validate
 
 from ._resources import ontology_candidates, ontology_dir as _bundled_ontology_dir
+from .core import is_existing_path
 
 
 # Hints for the messages of ontology/amt-shapes.ttl: (start of the message, what to do).
@@ -136,7 +137,7 @@ def validate_against_shapes(
     # Resolve data_source: if it's a path that exists, pass it through;
     # otherwise treat it as raw Turtle.
     src_str = str(data_source)
-    if Path(src_str).exists():
+    if is_existing_path(src_str):
         data_kwargs = {"data_graph": src_str}
     else:
         data_kwargs = {"data_graph": src_str, "data_graph_format": "turtle"}

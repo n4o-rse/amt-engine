@@ -1,195 +1,5 @@
 [
   {
-    "@id": "http://academic-meta-tool.xyz/vocab#ReasoningRule",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Informal but normative description of an inference or consistency rule."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Reasoning Rule"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#subRole",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "The finer role. Every edge carrying it also carries the super-role."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "sub-role"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#EinsteinProduct",
-    "@type": [
-      "http://academic-meta-tool.xyz/vocab#Logic"
-    ],
-    "http://academic-meta-tool.xyz/vocab#arity": [
-      {
-        "@value": "binary"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#formula": [
-      {
-        "@value": "(x * y) / (2 - (x + y - x * y))"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#isParametrised": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#boolean",
-        "@value": false
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#recommendedFor": [
-      {
-        "@value": "Automatically generated mappings of medium confidence. Good middle ground for n=3 and n=4."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Soft multiplication, lying between Gödel and Product. Stricter than Gödel, gentler than Product."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Einstein product"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#RoleChainRule",
-    "@type": [
-      "http://academic-meta-tool.xyz/vocab#ReasoningRule"
-    ],
-    "http://academic-meta-tool.xyz/vocab#appliesTo": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#effect": [
-      {
-        "@value": "Add a new edge from source of e_1 to target of e_n with role = consequent and weight = logic(weight(e_1), ..., weight(e_n)). Mark the edge as inferred. Iterate to fixpoint."
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#precondition": [
-      {
-        "@value": "There exists a sequence of edges e_1, ..., e_n such that e_i has role antecedents[i] and the target of e_i equals the source of e_{i+1}."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Role Chain Inference Rule"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#appliesTo",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#ReasoningRule"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "applies to"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#Class"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#antecedent",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Role whose inverse is being declared."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#InverseAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "antecedent"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#antecedent2",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Second role in a 2-step role chain (legacy form)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "antecedent 2"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
     "@id": "http://academic-meta-tool.xyz/vocab#instanceOf",
     "@type": [
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
@@ -209,6 +19,102 @@
     "http://www.w3.org/2000/01/rdf-schema#range": [
       {
         "@id": "http://academic-meta-tool.xyz/vocab#Concept"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#logicParameter",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Numeric parameter for parametrised logics (e.g. gamma for Hamacher product)."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "logic parameter"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#decimal"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#recommendedFor",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Free-text hint about typical use cases of the operator."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "recommended for"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#HamacherProduct",
+    "@type": [
+      "http://academic-meta-tool.xyz/vocab#Logic",
+      "http://w3id.org/fw_ontology/PropagationMethod"
+    ],
+    "http://academic-meta-tool.xyz/vocab#arity": [
+      {
+        "@value": "binary"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#formula": [
+      {
+        "@value": "(x * y) / (gamma + (1 - gamma) * (x + y - x * y))"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#isParametrised": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean",
+        "@value": true
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#recommendedFor": [
+      {
+        "@value": "Research applications where path-length sensitivity should be tuned empirically. gamma = 1 equals Product; gamma < 1 stricter; gamma > 1 softer."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Parametrised t-norm family. Sensitivity to path length is controlled by a gamma parameter."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Hamacher product"
       }
     ]
   },
@@ -241,32 +147,66 @@
     ]
   },
   {
-    "@id": "http://academic-meta-tool.xyz/vocab#Axiom",
+    "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionAxiom",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Abstract base class for all AMT axioms."
+        "@value": "Asserts that one role is finer than another: every edge carrying the sub-role also carries the super-role, at no lower weight. A statement about roles, not about any pair of nodes."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Axiom"
+        "@value": "Subsumption Axiom"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#Class"
+        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
+      }
+    ],
+    "http://www.w3.org/2004/02/skos/core#note": [
+      {
+        "@value": "Two readings. Entailment: if edge (a -subRole-> b) exists with weight w, infer (a -superRole-> b) with weight w. Redundancy elimination: if both (a -subRole-> b, w1) and (a -superRole-> b, w2) exist with w1 >= w2, the super-role edge is implied and may be suppressed. An implementation must offer entailment as its default and elimination as an option, because a consumer that does not know the role hierarchy needs every edge spelled out."
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#InverseAxiom",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Asserts that two roles are inverses of each other."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Inverse Axiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
+      }
+    ],
+    "http://www.w3.org/2004/02/skos/core#note": [
+      {
+        "@value": "Reasoning rule: if edge (a -antecedent-> b) exists with weight w, infer (b -inverse-> a) with weight w."
       }
     ]
   },
   {
     "@id": "http://academic-meta-tool.xyz/vocab#LukasiewiczLogic",
     "@type": [
-      "http://academic-meta-tool.xyz/vocab#Logic"
+      "http://academic-meta-tool.xyz/vocab#Logic",
+      "http://w3id.org/fw_ontology/PropagationMethod"
     ],
     "http://academic-meta-tool.xyz/vocab#arity": [
       {
@@ -303,9 +243,316 @@
     ]
   },
   {
+    "@id": "http://academic-meta-tool.xyz/vocab#role2",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Second role in a disjointness assertion."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#DisjointAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "role 2"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#Role",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "A typed relation between Concepts (e.g. connectedWith, partOf)."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Role"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Axiom that derives new edges from existing ones."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Inference Axiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Axiom"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#inverse",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Inverse role of the antecedent."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#InverseAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "inverse"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#subRole",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The finer role. Every edge carrying it also carries the super-role."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "sub-role"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#IntegrityAxiom",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Axiom that constrains which edge configurations are valid."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Integrity Axiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Axiom"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#isParametrised",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "True if the operator requires an additional numeric parameter (provided via amt:logicParameter on the axiom)."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "is parametrised"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#antecedent2",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Second role in a 2-step role chain (legacy form)."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "antecedent 2"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#ReasoningRule",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Informal but normative description of an inference or consistency rule."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Reasoning Rule"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#role1",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "First role in a disjointness assertion."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#DisjointAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "role 1"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#Concept",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "A class of entities in the modelled domain (e.g. Person, Place)."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Concept"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#Class"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#antecedent1",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "First role in a 2-step role chain (legacy form). Use amt:antecedents for chains of length n != 2."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "antecedent 1"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
     "@id": "http://academic-meta-tool.xyz/vocab#ProductLogic",
     "@type": [
-      "http://academic-meta-tool.xyz/vocab#Logic"
+      "http://academic-meta-tool.xyz/vocab#Logic",
+      "http://w3id.org/fw_ontology/PropagationMethod"
     ],
     "http://academic-meta-tool.xyz/vocab#arity": [
       {
@@ -342,41 +589,51 @@
     ]
   },
   {
-    "@id": "http://academic-meta-tool.xyz/vocab#GeometricMean",
+    "@id": "http://academic-meta-tool.xyz/vocab#InverseRule",
     "@type": [
-      "http://academic-meta-tool.xyz/vocab#Logic"
+      "http://academic-meta-tool.xyz/vocab#ReasoningRule"
     ],
-    "http://academic-meta-tool.xyz/vocab#arity": [
+    "http://academic-meta-tool.xyz/vocab#appliesTo": [
       {
-        "@value": "n-ary"
+        "@id": "http://academic-meta-tool.xyz/vocab#InverseAxiom"
       }
     ],
-    "http://academic-meta-tool.xyz/vocab#formula": [
+    "http://academic-meta-tool.xyz/vocab#effect": [
       {
-        "@value": "(x_1 * x_2 * ... * x_n)^(1/n)"
+        "@value": "Add an edge (b -inverse-> a) with weight w. Mark the edge as inferred. Iterate to fixpoint."
       }
     ],
-    "http://academic-meta-tool.xyz/vocab#isParametrised": [
+    "http://academic-meta-tool.xyz/vocab#precondition": [
       {
-        "@type": "http://www.w3.org/2001/XMLSchema#boolean",
-        "@value": false
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#recommendedFor": [
-      {
-        "@value": "Comparing inferences across different chain lengths. Recommended default for n >= 4. Note: not a t-norm in the strict sense."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Aggregation operator: n-th root of the product. Path-length neutral; expresses average link quality."
+        "@value": "There exists an edge (a -antecedent-> b) with weight w."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Geometric mean"
+        "@value": "Inverse Inference Rule"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#precondition",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#ReasoningRule"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "precondition"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#string"
       }
     ]
   },
@@ -409,739 +666,6 @@
     ]
   },
   {
-    "@id": "http://academic-meta-tool.xyz/vocab#effect",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#ReasoningRule"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "effect"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionAxiom",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Asserts that one role is finer than another: every edge carrying the sub-role also carries the super-role, at no lower weight. A statement about roles, not about any pair of nodes."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Subsumption Axiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
-      }
-    ],
-    "http://www.w3.org/2004/02/skos/core#note": [
-      {
-        "@value": "Two readings. Entailment: if edge (a -subRole-> b) exists with weight w, infer (a -superRole-> b) with weight w. Redundancy elimination: if both (a -subRole-> b, w1) and (a -superRole-> b, w2) exist with w1 >= w2, the super-role edge is implied and may be suppressed. An implementation must offer entailment as its default and elimination as an option, because a consumer that does not know the role hierarchy needs every edge spelled out."
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#superRole",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "The coarser role, implied by the sub-role at no lower weight."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "super-role"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#inverse",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Inverse role of the antecedent."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#InverseAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "inverse"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#Role",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "A typed relation between Concepts (e.g. connectedWith, partOf)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Role"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#recommendedFor",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Free-text hint about typical use cases of the operator."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "recommended for"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Asserts that a chain of roles implies a consequent role; supports both legacy 2-ary form (antecedent1/antecedent2) and n-ary form (antecedents as RDF list)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Role Chain Axiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
-      }
-    ],
-    "http://www.w3.org/2004/02/skos/core#note": [
-      {
-        "@value": "Reasoning rule: if edges (a -r1-> b) and (b -r2-> c) exist with weights w1 and w2, infer (a -consequent-> c) with weight = logic(w1, w2). Generalises to n antecedents."
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#logic",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Fuzzy logic operator used to combine weights along the inference chain."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "logic"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#InverseAxiom",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Asserts that two roles are inverses of each other."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Inverse Axiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
-      }
-    ],
-    "http://www.w3.org/2004/02/skos/core#note": [
-      {
-        "@value": "Reasoning rule: if edge (a -antecedent-> b) exists with weight w, infer (b -inverse-> a) with weight w."
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#isParametrised",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "True if the operator requires an additional numeric parameter (provided via amt:logicParameter on the axiom)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "is parametrised"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#boolean"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#consequent",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Role inferred between the first and last node of the chain."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "consequent"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#weight",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Fuzzy truth value in the closed interval [0, 1] attached to a quadruple."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "weight"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#decimal"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#role2",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Second role in a disjointness assertion."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#DisjointAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "role 2"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#DisjointRule",
-    "@type": [
-      "http://academic-meta-tool.xyz/vocab#ReasoningRule"
-    ],
-    "http://academic-meta-tool.xyz/vocab#appliesTo": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#DisjointAxiom"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#effect": [
-      {
-        "@value": "Report a consistency violation. Both edges contradict the disjointness assertion."
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#precondition": [
-      {
-        "@value": "There exist edges (a -role1-> b) and (a -role2-> b) with weights > 0."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Disjoint Consistency Rule"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Axiom that derives new edges from existing ones."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Inference Axiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Axiom"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#antecedent1",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "First role in a 2-step role chain (legacy form). Use amt:antecedents for chains of length n != 2."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "antecedent 1"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#arity",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Either 'binary' (associative, can be applied pairwise) or 'n-ary' (must receive the full weight list at once)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "arity"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#role",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Role declared as self-disjoint (irreflexive)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#SelfDisjointAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "role"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#GoedelLogic",
-    "@type": [
-      "http://academic-meta-tool.xyz/vocab#Logic"
-    ],
-    "http://academic-meta-tool.xyz/vocab#arity": [
-      {
-        "@value": "binary"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#formula": [
-      {
-        "@value": "min(x, y)"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#isParametrised": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#boolean",
-        "@value": false
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#recommendedFor": [
-      {
-        "@value": "Curated mappings; chains where path length should not penalise the result. Good default for n=2 and n=3."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Bottleneck semantics: the chain is as strong as its weakest link. Path length is ignored."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Gödel logic"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#logicParameter",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Numeric parameter for parametrised logics (e.g. gamma for Hamacher product)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "logic parameter"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#decimal"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#SelfDisjointAxiom",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Asserts that a role cannot hold between a node and itself."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Self-Disjoint Axiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#IntegrityAxiom"
-      }
-    ],
-    "http://www.w3.org/2004/02/skos/core#note": [
-      {
-        "@value": "Consistency check: violated if any edge (a -role-> a) exists."
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#Concept",
-    "@type": [
-      "http://www.w3.org/2000/01/rdf-schema#Class"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "A class of entities in the modelled domain (e.g. Person, Place)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Concept"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
-      {
-        "@id": "http://www.w3.org/2000/01/rdf-schema#Class"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#antecedents",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Ordered RDF list of n roles forming the chain. Generalises antecedent1/antecedent2 to arbitrary chain length."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "antecedents"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#precondition",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#ReasoningRule"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "precondition"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#role1",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "First role in a disjointness assertion."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#DisjointAxiom"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "role 1"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Role"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#formula",
-    "@type": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Mathematical formula of the operator in plain notation (variables x, y for binary; x_1..x_n for n-ary)."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#domain": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "formula"
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#range": [
-      {
-        "@id": "http://www.w3.org/2001/XMLSchema#string"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#InverseRule",
-    "@type": [
-      "http://academic-meta-tool.xyz/vocab#ReasoningRule"
-    ],
-    "http://academic-meta-tool.xyz/vocab#appliesTo": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#InverseAxiom"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#effect": [
-      {
-        "@value": "Add an edge (b -inverse-> a) with weight w. Mark the edge as inferred. Iterate to fixpoint."
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#precondition": [
-      {
-        "@value": "There exists an edge (a -antecedent-> b) with weight w."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Inverse Inference Rule"
-      }
-    ]
-  },
-  {
     "@id": "http://academic-meta-tool.xyz/vocab#Logic",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
@@ -1161,72 +685,6 @@
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
         "@id": "http://www.w3.org/2000/01/rdf-schema#Class"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionRule",
-    "@type": [
-      "http://academic-meta-tool.xyz/vocab#ReasoningRule"
-    ],
-    "http://academic-meta-tool.xyz/vocab#appliesTo": [
-      {
-        "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionAxiom"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#effect": [
-      {
-        "@value": "Default (entailment) mode: add an edge (a -superRole-> b) with weight w. Mark the edge as inferred. Iterate to fixpoint. Minimal mode: apply no entailment, and after the fixpoint suppress every inferred edge (a -superRole-> b, w2) for which an edge (a -subRole-> b, w1) with w1 >= w2 exists. Never suppress an asserted edge; when w1 < w2 keep both, because a coarse relation derived along a strong path can be worth more than a fine relation derived along a weak one."
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#precondition": [
-      {
-        "@value": "There exists an edge (a -subRole-> b) with weight w."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Subsumption Inference Rule"
-      }
-    ]
-  },
-  {
-    "@id": "http://academic-meta-tool.xyz/vocab#HamacherProduct",
-    "@type": [
-      "http://academic-meta-tool.xyz/vocab#Logic"
-    ],
-    "http://academic-meta-tool.xyz/vocab#arity": [
-      {
-        "@value": "binary"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#formula": [
-      {
-        "@value": "(x * y) / (gamma + (1 - gamma) * (x + y - x * y))"
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#isParametrised": [
-      {
-        "@type": "http://www.w3.org/2001/XMLSchema#boolean",
-        "@value": true
-      }
-    ],
-    "http://academic-meta-tool.xyz/vocab#recommendedFor": [
-      {
-        "@value": "Research applications where path-length sensitivity should be tuned empirically. gamma = 1 equals Product; gamma < 1 stricter; gamma > 1 softer."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#comment": [
-      {
-        "@language": "en",
-        "@value": "Parametrised t-norm family. Sensitivity to path length is controlled by a gamma parameter."
-      }
-    ],
-    "http://www.w3.org/2000/01/rdf-schema#label": [
-      {
-        "@language": "en",
-        "@value": "Hamacher product"
       }
     ]
   },
@@ -1290,6 +748,471 @@
     ]
   },
   {
+    "@id": "http://academic-meta-tool.xyz/vocab#SelfDisjointAxiom",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Asserts that a role cannot hold between a node and itself."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Self-Disjoint Axiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#IntegrityAxiom"
+      }
+    ],
+    "http://www.w3.org/2004/02/skos/core#note": [
+      {
+        "@value": "Consistency check: violated if any edge (a -role-> a) exists."
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#appliesTo",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#ReasoningRule"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "applies to"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#Class"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#RoleChainRule",
+    "@type": [
+      "http://academic-meta-tool.xyz/vocab#ReasoningRule"
+    ],
+    "http://academic-meta-tool.xyz/vocab#appliesTo": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#effect": [
+      {
+        "@value": "Add a new edge from source of e_1 to target of e_n with role = consequent and weight = logic(weight(e_1), ..., weight(e_n)). Mark the edge as inferred. Iterate to fixpoint."
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#precondition": [
+      {
+        "@value": "There exists a sequence of edges e_1, ..., e_n such that e_i has role antecedents[i] and the target of e_i equals the source of e_{i+1}."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Role Chain Inference Rule"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#role",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Role declared as self-disjoint (irreflexive)."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#SelfDisjointAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "role"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#effect",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#ReasoningRule"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "effect"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#formula",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Mathematical formula of the operator in plain notation (variables x, y for binary; x_1..x_n for n-ary)."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "formula"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#superRole",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "The coarser role, implied by the sub-role at no lower weight."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "super-role"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#Axiom",
+    "@type": [
+      "http://www.w3.org/2000/01/rdf-schema#Class"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Abstract base class for all AMT axioms."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Axiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
+      {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#Class"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#EinsteinProduct",
+    "@type": [
+      "http://academic-meta-tool.xyz/vocab#Logic",
+      "http://w3id.org/fw_ontology/PropagationMethod"
+    ],
+    "http://academic-meta-tool.xyz/vocab#arity": [
+      {
+        "@value": "binary"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#formula": [
+      {
+        "@value": "(x * y) / (2 - (x + y - x * y))"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#isParametrised": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean",
+        "@value": false
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#recommendedFor": [
+      {
+        "@value": "Automatically generated mappings of medium confidence. Good middle ground for n=3 and n=4."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Soft multiplication, lying between Gödel and Product. Stricter than Gödel, gentler than Product."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Einstein product"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#arity",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Either 'binary' (associative, can be applied pairwise) or 'n-ary' (must receive the full weight list at once)."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "arity"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#GeometricMean",
+    "@type": [
+      "http://academic-meta-tool.xyz/vocab#Logic",
+      "http://w3id.org/fw_ontology/PropagationMethod"
+    ],
+    "http://academic-meta-tool.xyz/vocab#arity": [
+      {
+        "@value": "n-ary"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#formula": [
+      {
+        "@value": "(x_1 * x_2 * ... * x_n)^(1/n)"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#isParametrised": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean",
+        "@value": false
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#recommendedFor": [
+      {
+        "@value": "Comparing inferences across different chain lengths. Recommended default for n >= 4. Note: not a t-norm in the strict sense."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Aggregation operator: n-th root of the product. Path-length neutral; expresses average link quality."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Geometric mean"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#GoedelLogic",
+    "@type": [
+      "http://academic-meta-tool.xyz/vocab#Logic",
+      "http://w3id.org/fw_ontology/PropagationMethod"
+    ],
+    "http://academic-meta-tool.xyz/vocab#arity": [
+      {
+        "@value": "binary"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#formula": [
+      {
+        "@value": "min(x, y)"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#isParametrised": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean",
+        "@value": false
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#recommendedFor": [
+      {
+        "@value": "Curated mappings; chains where path length should not penalise the result. Good default for n=2 and n=3."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Bottleneck semantics: the chain is as strong as its weakest link. Path length is ignored."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Gödel logic"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#consequent",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Role inferred between the first and last node of the chain."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "consequent"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#antecedents",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Ordered RDF list of n roles forming the chain. Generalises antecedent1/antecedent2 to arbitrary chain length."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "antecedents"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#antecedent",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Role whose inverse is being declared."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#InverseAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "antecedent"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Role"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#DisjointRule",
+    "@type": [
+      "http://academic-meta-tool.xyz/vocab#ReasoningRule"
+    ],
+    "http://academic-meta-tool.xyz/vocab#appliesTo": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#DisjointAxiom"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#effect": [
+      {
+        "@value": "Report a consistency violation. Both edges contradict the disjointness assertion."
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#precondition": [
+      {
+        "@value": "There exist edges (a -role1-> b) and (a -role2-> b) with weights > 0."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Disjoint Consistency Rule"
+      }
+    ]
+  },
+  {
     "@id": "http://academic-meta-tool.xyz/vocab#SelfDisjointRule",
     "@type": [
       "http://academic-meta-tool.xyz/vocab#ReasoningRule"
@@ -1317,25 +1240,108 @@
     ]
   },
   {
-    "@id": "http://academic-meta-tool.xyz/vocab#IntegrityAxiom",
+    "@id": "http://academic-meta-tool.xyz/vocab#weight",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Fuzzy truth value in the closed interval [0, 1] attached to a quadruple."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "weight"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://www.w3.org/2001/XMLSchema#decimal"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#logic",
+    "@type": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#comment": [
+      {
+        "@language": "en",
+        "@value": "Fuzzy logic operator used to combine weights along the inference chain."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#domain": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "logic"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#range": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#Logic"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionRule",
+    "@type": [
+      "http://academic-meta-tool.xyz/vocab#ReasoningRule"
+    ],
+    "http://academic-meta-tool.xyz/vocab#appliesTo": [
+      {
+        "@id": "http://academic-meta-tool.xyz/vocab#SubsumptionAxiom"
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#effect": [
+      {
+        "@value": "Default (entailment) mode: add an edge (a -superRole-> b) with weight w. Mark the edge as inferred. Iterate to fixpoint. Minimal mode: apply no entailment, and after the fixpoint suppress every inferred edge (a -superRole-> b, w2) for which an edge (a -subRole-> b, w1) with w1 >= w2 exists. Never suppress an asserted edge; when w1 < w2 keep both, because a coarse relation derived along a strong path can be worth more than a fine relation derived along a weak one."
+      }
+    ],
+    "http://academic-meta-tool.xyz/vocab#precondition": [
+      {
+        "@value": "There exists an edge (a -subRole-> b) with weight w."
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@language": "en",
+        "@value": "Subsumption Inference Rule"
+      }
+    ]
+  },
+  {
+    "@id": "http://academic-meta-tool.xyz/vocab#RoleChainAxiom",
     "@type": [
       "http://www.w3.org/2000/01/rdf-schema#Class"
     ],
     "http://www.w3.org/2000/01/rdf-schema#comment": [
       {
         "@language": "en",
-        "@value": "Axiom that constrains which edge configurations are valid."
+        "@value": "Asserts that a chain of roles implies a consequent role; supports both legacy 2-ary form (antecedent1/antecedent2) and n-ary form (antecedents as RDF list)."
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#label": [
       {
         "@language": "en",
-        "@value": "Integrity Axiom"
+        "@value": "Role Chain Axiom"
       }
     ],
     "http://www.w3.org/2000/01/rdf-schema#subClassOf": [
       {
-        "@id": "http://academic-meta-tool.xyz/vocab#Axiom"
+        "@id": "http://academic-meta-tool.xyz/vocab#InferenceAxiom"
+      }
+    ],
+    "http://www.w3.org/2004/02/skos/core#note": [
+      {
+        "@value": "Reasoning rule: if edges (a -r1-> b) and (b -r2-> c) exist with weights w1 and w2, infer (a -consequent-> c) with weight = logic(w1, w2). Generalises to n antecedents."
       }
     ]
   }

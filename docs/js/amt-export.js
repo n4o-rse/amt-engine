@@ -64,13 +64,27 @@ var ttlLiteral = function(str) {
 };
 
 // ------------------------------------------------------------
-// ttlDouble: format a number as an xsd:double literal
+// ttlDecimal: format a weight as an xsd:decimal literal (the datatype
+// amt-shapes.ttl asks for)
 // ------------------------------------------------------------
-var ttlDouble = function(w) {
+var ttlDecimal = function(w) {
     var v = (typeof w === "number") ? w : parseFloat(w) || 0;
     if (v > 1.0) v = 1.0;
     // always emit with enough precision, never Infinity
-    return ttlLiteral(v.toFixed(6)) + "^^xsd:double";
+    return ttlLiteral(v.toFixed(6)) + "^^xsd:decimal";
+};
+
+// ------------------------------------------------------------
+// ttlHextuple: the lines for fw:hasType and fw:hasMethod of an edge, each
+// ending in " ;" (empty if the edge has neither; the default type is not
+// written unless the edge carries it)
+// ------------------------------------------------------------
+var ttlHextuple = function(e, width) {
+    var out = [];
+    var pad = function(name) { while (name.length < width) name += " "; return name; };
+    if (e.type)   out.push("    " + pad("fw:hasType")   + "<" + e.type   + "> ;");
+    if (e.method) out.push("    " + pad("fw:hasMethod") + "<" + e.method + "> ;");
+    return out;
 };
 
 // ------------------------------------------------------------
@@ -103,6 +117,9 @@ var exportTTL = function() {
     lines.push("@prefix rdf:  <" + RDF  + "> .");
     lines.push("@prefix rdfs: <" + RDFS + "> .");
     lines.push("@prefix xsd:  <" + XSD  + "> .");
+    if (edges.some(function(e) { return e.type || e.method; })) {
+        lines.push("@prefix fw:   <http://w3id.org/fw_ontology/> .");
+    }
     lines.push("@prefix ex:   <"  + ex   + "> .");
     sep();
 
@@ -265,7 +282,9 @@ var exportTTL = function() {
         lines.push("    rdf:subject   " + pfx(e.from) + " ;");
         lines.push("    rdf:predicate " + pfx(e.role) + " ;");
         lines.push("    rdf:object    " + pfx(e.to)   + " ;");
-        lines.push("    amt:weight    " + ttlDouble(e.width) + " .");
+        lines.push("    amt:weight    " + ttlDecimal(e.width) + (e.type || e.method ? " ;" : " ."));
+        var hx = ttlHextuple(e, 14);
+        hx.forEach(function(l, n) { lines.push(n === hx.length - 1 ? l.replace(/ ;$/, " .") : l); });
         sep();
     }
 
@@ -280,7 +299,8 @@ var exportTTL = function() {
             lines.push("    rdf:subject    " + pfx(ei.from) + " ;");
             lines.push("    rdf:predicate  " + pfx(ei.role) + " ;");
             lines.push("    rdf:object     " + pfx(ei.to)   + " ;");
-            lines.push("    amt:weight     " + ttlDouble(ei.width) + " ;");
+            lines.push("    amt:weight     " + ttlDecimal(ei.width) + " ;");
+            ttlHextuple(ei, 15).forEach(function(l) { lines.push(l); });
             if (ei.provenance && ei.provenance.length) {
                 lines.push('    amt:inferred   "true"^^xsd:boolean ;');
                 lines.push("    amt:provenance " + ei.provenance.map(pfx).join(", ") + " .");
@@ -363,7 +383,9 @@ var exportCypher = function() {
             "weight: " + w + ", " +
             "role: \"" + localName(e.role) + "\", " +
             "inferred: " + (inferred ? "true" : "false") + ", " +
-            "provenance: \"" + (e.provenance || []).map(localName).join(";") + "\"" +
+            "provenance: \"" + (e.provenance || []).map(localName).join(";") + "\", " +
+            "type: \"" + localName(e.type || "http://w3id.org/fw_ontology/Vagueness") + "\"" +
+            (e.method ? ", method: \"" + localName(e.method) + "\"" : "") +
             "}]->(" + toVar + ")"
         );
     };

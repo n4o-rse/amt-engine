@@ -109,6 +109,12 @@ ex:vespasian rdfs:label &quot;vespasian&quot; .          # a label does not make
 <h4>Example</h4><pre><code>ex:C a amt:Concept ; rdfs:label &quot;C&quot; .
 ex:a amt:instanceOf ex:C .
 [] rdf:subject ex:a ; rdf:predicate ex:r ; amt:weight 0.5 .      # no rdf:object</code></pre></div>
+<div class="term" id="AMT-E104">
+<h3><code>AMT-E104</code> <span class="badge">error</span></h3>
+<p><strong>The statement ... has amt:weight X and fw:hasDegreeOfConnection Y</strong></p>
+<p><em>Cause.</em> The FW ontology calls the weight <code>fw:hasDegreeOfConnection</code>; AMT calls it <code>amt:weight</code>. The engine reads both and writes <code>amt:weight</code>. If a statement carries both with different values, <code>amt:weight</code> is used and this message tells you which statement it was.</p>
+<p><em>Fix.</em> Keep one of the two properties, or give both the same value.</p>
+</div>
 <div class="term" id="AMT-W201">
 <h3><code>AMT-W201</code> <span class="badge">warning</span></h3>
 <p><strong>Weight X is outside [0, 1]</strong></p>
@@ -117,11 +123,23 @@ ex:a amt:instanceOf ex:C .
 <h4>Example</h4><pre><code>ex:C a amt:Concept ; rdfs:label &quot;C&quot; .
 ex:a amt:instanceOf ex:C . ex:b amt:instanceOf ex:C .
 [] rdf:subject ex:a ; rdf:predicate ex:r ; rdf:object ex:b ; amt:weight 1.5 .</code></pre></div>
+<div class="term" id="AMT-W205">
+<h3><code>AMT-W205</code> <span class="badge">warning</span></h3>
+<p><strong>... is used as fw:hasType but is not one of the three types</strong></p>
+<p><em>Cause.</em> A statement can say what kind of fuzziness its weight expresses: <code>fw:Vagueness</code>, <code>fw:Uncertainty</code> or <code>fw:FuzzinessWobbliness</code>. Any other value is kept and counted as a type of its own, which is probably a typo or a term from another vocabulary.</p>
+<p><em>Fix.</em> Use one of the three, or leave <code>fw:hasType</code> out: a statement without a type is a vagueness statement.</p>
+</div>
 <div class="term" id="AMT-W204">
 <h3><code>AMT-W204</code> <span class="badge">warning</span></h3>
 <p><strong>The file contains no weighted statement</strong></p>
 <p><em>Cause.</em> There is nothing to reason about. Typical reasons: the edges are written without amt:weight, or they are only linked from the nodes (for example with lado:hasAMT) and the reified statement itself is missing.</p>
 <p><em>Fix.</em> Write each edge as a statement with rdf:subject, rdf:predicate, rdf:object and amt:weight.</p>
+</div>
+<div class="term" id="AMT-N303">
+<h3><code>AMT-N303</code> <span class="badge">note</span></h3>
+<p><strong>N statement(s) have fw:hasType but no fw:hasMethod</strong></p>
+<p><em>Cause.</em> The type says what kind of fuzziness the weight is, the method says how it was obtained. The type is used without a method, so nothing breaks; the method is what makes the statement reproducible.</p>
+<p><em>Fix.</em> Add <code>fw:hasMethod</code>, for example <code>fw:EqualShareRule</code> for a weight that comes from sharing equally.</p>
 </div>
 <div class="term" id="AMT-N301">
 <h3><code>AMT-N301</code> <span class="badge">note</span></h3>

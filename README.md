@@ -319,12 +319,44 @@ The `ontology/` folder defines the full vocabulary and SHACL shapes —
 any tool that wants to consume or produce AMT-compatible data can rely
 on those files alone.
 
+### Type and method of a statement (hextuple)
+
+A statement is a quadruple (subject, role, object, weight). Two optional
+properties from the [FW ontology](https://github.com/caa-datadragons/FW_Ontology)
+(`@prefix fw: <http://w3id.org/fw_ontology/> .`) make it a hextuple:
+
+```turtle
+_:a2 rdf:subject   ex:coin1 ;
+     rdf:predicate ex:attributedTo ;
+     rdf:object    ex:vespasian ;
+     amt:weight    "0.5"^^xsd:decimal ;
+     fw:hasType    fw:Uncertainty ;        # fw:Vagueness | fw:Uncertainty | fw:FuzzinessWobbliness
+     fw:hasMethod  fw:EqualShareRule .     # how the weight was obtained
+```
+
+- Both are optional. **A statement without `fw:hasType` is a vagueness
+  statement**, also at weight 1.0; the engine does not write that default into
+  its output unless the input had it.
+- The weight can be written `amt:weight` or `fw:hasDegreeOfConnection`; the
+  output always uses `amt:weight`.
+- A derived statement carries the logic of its axiom as `fw:hasMethod`
+  (for example `amt:GoedelLogic`) and as `fw:hasType` the common type of its
+  antecedents, or `fw:FuzzinessWobbliness` if they differ. The edge dicts have
+  the keys `type`, `method` and `evidence`; `amt.effective_type(edge)` returns
+  the type that counts.
+- `edges.csv` has two more columns at the end (`type`, `method`); the Cypher
+  relationships get the properties `type` and `method`.
+
+[`examples/hextuple-demo.md`](examples/hextuple-demo.md) walks through a
+small example with every case.
+
 ## Bundled examples
 
 | File | Purpose |
 |------|---------|
 | `examples/chain-test.ttl` | Minimal Alice/Bob/Carol/Dave chain — useful for understanding what reasoning produces from a simple input. |
 | `examples/subsumption-demo.ttl` | Six events and a three-role subsumption chain (`before ⊑ olderBeginning ⊑ older`), a miniature of Freksa's semi-interval vocabulary. Run it with and without `--minimal` to see both readings of `amt:SubsumptionAxiom`; the companion file [`examples/subsumption-demo.md`](examples/subsumption-demo.md) documents every derivation. |
+| `examples/hextuple-demo.ttl` | Statements with type and method: uncertainty with an equal-share method and evidence, the default type, the weight under its FW name, and derived statements that get method and type from their axiom. The companion file [`examples/hextuple-demo.md`](examples/hextuple-demo.md) lists the expected derivations. |
 | `examples/animals.ttl` | Taxonomy meets family tree: seven species, three animal families across 5/3/3 generations, four `RoleChainAxiom`s using Goedel, Product and Geometric Mean. The companion file [`examples/animals.md`](examples/animals.md) documents the family-tree diagrams and lists every expected derivation. |
 | `ontology/examples/example-valid.ttl` | Smallest possible file that passes SHACL validation. |
 | `ontology/examples/example-invalid.ttl` | Deliberately broken file used in the validation tests; produces exactly four expected SHACL violations. |

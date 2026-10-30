@@ -1,0 +1,144 @@
+@prefix amt:  <http://academic-meta-tool.xyz/vocab#> .
+@prefix fw:   <http://w3id.org/fw_ontology/> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:   <http://github.com/alpaca-fair-framework/amt-engine/hextuple-demo/> .
+
+# =============================================================================
+# AMT data file: hextuple-demo — statements with type and method
+# =============================================================================
+#
+# A plain AMT statement is a quadruple: subject, role, object, weight.
+# The FW ontology (http://w3id.org/fw_ontology/) adds two more parts, which
+# make it a hextuple:
+#
+#   fw:hasType    what kind of fuzziness the weight expresses
+#                 (fw:Vagueness, fw:Uncertainty, fw:FuzzinessWobbliness)
+#   fw:hasMethod  how the weight was obtained
+#
+# Both are optional. A statement without fw:hasType is a vagueness statement,
+# also at weight 1.0. The engine does not write that default into its output
+# unless it was in the input, so a quadruple stays a quadruple.
+#
+# This file mixes all cases on a small coin example:
+#
+#   * a statement with type, method and evidence   (coin c1 attributedTo ...)
+#   * a statement with only a type                 (lugdunum mintIn gaul)
+#   * a statement with an explicit default type    (c2 struckAt lugdunum)
+#   * plain quadruples                             (most of the others)
+#   * the weight written as fw:hasDegreeOfConnection instead of amt:weight
+#
+# The reasoner then derives statements that carry a method (the logic of the
+# axiom) and a type (the common type of the antecedents, or
+# fw:FuzzinessWobbliness if they differ). The companion file
+# `hextuple-demo.md` lists the expected result.
+
+# ── Concepts ────────────────────────────────────────────────────────────────
+ex:Coin rdf:type amt:Concept ; rdfs:label "Coin" ; amt:placeholder "Coin" .
+ex:Authority rdf:type amt:Concept ; rdfs:label "Authority" ; amt:placeholder "Issuing authority" .
+ex:Mint rdf:type amt:Concept ; rdfs:label "Mint" ; amt:placeholder "Mint" .
+ex:Region rdf:type amt:Concept ; rdfs:label "Region" ; amt:placeholder "Region" .
+
+# ── Roles ───────────────────────────────────────────────────────────────────
+ex:attributedTo rdf:type amt:Role ; rdfs:label "attributedTo" ; rdfs:domain ex:Coin ; rdfs:range ex:Authority .
+ex:struckAt     rdf:type amt:Role ; rdfs:label "struckAt"     ; rdfs:domain ex:Coin ; rdfs:range ex:Mint .
+ex:mintIn       rdf:type amt:Role ; rdfs:label "mintIn"       ; rdfs:domain ex:Mint ; rdfs:range ex:Region .
+ex:ruled        rdf:type amt:Role ; rdfs:label "ruled"        ; rdfs:domain ex:Authority ; rdfs:range ex:Region .
+ex:struckIn     rdf:type amt:Role ; rdfs:label "struckIn"     ; rdfs:domain ex:Coin ; rdfs:range ex:Region .
+ex:linkedTo     rdf:type amt:Role ; rdfs:label "linkedTo"     ; rdfs:domain ex:Coin ; rdfs:range ex:Region .
+ex:producedCoin rdf:type amt:Role ; rdfs:label "producedCoin" ; rdfs:domain ex:Region ; rdfs:range ex:Coin .
+
+# ── Instances ───────────────────────────────────────────────────────────────
+ex:c1 amt:instanceOf ex:Coin ; rdfs:label "Coin 1" .
+ex:c2 amt:instanceOf ex:Coin ; rdfs:label "Coin 2" .
+ex:vespasian amt:instanceOf ex:Authority ; rdfs:label "Vespasian" .
+ex:titus amt:instanceOf ex:Authority ; rdfs:label "Titus" .
+ex:rome amt:instanceOf ex:Mint ; rdfs:label "Rome" .
+ex:lugdunum amt:instanceOf ex:Mint ; rdfs:label "Lugdunum" .
+ex:latium amt:instanceOf ex:Region ; rdfs:label "Latium" .
+ex:gaul amt:instanceOf ex:Region ; rdfs:label "Gaul" .
+
+# =============================================================================
+# AXIOMS
+# =============================================================================
+
+# Coin struck at a mint, mint lies in a region => coin struck in that region.
+# Goedel: as strong as the weakest link. The derived method is amt:GoedelLogic.
+ex:RCA_struckIn rdf:type        amt:RoleChainAxiom ;
+                amt:antecedents ( ex:struckAt ex:mintIn ) ;
+                amt:consequent  ex:struckIn ;
+                amt:logic       amt:GoedelLogic .
+
+# Coin attributed to an authority, authority ruled a region => coin linked to
+# the region. Product: independent evidence multiplies.
+ex:RCA_linkedTo rdf:type        amt:RoleChainAxiom ;
+                amt:antecedents ( ex:attributedTo ex:ruled ) ;
+                amt:consequent  ex:linkedTo ;
+                amt:logic       amt:ProductLogic .
+
+# struckIn and producedCoin are inverse. The derived statement has no method
+# and takes the type of the statement it comes from.
+ex:IA_struckIn rdf:type          amt:InverseAxiom ;
+               amt:antecedent    ex:struckIn ;
+               amt:inverse       ex:producedCoin .
+
+# =============================================================================
+# STATEMENTS
+# =============================================================================
+
+# Coin 1 is attributed to Vespasian or Titus, equal share. An uncertainty
+# statement: one of the two is right, we do not know which. The method says
+# how the weight was obtained; the evidence is passed through unchanged.
+[] rdf:subject   ex:c1 ;
+   rdf:predicate ex:attributedTo ;
+   rdf:object    ex:vespasian ;
+   amt:weight    0.5 ;
+   fw:hasType    fw:Uncertainty ;
+   fw:hasMethod  fw:EqualShareRule ;
+   fw:derivedFrom [ rdf:type fw:TextEvidence ;
+                    fw:sourceString "Obverse legend damaged: IMP CAES VESP or TITVS." ] .
+
+[] rdf:subject   ex:c1 ;
+   rdf:predicate ex:attributedTo ;
+   rdf:object    ex:titus ;
+   amt:weight    0.5 ;
+   fw:hasType    fw:Uncertainty ;
+   fw:hasMethod  fw:EqualShareRule .
+
+# No type: a vagueness statement. The weight uses the FW name for the same
+# property; the engine reads both and writes amt:weight.
+[] rdf:subject   ex:c1 ;
+   rdf:predicate ex:struckAt ;
+   rdf:object    ex:rome ;
+   fw:hasDegreeOfConnection 0.9 .
+
+# The default type written out: kept as it is.
+[] rdf:subject   ex:c2 ;
+   rdf:predicate ex:struckAt ;
+   rdf:object    ex:lugdunum ;
+   amt:weight    0.8 ;
+   fw:hasType    fw:Vagueness .
+
+# Weight 1.0 and no type: still a vagueness statement.
+[] rdf:subject   ex:rome ;
+   rdf:predicate ex:mintIn ;
+   rdf:object    ex:latium ;
+   amt:weight    1.0 .
+
+# Type without method.
+[] rdf:subject   ex:lugdunum ;
+   rdf:predicate ex:mintIn ;
+   rdf:object    ex:gaul ;
+   amt:weight    0.7 ;
+   fw:hasType    fw:Uncertainty .
+
+[] rdf:subject   ex:vespasian ;
+   rdf:predicate ex:ruled ;
+   rdf:object    ex:latium ;
+   amt:weight    0.8 .
+
+[] rdf:subject   ex:titus ;
+   rdf:predicate ex:ruled ;
+   rdf:object    ex:latium ;
+   amt:weight    0.8 .

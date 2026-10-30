@@ -257,14 +257,31 @@ CATALOGUE = [
      "A weighted edge needs all four properties together. A statement with a missing part is ignored.",
      "Add the missing property.",
      "bad-incomplete"),
+    ("AMT-E104", "error", "The statement ... has amt:weight X and fw:hasDegreeOfConnection Y",
+     "The FW ontology calls the weight <code>fw:hasDegreeOfConnection</code>; AMT calls it <code>amt:weight</code>. "
+     "The engine reads both and writes <code>amt:weight</code>. If a statement carries both with different values, "
+     "<code>amt:weight</code> is used and this message tells you which statement it was.",
+     "Keep one of the two properties, or give both the same value.",
+     None),
     ("AMT-W201", "warning", "Weight X is outside [0, 1]",
      "Weights are degrees of truth between 0 and 1. SHACL rejects the file first, but with --no-validate the engine would clamp values above 1.",
      "Use a value between 0 and 1.",
      "bad-weight"),
+    ("AMT-W205", "warning", "... is used as fw:hasType but is not one of the three types",
+     "A statement can say what kind of fuzziness its weight expresses: <code>fw:Vagueness</code>, "
+     "<code>fw:Uncertainty</code> or <code>fw:FuzzinessWobbliness</code>. Any other value is kept and counted as a type of its own, "
+     "which is probably a typo or a term from another vocabulary.",
+     "Use one of the three, or leave <code>fw:hasType</code> out: a statement without a type is a vagueness statement.",
+     None),
     ("AMT-W204", "warning", "The file contains no weighted statement",
      "There is nothing to reason about. Typical reasons: the edges are written without amt:weight, or they are only linked "
      "from the nodes (for example with lado:hasAMT) and the reified statement itself is missing.",
      "Write each edge as a statement with rdf:subject, rdf:predicate, rdf:object and amt:weight.",
+     None),
+    ("AMT-N303", "note", "N statement(s) have fw:hasType but no fw:hasMethod",
+     "The type says what kind of fuzziness the weight is, the method says how it was obtained. The type is used without a method, "
+     "so nothing breaks; the method is what makes the statement reproducible.",
+     "Add <code>fw:hasMethod</code>, for example <code>fw:EqualShareRule</code> for a weight that comes from sharing equally.",
      None),
     ("AMT-N301", "note", "Role ... is used in edges but not declared as an amt:Role",
      "Fine for simple files. Only axioms need declared roles.",

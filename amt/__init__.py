@@ -25,6 +25,11 @@ from .core import (
     load_amt,
     local_name,
 )
+from .fw import (
+    DEFAULT_TYPE,
+    combine_types,
+    effective_type,
+)
 from .reasoning import (
     check_consistency,
     do_reasoning,
@@ -73,6 +78,10 @@ __all__ = [
     # core
     "load_amt",
     "local_name",
+    # type and method of a statement (FW ontology)
+    "DEFAULT_TYPE",
+    "effective_type",
+    "combine_types",
     # reasoning
     "do_reasoning",
     "reason_with_stats",

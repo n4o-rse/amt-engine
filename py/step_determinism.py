@@ -25,7 +25,7 @@ try:
 except ImportError:
     from py.amt_dev_utils import DETERMINISM_DIR, EXAMPLES_DIR, ROOT, Report, ensure_dirs, run_python
 
-SAMPLES = ("animals.ttl", "subsumption-demo.ttl")
+SAMPLES = ("animals.ttl", "subsumption-demo.ttl", "hextuple-demo.ttl")
 SEEDS = ("1", "2")
 EXCLUDED_SUFFIX = ".report.md"
 

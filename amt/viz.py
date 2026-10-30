@@ -17,6 +17,7 @@ from pathlib import Path
 from pyvis.network import Network
 
 from .core import local_name
+from .fw import effective_type
 from .reasoning import do_reasoning
 
 # Same colour order as ``AMT_PALETTE`` in ``amt-render.js``
@@ -157,10 +158,18 @@ def build_network(
                 "color": "#cc0000" if inferred else "#333333",
                 "align": "middle",
             },
-            title="inferred" if inferred else "asserted",
+            title=_edge_tooltip(e),
         )
 
     return net
+
+
+def _edge_tooltip(e: dict) -> str:
+    """Hover text of an edge: asserted or inferred, then type and, if there is one, method."""
+    parts = ["inferred" if e.get("inferred") else "asserted", f"type: {local_name(effective_type(e))}"]
+    if e.get("method"):
+        parts.append(f"method: {local_name(e['method'])}")
+    return " | ".join(parts)
 
 
 def render_to_html(

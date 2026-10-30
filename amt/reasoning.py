@@ -15,6 +15,21 @@ multiple paths, the provenance lists are merged and the **maximum** weight
 across paths is kept (standard semantics for fuzzy forward-chaining: any
 path of evidence at strength w means the consequent holds at >= w).
 
+Type and method (hextuple)
+--------------------------
+
+Every derived edge also says *how* and *what kind of*. A ``RoleChainAxiom``
+sets the method to its logic (for example ``amt:GoedelLogic``) and the type to
+the common type of its antecedent edges, or ``fw:FuzzinessWobbliness`` if they
+differ (:func:`amt.fw.combine_types`). ``InverseAxiom`` and
+``SubsumptionAxiom`` set no method and take the type of the source edge. The
+default type (vagueness) is stored as ``None``.
+
+If an edge is derived on several paths, the path with the highest weight
+decides type and method; on equal weights the smallest method IRI wins (an
+edge without method sorts first), then the smallest type IRI. Asserted edges
+keep what they were given.
+
 The input ``edges`` list is never mutated — :func:`do_reasoning` returns a
 new list.
 
@@ -53,6 +68,7 @@ import copy
 from collections import defaultdict
 from typing import Iterator
 
+from .fw import combine_types, effective_type, stored_type
 from .logic import aggregate_weights
 from .subsumption import eliminate_redundant_edges
 
@@ -181,6 +197,9 @@ def reason_with_stats(
     for e in result:
         e.setdefault("inferred",   False)
         e.setdefault("provenance", [])
+        e.setdefault("type",       None)
+        e.setdefault("method",     None)
+        e.setdefault("evidence",   None)
 
     index = _EdgeIndex(result)
 
@@ -317,6 +336,8 @@ def _apply_role_chain(result: list[dict], axiom: dict, index: _EdgeIndex) -> boo
             to=match["end"],
             weight=weight,
             provenance_axiom=axiom_iri,
+            type_=stored_type(combine_types(e.get("type") for e in match["edges"])),
+            method=logic,
         )
     return changed
 
@@ -331,7 +352,8 @@ def _find_chain_matches(
 
     Each yielded match is a dict with::
 
-        {"start": IRI, "end": IRI, "weights": [w1, w2, ..., wk]}
+        {"start": IRI, "end": IRI, "weights": [w1, w2, ..., wk],
+         "edges": [e1, e2, ..., ek]}
     """
     if not antecedent_roles:
         return
@@ -347,6 +369,7 @@ def _find_chain_matches(
                 current=first_edge["to"],
                 remaining_roles=rest_roles,
                 weights_so_far=[first_edge["weight"]],
+                edges_so_far=[first_edge],
                 index=index,
             )
 
@@ -356,11 +379,12 @@ def _extend_chain(
     current: str,
     remaining_roles: list[str],
     weights_so_far: list[float],
+    edges_so_far: list[dict],
     index: _EdgeIndex,
 ) -> Iterator[dict]:
     """Recursive helper for :func:`_find_chain_matches`."""
     if not remaining_roles:
-        yield {"start": start, "end": current, "weights": weights_so_far}
+        yield {"start": start, "end": current, "weights": weights_so_far, "edges": edges_so_far}
         return
 
     next_role = remaining_roles[0]
@@ -372,6 +396,7 @@ def _extend_chain(
             current=next_edge["to"],
             remaining_roles=further,
             weights_so_far=weights_so_far + [next_edge["weight"]],
+            edges_so_far=edges_so_far + [next_edge],
             index=index,
         )
 
@@ -385,6 +410,8 @@ def _add_or_strengthen_edge(
     to: str,
     weight: float,
     provenance_axiom: str,
+    type_: str | None = None,
+    method: str | None = None,
 ) -> bool:
     """
     Add a new inferred edge, or strengthen an existing one.
@@ -395,9 +422,14 @@ def _add_or_strengthen_edge(
         merge the axiom IRI into its provenance (a record that this axiom
         also independently supports the assertion).
       - If an inferred edge exists with lower weight: raise the weight,
-        keep merged provenance.
-      - If an inferred edge exists with equal-or-higher weight: just merge
+        take type and method of the new path, keep merged provenance.
+      - If an inferred edge exists with equal weight: keep the path whose
+        (method, type) is smaller, so the result does not depend on the
+        order in which paths are found.
+      - If an inferred edge exists with higher weight: just merge
         provenance.
+
+    ``type_`` is the stored form (``None`` = default), see :mod:`amt.fw`.
     """
     existing = index.get(role, frm, to)
     if existing is None:
@@ -408,6 +440,9 @@ def _add_or_strengthen_edge(
             "weight":     weight,
             "inferred":   True,
             "provenance": [provenance_axiom] if provenance_axiom else [],
+            "type":       type_,
+            "method":     method,
+            "evidence":   None,
         })
         return True
 
@@ -418,9 +453,21 @@ def _add_or_strengthen_edge(
         changed = True
 
     # Only strengthen weights of inferred edges; never overwrite asserted ones.
-    if existing.get("inferred", False) and existing["weight"] < weight:
-        existing["weight"] = weight
-        changed = True
+    if existing.get("inferred", False):
+        if existing["weight"] < weight:
+            existing["weight"] = weight
+            existing["type"] = type_
+            existing["method"] = method
+            changed = True
+        elif existing["weight"] == weight:
+            new_key = (method or "", effective_type({"type": type_}))
+            old_key = (existing.get("method") or "", effective_type(existing))
+            if new_key < old_key:
+                # A different type can change what depends on this edge; a
+                # different method cannot, so only the former is a change.
+                changed |= effective_type({"type": type_}) != effective_type(existing)
+                existing["type"] = type_
+                existing["method"] = method
 
     return changed
 
@@ -447,6 +494,7 @@ def _apply_inverse(result: list[dict], axiom: dict, index: _EdgeIndex) -> bool:
                 to=e["from"],
                 weight=e["weight"],
                 provenance_axiom=axiom_iri,
+                type_=stored_type(e.get("type")),
             )
     return changed
 
@@ -480,5 +528,6 @@ def _apply_subsumption(result: list[dict], axiom: dict, index: _EdgeIndex) -> bo
                 to=e["to"],
                 weight=e["weight"],
                 provenance_axiom=axiom_iri,
+                type_=stored_type(e.get("type")),
             )
     return changed

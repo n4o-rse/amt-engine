@@ -144,6 +144,11 @@ Eigenschaften, die das Repo haben muss:
 | Hextupel: Schnitt und Version | Drei Patches: (1) S19 und S20 in beiden Repos, (2) S21 und S22 in der Engine (zusammen, weil `tests/test_js_reasoner.py` Python und JS gemeinsam prüft), (3) S23 mit Runner, Release und Zenodo. Die Änderung ist additiv, daher Engine 0.6.0 und Runner 0.5.0 | 2026-10-30 |
 | Folge für das Mini-AMT-Repo | `leiza-scit/CHNT2026-amt` ordnet sichere Aussagen laut Chat vom 2026-10-30 bisher „ohne Typ“ zu; mit dem Standard „vage“ muss das nachgezogen werden (D17) | 2026-10-30 |
 | Hextupel: Inverse, Subsumption, Mehrfachableitung | `InverseAxiom` und `SubsumptionAxiom` setzen keine Methode und übernehmen den Typ der Quellkante. Bei Mehrfachableitung liefert der Weg mit dem höchsten Gewicht Typ und Methode, bei Gleichstand die kleinste Methoden-IRI (sortiert, deterministisch) | 2026-10-30 |
+| Hextupel: Gleichstand genauer | Bei Mehrfachableitung mit gleichem Gewicht gilt der kleinere Schlüssel `(Methoden-IRI, Typ-IRI)`; eine Kante ohne Methode sortiert zuerst. Ein anderer Typ zählt als Änderung für den Fixpunkt, eine andere Methode nicht (sonst steigt die Zahl der Durchläufe, ohne dass sich etwas ändert). Bekannte Grenze: ändert sich der Typ einer Antezedens-Kante erst nach der Ableitung bei gleichem Gewicht, bleibt der früher abgeleitete Typ, wenn er der kleinere Schlüssel ist (deterministisch, aber nicht neu berechnet) | 2026-10-30 |
+| Hextupel: Methode an abgeleiteten Kanten | Jede von einer Rollenkette abgeleitete Kante trägt `fw:hasMethod` (die Logik), auch wenn ihr Typ der Standard ist; deshalb enthält `*.reasoned.ttl` auch bei Dateien ohne Typ den Präfix `fw:` und `fw:hasMethod` (im CHANGELOG genannt). Nur `fw:hasType` des Standards wird nicht geschrieben | 2026-10-30 |
+| Hextupel: Ausgabeformate | `edges.csv` bekommt am Ende die Spalten `type` (wirksamer Typ, also `fw:Vagueness` statt leer) und `method` (leer, wenn keine); Cypher-Eigenschaften `type` und `method` (Kurznamen, `method` nur wenn vorhanden); Tooltip im Graphen und im Explorer: `asserted\|inferred \| type: … \| method: …` | 2026-10-30 |
+| Hextupel: Evidenz | Evidenz-Knoten werden mit ihren eigenen Tripeln gelesen (Objekte, die Blank Nodes sind, entfallen: keine verschachtelten Knoten) und als `fw:derivedFrom [ … ]` wieder geschrieben; der Explorer führt Evidenz nicht mit | 2026-10-30 |
+| Eingabe als Text | `load_amt` und `validate_against_shapes` behandeln einen Text, der kein Pfad sein kann („File name too long“), als Turtle; Fehler beim Prüfen des Pfads gelten als „kein Pfad“ (`is_existing_path` in `amt/core.py`) | 2026-10-30 |
 | Namensräume der Beispiele | Die Bezeichner der Beispieldaten ziehen mit um: `http://github.com/alpaca-fair-framework/amt-explore/` (animals, SKOS-Beispiele) und `http://github.com/alpaca-fair-framework/amt-engine/subsumption-demo/`; die Pfade bleiben, nur der Organisationsname ändert sich. Der Vorschlag war, sie als stabile Bezeichner zu belassen; der Autor hat anders entschieden. Dateien mit dem alten Namensraum laden und validieren weiter | 2026-10-30 |
 | Adressen nach dem Umzug | Pages: `https://alpaca-fair-framework.github.io/amt-engine/` (am 2026-10-30 geprüft: lädt; `n4o-rse.github.io/amt-engine/` antwortet nicht). `deploy/redirects.yaml` hat die neue `pages`-Adresse und die neuen Repo-Ziele; die `.htaccess`-Dateien und die w3id-README entstehen daraus. Historische Texte (Prosa im CHANGELOG des Runners, ältere Einträge in diesem Primer) bleiben unverändert | 2026-10-30 |
 | Ausspielen der Weiterleitungen | Die erzeugte `deploy/academic-meta-tool.xyz/.htaccess` lädt der Autor per FTP neu hoch; für `w3id.org/amt/` stellt er einen neuen Pull Request in `perma-id/w3id.org` mit `deploy/w3id/ids/amt/.htaccess` und README; danach `python py/check_redirects.py` | 2026-10-30 |
@@ -197,10 +202,10 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S16 | Nutzerfreundliche Validierung: Diagnose (`AMT-E…`), SHACL-Meldungen mit Knoten, `--check-only`/`--strict`, viz ohne Absturz, How-To-Sektion | amt-engine, amt-runner | S15 | erledigt 2026-10-27 |
 | S17 | How-To-Seite „Run and look at the result“: klonen, Datei ablegen, prüfen, laufen lassen, Ergebnis lesen (Windows-`cmd`, Hinweise für Linux/macOS) | amt-engine | S16 | erledigt 2026-10-27 (Windows, Python 3.10) |
 | S18 | Release 0.5.0 (Engine) / 0.4.0 (Runner) samt Zenodo | amt-engine, amt-runner | S16, S17 | 18a und 18b erledigt (Tag `v0.5.0`, Release, Zenodo); 18c als Patch geliefert |
-| S19 | Adressen auf `alpaca-fair-framework` umstellen (Quellen, erzeugte Seiten, Tests, `CITATION.cff`, Weiterleitungen) | amt-engine, amt-runner | S18 | Patch geliefert, nach Push erledigt |
+| S19 | Adressen auf `alpaca-fair-framework` umstellen (Quellen, erzeugte Seiten, Tests, `CITATION.cff`, Weiterleitungen) | amt-engine, amt-runner | S18 | erledigt 2026-10-30 (Push, `.htaccess`, Zenodo durch den Autor gemeldet) |
 | S20 | Hextupel: Festlegungen, kein Code (Datentyp der Gewichte, Konfliktfall, Diagnose-Codes, Methode bei Inverse und Subsumption, Mehrfachableitung, Evidenz) | amt-engine | – | Patch geliefert, nach Push erledigt |
-| S21 | Hextupel in der Python-Engine: laden, Reasoning, Export, SHACL, Diagnose, How-To, Tests, Roundtrip-Beispiel | amt-engine | S19, S20 | offen |
-| S22 | Hextupel im JS-Port und im Explorer, Paritätstest | amt-engine | S21 | offen |
+| S21 | Hextupel in der Python-Engine: laden, Reasoning, Export, SHACL, Diagnose, How-To, Tests, Roundtrip-Beispiel | amt-engine | S19, S20 | Patch geliefert (zusammen mit S22) |
+| S22 | Hextupel im JS-Port und im Explorer, Paritätstest | amt-engine | S21 | Patch geliefert (zusammen mit S21) |
 | S23 | Runner (Beispiel, Dokumentation, Versions-Hinweis), Release Engine 0.6.0 und Runner 0.5.0 samt Zenodo | amt-engine, amt-runner | S21, S22 | offen |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
@@ -587,6 +592,14 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 
 **Abnahme:** `python main.py --strict` zweimal grün, `git status` sauber; alle Tests aus 0.5.0 unverändert grün; ein Test liest `examples/hextuple-demo.ttl`, schreibt `*.reasoned.ttl`, liest sie wieder ein und findet dieselben Kanten mit Gewicht, Typ und Methode; die Ausgabe von `animals.ttl` besteht die Shapes (behebt den Befund vom 2026-10-30); die Kantenmenge der bestehenden Beispiele ist gegenüber 0.5.0 unverändert, in `edges.csv` kommen nur die neuen Spalten dazu.
 
+### Erledigt 2026-10-30
+
+- Neu: `amt/fw.py` (Namensraum, drei Typen, `effective_type`, `stored_type`, `combine_types`), `examples/hextuple-demo.ttl` und `.md`, `tests/test_hextuple.py` (23 Tests: Hilfsfunktionen, Laden, beide Gewichts-Properties, Konflikt, Ableitung, Gleichstand, Roundtrip, Shapes, CSV, Cypher, Diagnose, Ontologie). Geändert: `amt/core.py`, `reasoning.py`, `export.py`, `diagnostics.py`, `viz.py`, `validation.py`, `__init__.py`, `ontology/amt.ttl`, `py/site_howto.py` (drei Einträge: `AMT-E104`, `AMT-W205`, `AMT-N303`), `py/step_determinism.py` (Probe `hextuple-demo.ttl`), `README.md`, `CHANGELOG.md`.
+- Gemessen: die Kantenmenge (Rolle, Quelle, Ziel, Gewicht, `inferred`, `provenance`) ist für alle bisherigen Beispiele gegenüber 0.5.0 gleich (Vergleich der JSON-Listen, nicht der Dateien); alle Tests aus 0.5.0 laufen unverändert; die Ausgabe jedes Beispiels besteht jetzt die Shapes (Befund vom 2026-10-30 behoben, `xsd:decimal`).
+- Beim Testen gefunden und behoben: Turtle-Text als String statt Pfad ließ `load_amt` und `validate_against_shapes` abstürzen (A4, „Eingabe als Text“).
+- Nicht geprüft: Python 3.10 unter Windows (nur 3.13 hier; der Code nutzt `X | None` mit `from __future__ import annotations` und keine Backslashes in f-Strings).
+- Offen: `fw:EqualShareRule` und `fw:PropagationMethod` sind in `amt.ttl` nur genannt, nicht definiert (die Definition liegt in der FW-Ontologie, D16).
+
 ### S22 – Hextupel im JS-Port und im Explorer
 
 **Ziel:** Der Explorer rechnet und zeigt dasselbe wie die Python-Engine.
@@ -594,6 +607,13 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 **Inhalt:** `docs/js/amt-reasoner.js` bekommt Typ, Methode und die Kombinationsregel (Änderungen an der Python-Logik ziehen den Port nach, A4 vom 2026-10-26); `tests/test_js_reasoner.py` vergleicht beide auch für `type` und `method`; der Explorer zeigt Typ und Methode im Kanten-Tooltip und lädt `hextuple-demo.ttl` in der Beispielliste. Die Kopie im Playground (`leiza-rse/amt-playground`) folgt als eigener Patch dort.
 
 **Abnahme:** der Paritätstest ist grün (Node vorhanden), `tests/test_offline.py` bleibt grün, im Explorer zeigt `hextuple-demo` Typ und Methode an abgeleiteten und behaupteten Kanten.
+
+### Erledigt 2026-10-30
+
+- `docs/js/amt-reasoner.js`: `effectiveType`, `storedType`, `combineTypes`, Typ und Methode beim Ableiten, derselbe Gleichstandsschlüssel; `docs/js/amt.js` liest `fw:hasType`, `fw:hasMethod` und `fw:hasDegreeOfConnection`; `amt-render.js` zeigt Typ und Methode im Kanten-Tooltip; `amt-export.js` und der RDF-Dialog schreiben `xsd:decimal`, `fw:hasType`, `fw:hasMethod`, Cypher bekommt `type` und `method`.
+- `tests/test_js_reasoner.py` vergleicht jetzt auch `type` und `method` (alle Beispiele, drei Fälle im Demo, `combineTypes`, Gleichstand). Im Headless-Browser geprüft (Playwright, Seite `explorer/?ttl=data/hextuple-demo.ttl`): acht behauptete und fünf abgeleitete Kanten mit dem erwarteten Tooltip, keine Konsolenfehler; dieser Browser-Test ist nicht Teil von `main.py`.
+- Die Beispielliste des Explorers entsteht aus `examples/`; `hextuple-demo` steht darin, ohne weitere Änderung.
+- Offen: die Kopie im Playground (`leiza-rse/amt-playground`) folgt als eigener Patch dort.
 
 ### S23 – Runner und Release 0.6.0 / 0.5.0
 
@@ -622,4 +642,4 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 - **D15** erledigt in S20 (2026-10-30): `xsd:decimal` in der Turtle-Ausgabe (A4); die Ausgabe jedes Beispiels ändert sich einmalig und wird im CHANGELOG von S21 genannt.
 - **D16** Rückmeldung an die FW-Ontologie (Repo gehört dem Autor, eigener Patch dort): (a) die Kombinationsregel für Typen abgeleiteter Aussagen, (b) die AMT-Logiken stehen jetzt in `amt.ttl`, `data/amt-alignment.ttl` kann entfallen, (c) `fw:implementedBy` für `fw:EqualShareRule`, (d) dass in AMT jede Aussage ohne Angabe als vage gilt, steht dort nirgends.
 - **D17** Mini-AMT-Repo (`leiza-scit/CHNT2026-amt`): die Zuordnung „sichere Aussage, kein Typ“ in `weights.py` entfällt mit dem Standard „vage“; dort in S3a mitnehmen. Der Schritt „Hextupel in amt-engine und amt-runner“ im Primer jenes Repos entspricht S20 bis S23 hier.
-- **D18** teilweise erledigt in S19 (2026-10-30): Pages-Adresse `https://alpaca-fair-framework.github.io/amt-engine/` geprüft, `deploy/redirects.yaml` umgestellt (A4). Offen, durch den Autor: die erzeugte `.htaccess` für `academic-meta-tool.xyz` per FTP neu hochladen; einen neuen Pull Request in `perma-id/w3id.org` stellen (ein bestehender Eintrag zeigt, falls #6998 gemergt ist, noch auf die alte Pages-Adresse; Stand nicht geprüft); die Zenodo-Anbindung an der neuen Organisation prüfen (die Concept-DOIs bleiben); danach `python py/check_redirects.py`.
+- **D18** teilweise erledigt in S19 (2026-10-30): Pages-Adresse `https://alpaca-fair-framework.github.io/amt-engine/` geprüft, `deploy/redirects.yaml` umgestellt (A4). Stand 2026-10-30 laut Autor: `.htaccess` angepasst und Zenodo umgestellt; ungeprüft bleibt `py/check_redirects.py`. Ursprünglich offen, durch den Autor: die erzeugte `.htaccess` für `academic-meta-tool.xyz` per FTP neu hochladen; einen neuen Pull Request in `perma-id/w3id.org` stellen (ein bestehender Eintrag zeigt, falls #6998 gemergt ist, noch auf die alte Pages-Adresse; Stand nicht geprüft); die Zenodo-Anbindung an der neuen Organisation prüfen (die Concept-DOIs bleiben); danach `python py/check_redirects.py`.

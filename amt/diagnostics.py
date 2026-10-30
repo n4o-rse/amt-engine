@@ -38,7 +38,8 @@ from dataclasses import dataclass, field
 
 from rdflib import RDF, RDFS, Graph, URIRef
 
-from .core import AMT
+from .core import AMT, local_name
+from .fw import FW, KNOWN_TYPES
 
 LEVELS = ("error", "warning", "note")
 
@@ -73,6 +74,16 @@ def _concept_example(concepts: dict) -> str:
     if concepts:
         return _angle(sorted(concepts)[0])
     return "<https://example.org/YourConcept>"
+
+
+def _weighted_statements(g: Graph) -> list:
+    """Every statement with a weight: amt:weight or fw:hasDegreeOfConnection."""
+    found = set(g.subjects(AMT.weight, None)) | set(g.subjects(FW.hasDegreeOfConnection, None))
+    return sorted(found, key=str)
+
+
+def _triple_text(frm: str, role: str, to: str) -> str:
+    return f"{local_name(frm)} {local_name(role)} {local_name(to)}"
 
 
 def diagnose(amt: dict) -> list[Finding]:
@@ -132,7 +143,7 @@ def diagnose(amt: dict) -> list[Finding]:
         out.append(Finding("error", "AMT-E102", iri, msg, hint, related=tuple(who)))
 
     # ── E103: a weighted statement with a missing part ──────────────────
-    for stmt in sorted(g.subjects(AMT.weight, None), key=str):
+    for stmt in _weighted_statements(g):
         missing = [name for name, p in (("rdf:subject", RDF.subject),
                                         ("rdf:predicate", RDF.predicate),
                                         ("rdf:object", RDF.object))
@@ -140,13 +151,13 @@ def diagnose(amt: dict) -> list[Finding]:
         if missing:
             out.append(Finding(
                 "error", "AMT-E103", str(stmt),
-                f"A statement with amt:weight lacks {', '.join(missing)}; it is ignored.",
-                "A weighted edge needs rdf:subject, rdf:predicate, rdf:object and amt:weight together.",
+                f"A statement with a weight lacks {', '.join(missing)}; it is ignored.",
+                "A weighted edge needs rdf:subject, rdf:predicate, rdf:object and amt:weight (or fw:hasDegreeOfConnection) together.",
             ))
 
     # ── W201: weight outside [0, 1] ─────────────────────────────────────
-    for stmt in sorted(g.subjects(AMT.weight, None), key=str):
-        for w in g.objects(stmt, AMT.weight):
+    for stmt in _weighted_statements(g):
+        for w in list(g.objects(stmt, AMT.weight)) + list(g.objects(stmt, FW.hasDegreeOfConnection)):
             try:
                 value = float(w)
             except (TypeError, ValueError):
@@ -157,6 +168,59 @@ def diagnose(amt: dict) -> list[Finding]:
                     f"Weight {value} is outside [0, 1].",
                     "Weights are degrees of truth between 0 and 1. The engine clamps values above 1 to 1.",
                 ))
+
+    # ── E104: amt:weight and fw:hasDegreeOfConnection disagree ──────────
+    conflicts = []
+    for stmt in _weighted_statements(g):
+        a = [v for v in g.objects(stmt, AMT.weight)]
+        b = [v for v in g.objects(stmt, FW.hasDegreeOfConnection)]
+        if not a or not b:
+            continue
+        try:
+            va, vb = float(a[0]), float(b[0])
+        except (TypeError, ValueError):
+            continue
+        if abs(va - vb) > 1e-9:
+            frm, role, to = (g.value(stmt, p) for p in (RDF.subject, RDF.predicate, RDF.object))
+            if frm is not None and role is not None and to is not None:
+                conflicts.append((str(frm), str(role), str(to), va, vb))
+    for frm, role, to, va, vb in sorted(conflicts):
+        out.append(Finding(
+            "error", "AMT-E104", frm,
+            f"The statement {_triple_text(frm, role, to)} has amt:weight {va} and fw:hasDegreeOfConnection {vb}; "
+            "amt:weight is used.",
+            "The two properties mean the same thing. Keep one of them, or give both the same value.",
+        ))
+
+    # ── W205: fw:hasType names something that is not one of the three types ─
+    unknown_types: dict[str, list[str]] = {}
+    for e in edges:
+        t = e.get("type")
+        if t and t not in KNOWN_TYPES:
+            unknown_types.setdefault(t, []).append(_triple_text(e["from"], e["role"], e["to"]))
+    for iri in sorted(unknown_types):
+        who = sorted(unknown_types[iri])
+        sample = "; ".join(who[:3]) + (f"; and {len(who) - 3} more" if len(who) > 3 else "")
+        out.append(Finding(
+            "warning", "AMT-W205", iri,
+            f"{_angle(iri)} is used as fw:hasType ({sample}) but is not one of fw:Vagueness, fw:Uncertainty, "
+            "fw:FuzzinessWobbliness. It is kept as it is and counted as its own type.",
+            "Use one of the three individuals of the FW ontology (http://w3id.org/fw_ontology/), or leave fw:hasType out "
+            "to get the default, fw:Vagueness.",
+            related=tuple(who),
+        ))
+
+    # ── N303: a type without a method ───────────────────────────────────
+    untyped_method = sorted(_triple_text(e["from"], e["role"], e["to"])
+                            for e in edges if e.get("type") and not e.get("method"))
+    if untyped_method:
+        sample = "; ".join(untyped_method[:3]) + (f"; and {len(untyped_method) - 3} more" if len(untyped_method) > 3 else "")
+        out.append(Finding(
+            "note", "AMT-N303", untyped_method[0],
+            f"{len(untyped_method)} statement(s) have fw:hasType but no fw:hasMethod ({sample}).",
+            "Say how the weight was obtained, for example fw:hasMethod fw:EqualShareRule. "
+            "Without a method the type is still used; nothing needs to be done.",
+        ))
 
     # ── N301: edge role is not declared as an amt:Role ──────────────────
     used_roles = sorted({e["role"] for e in edges})

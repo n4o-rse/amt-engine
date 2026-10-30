@@ -14,6 +14,8 @@ process.stdin.on("end", () => {
   } else if (req.op === "reason") {
     const r = R.reason(req.edges, req.axioms);
     out = { edges: r.edges, stats: r.stats, consistency: R.checkConsistency(req.edges, req.axioms, r.edges) };
+  } else if (req.op === "combine") {
+    out = req.cases.map((c) => R.combineTypes(c));
   } else if (req.op === "normalise") {
     out = R.normaliseAxioms(req.axioms);
   } else {

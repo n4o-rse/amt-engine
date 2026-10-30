@@ -160,12 +160,49 @@
     this.register(edge);
   };
 
-  function addOrStrengthen(result, index, role, from, to, weight, axiomIri) {
+  // ----------------------------------------------------------
+  // Type and method (amt/fw.py)
+  // ----------------------------------------------------------
+  var FW_NS = "http://w3id.org/fw_ontology/";
+  var VAGUENESS = FW_NS + "Vagueness";
+  var UNCERTAINTY = FW_NS + "Uncertainty";
+  var FUZZINESS_WOBBLINESS = FW_NS + "FuzzinessWobbliness";
+
+  // The type that counts for an edge: its own, or vagueness (the default).
+  function effectiveType(edge) { return (edge && edge.type) || VAGUENESS; }
+
+  // The value to store in an edge: null for the default type.
+  function storedType(t) { return !t || t === VAGUENESS ? null : t; }
+
+  // Effective type of a statement derived from several others: the common
+  // type if all agree, otherwise fw:FuzzinessWobbliness. null counts as vagueness.
+  function combineTypes(types) {
+    var seen = [];
+    for (var i = 0; i < types.length; i++) {
+      var t = types[i] || VAGUENESS;
+      if (seen.indexOf(t) < 0) seen.push(t);
+    }
+    if (!seen.length) return VAGUENESS;
+    return seen.length === 1 ? seen[0] : FUZZINESS_WOBBLINESS;
+  }
+
+  // Strings compare by UTF-16 code units here and by code points in Python;
+  // IRIs are ASCII in practice, so the order is the same.
+  function pathKey(method, type) { return [method || "", type]; }
+  function keyLess(a, b) {
+    if (a[0] !== b[0]) return a[0] < b[0];
+    return a[1] < b[1];
+  }
+
+  function addOrStrengthen(result, index, role, from, to, weight, axiomIri, type, method) {
+    type = type === undefined ? null : type;
+    method = method === undefined ? null : method;
     var existing = index.get(role, from, to);
     if (!existing) {
       index.append(result, {
         role: role, from: from, to: to, weight: weight,
         inferred: true, provenance: axiomIri ? [axiomIri] : [],
+        type: type, method: method, evidence: null,
       });
       return true;
     }
@@ -174,9 +211,22 @@
       existing.provenance.push(axiomIri);
       changed = true;
     }
-    if (existing.inferred && existing.weight < weight) {
-      existing.weight = weight;
-      changed = true;
+    if (existing.inferred) {
+      if (existing.weight < weight) {
+        existing.weight = weight;
+        existing.type = type;
+        existing.method = method;
+        changed = true;
+      } else if (existing.weight === weight) {
+        // Equal weight: keep the path with the smaller (method, type). A
+        // different type can change what depends on the edge, a different
+        // method cannot.
+        if (keyLess(pathKey(method, effectiveType({ type: type })), pathKey(existing.method, effectiveType(existing)))) {
+          if (effectiveType({ type: type }) !== effectiveType(existing)) changed = true;
+          existing.type = type;
+          existing.method = method;
+        }
+      }
     }
     return changed;
   }
@@ -184,21 +234,21 @@
   function chainMatches(index, roles) {
     var matches = [];
     if (!roles.length) return matches;
-    function extend(start, current, k, weights) {
+    function extend(start, current, k, weights, edgesSoFar) {
       if (k === roles.length) {
-        matches.push({ start: start, end: current, weights: weights });
+        matches.push({ start: start, end: current, weights: weights, edges: edgesSoFar });
         return;
       }
       var next = index.outgoing(roles[k], current).slice();
       for (var i = 0; i < next.length; i++) {
-        extend(start, next[i].to, k + 1, weights.concat([next[i].weight]));
+        extend(start, next[i].to, k + 1, weights.concat([next[i].weight]), edgesSoFar.concat([next[i]]));
       }
     }
     var seeds = index.starts(roles[0]);
     for (var s = 0; s < seeds.length; s++) {
       var edges = seeds[s][1].slice();
       for (var i = 0; i < edges.length; i++) {
-        extend(seeds[s][0], edges[i].to, 1, [edges[i].weight]);
+        extend(seeds[s][0], edges[i].to, 1, [edges[i].weight], [edges[i]]);
       }
     }
     return matches;
@@ -212,7 +262,8 @@
     for (var i = 0; i < matches.length; i++) {
       var w = aggregate(matches[i].weights, axiom.logic, axiom.logicParameter);
       if (w <= 0) continue;
-      if (addOrStrengthen(result, index, axiom.consequent, matches[i].start, matches[i].end, w, axiom.iri || ""))
+      var t = storedType(combineTypes(matches[i].edges.map(function (e) { return e.type; })));
+      if (addOrStrengthen(result, index, axiom.consequent, matches[i].start, matches[i].end, w, axiom.iri || "", t, axiom.logic))
         changed = true;
     }
     return changed;
@@ -225,7 +276,8 @@
     for (var s = 0; s < starts.length; s++) {
       var out = starts[s][1].slice();
       for (var i = 0; i < out.length; i++) {
-        if (addOrStrengthen(result, index, axiom.inverse, out[i].to, out[i].from, out[i].weight, axiom.iri || ""))
+        if (addOrStrengthen(result, index, axiom.inverse, out[i].to, out[i].from, out[i].weight, axiom.iri || "",
+                            storedType(out[i].type), null))
           changed = true;
       }
     }
@@ -240,7 +292,8 @@
     for (var s = 0; s < starts.length; s++) {
       var out = starts[s][1].slice();
       for (var i = 0; i < out.length; i++) {
-        if (addOrStrengthen(result, index, sup, out[i].from, out[i].to, out[i].weight, axiom.iri || ""))
+        if (addOrStrengthen(result, index, sup, out[i].from, out[i].to, out[i].weight, axiom.iri || "",
+                            storedType(out[i].type), null))
           changed = true;
       }
     }
@@ -257,6 +310,7 @@
       return {
         role: e.role, from: e.from, to: e.to, weight: e.weight,
         inferred: !!e.inferred, provenance: (e.provenance || []).slice(),
+        type: e.type || null, method: e.method || null, evidence: e.evidence || null,
       };
     });
     var index = new EdgeIndex(result);
@@ -306,6 +360,13 @@
   return {
     AMT_NS: AMT_NS,
     LOGICS: REGISTRY,
+    FW_NS: FW_NS,
+    VAGUENESS: VAGUENESS,
+    UNCERTAINTY: UNCERTAINTY,
+    FUZZINESS_WOBBLINESS: FUZZINESS_WOBBLINESS,
+    effectiveType: effectiveType,
+    storedType: storedType,
+    combineTypes: combineTypes,
     aggregate: aggregate,
     normaliseAxioms: normaliseAxioms,
     reason: reason,

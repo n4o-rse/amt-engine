@@ -13,7 +13,38 @@ Zenodo.
 
 ## [Unreleased]
 
+### Added
+
+- Type and method of a statement (the hextuple, PRIMER S21/S22). Besides `amt:weight` a statement can carry
+  `fw:hasType` (`fw:Vagueness`, `fw:Uncertainty`, `fw:FuzzinessWobbliness`) and `fw:hasMethod` from the FW ontology
+  (`http://w3id.org/fw_ontology/`); `fw:derivedFrom` evidence is read and passed through. All are optional: a
+  statement without a type is a vagueness statement, also at weight 1.0, and a plain quadruple behaves as in 0.5.0
+  (the set of edges of every bundled example is unchanged).
+- The weight is read from `amt:weight` and from `fw:hasDegreeOfConnection`; the output uses `amt:weight`.
+- Derived statements carry a method and a type: a `RoleChainAxiom` sets the method to its logic and the type to the
+  common type of its antecedents (`fw:FuzzinessWobbliness` if they differ); `InverseAxiom` and `SubsumptionAxiom`
+  set no method and take the type of the source edge. With several paths, the one with the highest weight decides;
+  on equal weights the smaller method IRI.
+- New module `amt/fw.py` (`effective_type`, `combine_types`, the three type IRIs); `amt.effective_type`,
+  `amt.combine_types` and `amt.DEFAULT_TYPE` are exported. Edge dicts have the keys `type`, `method`, `evidence`.
+- Diagnostics `AMT-E104` (conflicting `amt:weight` and `fw:hasDegreeOfConnection`; `amt:weight` is used),
+  `AMT-W205` (`fw:hasType` is none of the three types) and `AMT-N303` (type without method), each with an entry on
+  the How-To page "check an AMT file".
+- `edges.csv` has the columns `type` (effective type) and `method` at the end; Cypher relationships get the
+  properties `type` and `method`; the graph tooltip shows both.
+- `ontology/amt.ttl`: prefix `fw:`; the six logics are also `fw:PropagationMethod`.
+- Explorer (`docs/js/amt-reasoner.js`, `amt.js`): same rules as the Python engine, type and method in the edge
+  tooltip and in the Turtle and Cypher export. `tests/test_js_reasoner.py` compares type and method as well.
+  Evidence is not carried by the Explorer.
+- `examples/hextuple-demo.ttl` and `.md`; `tests/test_hextuple.py`.
+
 ### Changed
+
+- The Turtle output writes `amt:weight` as `xsd:decimal` instead of `xsd:double` (in Python and in the Explorer
+  export), as `amt:WeightShape` requires. Before, the reasoned output of every example failed the shapes (152
+  violations for `animals.reasoned.ttl`). The output of every example changes once because of this.
+- Derived edges in the Turtle output carry `fw:hasMethod` (the logic that produced them), so `*.reasoned.ttl`
+  declares the prefix `fw:` whenever there is a derived edge from a role chain.
 
 - `README.md`, "Citation": names the version DOI of 0.5.0,
   `10.5281/zenodo.23691499`. The concept DOI is unchanged.
@@ -29,6 +60,11 @@ Zenodo.
   `http://github.com/n4o-rse/amt-engine/subsumption-demo/` to the same paths under `alpaca-fair-framework`;
   the mirror in `docs/data/` and the expected IRIs in the tests follow. Files that use the old namespace still
   load and validate.
+
+### Fixed
+
+- `load_amt` and `validate_against_shapes` raised `OSError: File name too long` when given the text of a larger
+  Turtle file instead of a path. Such text is now treated as Turtle.
 
 ## [0.5.0] - 2026-10-27
 

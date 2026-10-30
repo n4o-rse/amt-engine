@@ -187,6 +187,12 @@ var AMT = function () {
   var P_INSTANCEOF = AMT_NS + "instanceOf";
   var P_PLACEHOLDER = AMT_NS + "placeholder";
   var P_WEIGHT = AMT_NS + "weight";
+  // FW ontology: the same weight under its own name, and the two extra parts
+  // of the hextuple (type and method of a statement).
+  var FW_NS = "http://w3id.org/fw_ontology/";
+  var P_FW_WEIGHT = FW_NS + "hasDegreeOfConnection";
+  var P_FW_TYPE = FW_NS + "hasType";
+  var P_FW_METHOD = FW_NS + "hasMethod";
   var P_ANTECEDENT1 = AMT_NS + "antecedent1";
   var P_ANTECEDENT2 = AMT_NS + "antecedent2";
   var P_ANTECEDENT = AMT_NS + "antecedent";
@@ -324,8 +330,14 @@ var AMT = function () {
       //     ?stmt rdf:object ?to .
       //     ?stmt amt:weight ?width . }
       var allEdges = [];
-      // Find all blank nodes / statements that carry a weight
+      // Find all blank nodes / statements that carry a weight: amt:weight, or
+      // fw:hasDegreeOfConnection for statements that have no amt:weight
+      // (amt:weight wins if both are there, as in the Python loader).
       var weightTriples = LocalStore.match(null, P_WEIGHT, null);
+      var withAmtWeight = new Set(weightTriples.map(function (wt) { return wt.subject; }));
+      LocalStore.match(null, P_FW_WEIGHT, null).forEach(function (wt) {
+        if (!withAmtWeight.has(wt.subject)) weightTriples.push(wt);
+      });
       weightTriples.forEach(function (wt) {
         var stmt = wt.subject;
         var from = LocalStore.objectOf(stmt, P_SUBJECT);
@@ -333,7 +345,11 @@ var AMT = function () {
         var to = LocalStore.objectOf(stmt, P_OBJECT);
         var width = parseFloat(wt.object);
         if (from && role && to && !isNaN(width)) {
-          allEdges.push({ role: role, from: from, to: to, width: width });
+          allEdges.push({
+            role: role, from: from, to: to, width: width,
+            type: LocalStore.objectOf(stmt, P_FW_TYPE) || null,
+            method: LocalStore.objectOf(stmt, P_FW_METHOD) || null,
+          });
         }
       });
 
@@ -452,6 +468,8 @@ var AMT = function () {
         from: graph.edges[i].from,
         to: graph.edges[i].to,
         width: graph.edges[i].width,
+        type: graph.edges[i].type || null,
+        method: graph.edges[i].method || null,
         label: width,
         font: {
           align: "middle",
@@ -486,6 +504,9 @@ var AMT = function () {
         weight: isNaN(w) ? 0 : Math.min(w, 1.0),
         inferred: false,
         provenance: [],
+        type: e.type || null,
+        method: e.method || null,
+        evidence: null,
       };
     });
   };
@@ -511,6 +532,8 @@ var AMT = function () {
         label: e.role.replace(_AMT.prefix, "") + ":" + e.weight,
         inferred: true,
         provenance: e.provenance,
+        type: e.type,
+        method: e.method,
         font: { align: "middle", size: 16, color: "red", face: "monospace" },
       });
     }

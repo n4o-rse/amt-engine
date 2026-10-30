@@ -8,6 +8,10 @@
     "title": "chain-test"
   },
   {
+    "file": "hextuple-demo.ttl",
+    "title": "hextuple-demo — statements with type and method"
+  },
+  {
     "file": "PotterAttributionExample.ttl",
     "title": "Potter Attribution — typological dating chain"
   },

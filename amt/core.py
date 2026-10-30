@@ -22,7 +22,19 @@ Every edge is a dict with these keys::
         "weight":     float,  # in [0, 1]
         "inferred":   bool,   # False for asserted, True for derived
         "provenance": list,   # IRIs of axioms that produced this edge
+        "type":       str | None,   # fw:hasType IRI; None = default (vagueness)
+        "method":     str | None,   # fw:hasMethod IRI
+        "evidence":   list | None,  # fw:derivedFrom nodes, passed through
     }
+
+``type``, ``method`` and ``evidence`` are the two optional columns of the
+hextuple plus the evidence behind a statement (see :mod:`amt.fw`). All three
+are ``None`` for a plain quadruple. The weight is read from ``amt:weight`` or
+from ``fw:hasDegreeOfConnection``; if a statement carries both with different
+values, ``amt:weight`` wins (and :func:`amt.diagnostics.diagnose` says so).
+An evidence entry is ``{"id": IRI or None, "properties": [[predicate, n3], ...]}``
+with the objects already written as Turtle terms; nested blank nodes are not
+followed.
 
 The ``"from"`` / ``"to"`` keys are kept (rather than ``"source"`` /
 ``"target"``) for round-trip compatibility with the original JS exporter
@@ -33,10 +45,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TypedDict
 
-from rdflib import Graph, Namespace, RDF, RDFS, URIRef
+from rdflib import BNode, Graph, Namespace, RDF, RDFS, URIRef
 from rdflib.collection import Collection
 
 from ._resources import ontology_dir as _bundled_ontology_dir
+from .fw import FW
 
 # AMT vocabulary namespace
 AMT = Namespace("http://academic-meta-tool.xyz/vocab#")
@@ -76,6 +89,18 @@ def local_name(iri: str) -> str:
 _local = local_name  # private alias
 
 
+def is_existing_path(text: str) -> bool:
+    """
+    True if ``text`` names an existing file. Turtle given as a string is not
+    a path: a long one would make ``Path.exists`` raise "File name too long",
+    so that error counts as "no".
+    """
+    try:
+        return Path(text).exists()
+    except (OSError, ValueError):
+        return False
+
+
 def _read_rdf_list(g: Graph, head) -> list[str]:
     """Return the IRIs of the items in an RDF list pointed at by ``head``."""
     if head is None:
@@ -112,6 +137,35 @@ def _normalise_axiom_entry(entry: dict, g: Graph) -> dict:
             pass  # leave as-is; SHACL should have caught this
 
     return entry
+
+
+def _first_iri(g: Graph, subject, predicate) -> str | None:
+    """The smallest IRI object of ``predicate`` (sorted, so runs agree), or None."""
+    values = sorted(str(o) for o in g.objects(subject, predicate) if isinstance(o, URIRef))
+    return values[0] if values else None
+
+
+def _read_evidence(g: Graph, stmt) -> list | None:
+    """
+    The ``fw:derivedFrom`` nodes of a statement, ready to be written again.
+
+    Each node becomes ``{"id": IRI or None, "properties": [[p, n3], ...]}``.
+    The properties are the node's own triples (for example ``rdf:type
+    fw:TextEvidence`` and ``fw:sourceString "..."``), sorted; objects that are
+    blank nodes are left out. Returns None if the statement has no evidence.
+    """
+    nodes = sorted(set(g.objects(stmt, FW.derivedFrom)), key=lambda n: (isinstance(n, URIRef) is False, str(n)))
+    if not nodes:
+        return None
+    out = []
+    for node in nodes:
+        props = sorted(
+            [str(p), o.n3()]
+            for p, o in g.predicate_objects(node)
+            if not isinstance(o, BNode)
+        )
+        out.append({"id": str(node) if isinstance(node, URIRef) else None, "properties": props})
+    return out
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -157,7 +211,7 @@ def load_amt(
 
     g = Graph()
     src = str(ttl_source)
-    if Path(src).exists():
+    if is_existing_path(src):
         g.parse(src, format="turtle")
     else:
         g.parse(data=src, format="turtle")
@@ -212,12 +266,21 @@ def load_amt(
             }
 
     # ── Edges (reified statements with weight) ──────────────────────────
+    # The weight is amt:weight or, equivalently, fw:hasDegreeOfConnection.
+    # amt:weight wins if a statement has both with different values.
+    weighted = list(g.subjects(AMT.weight, None))
+    known = set(weighted)
+    weighted += sorted(
+        {s for s in g.subjects(FW.hasDegreeOfConnection, None)} - known, key=str
+    )
     edges: list[dict] = []
-    for stmt in g.subjects(AMT.weight, None):
+    for stmt in weighted:
         frm = g.value(stmt, RDF.subject)
         role = g.value(stmt, RDF.predicate)
         to = g.value(stmt, RDF.object)
         w = g.value(stmt, AMT.weight)
+        if w is None:
+            w = g.value(stmt, FW.hasDegreeOfConnection)
         if frm and role and to and w is not None:
             edges.append(
                 {
@@ -227,6 +290,9 @@ def load_amt(
                     "weight":     min(float(w), 1.0),
                     "inferred":   False,
                     "provenance": [],
+                    "type":       _first_iri(g, stmt, FW.hasType),
+                    "method":     _first_iri(g, stmt, FW.hasMethod),
+                    "evidence":   _read_evidence(g, stmt),
                 }
             )
 

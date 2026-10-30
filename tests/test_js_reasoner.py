@@ -54,9 +54,47 @@ def test_reasoning_matches_python(path):
         assert mine["weight"] == pytest.approx(theirs["weight"], abs=1e-9)
         assert mine["inferred"] == theirs["inferred"]
         assert mine["provenance"] == theirs["provenance"]
+        assert mine["type"] == theirs["type"]
+        assert mine["method"] == theirs["method"]
     assert js["stats"]["iterations"] == py_stats["iterations"]
     assert js["consistency"]["consistent"] == ok
     assert js["consistency"]["violations"] == py_violations
+
+
+def test_the_demo_has_derived_edges_with_type_and_method():
+    """The comparison above is only worth something if some edges carry both."""
+    data = load_amt(ROOT / "examples" / "hextuple-demo.ttl")
+    got = _node({"op": "reason", "edges": data["edges"], "axioms": data["axioms"]})["edges"]
+    derived = [e for e in got if e["inferred"]]
+    assert any(e["method"] and e["type"] for e in derived)
+    assert any(e["method"] and e["type"] is None for e in derived)
+    assert any(e["method"] is None and e["type"] for e in derived)
+
+
+def test_combine_types_matches_python():
+    from amt.fw import FUZZINESS_WOBBLINESS, UNCERTAINTY, VAGUENESS, combine_types
+    cases = [[], [None], [None, VAGUENESS], [UNCERTAINTY], [UNCERTAINTY, UNCERTAINTY], [UNCERTAINTY, None],
+             [UNCERTAINTY, VAGUENESS, UNCERTAINTY], [FUZZINESS_WOBBLINESS, FUZZINESS_WOBBLINESS],
+             [FUZZINESS_WOBBLINESS, UNCERTAINTY]]
+    got = _node({"op": "combine", "cases": cases})
+    assert got == [combine_types(c) for c in cases]
+
+
+def test_equal_weight_tie_break_matches_python():
+    from amt.core import AMT_PFX as A
+    axioms = [
+        {"type": "RoleChainAxiom", "iri": "http://x/axL", "antecedents": ["http://x/r1", "http://x/r2"],
+         "consequent": "http://x/r3", "logic": A + "ProductLogic"},
+        {"type": "RoleChainAxiom", "iri": "http://x/axG", "antecedents": ["http://x/r1", "http://x/r2"],
+         "consequent": "http://x/r3", "logic": A + "GoedelLogic"},
+    ]
+    base = {"inferred": False, "provenance": [], "method": None, "evidence": None}
+    edges = [dict(base, role="http://x/r1", **{"from": "http://x/a", "to": "http://x/b"}, weight=1.0, type=None),
+             dict(base, role="http://x/r2", **{"from": "http://x/b", "to": "http://x/c"}, weight=0.5, type="http://w3id.org/fw_ontology/Uncertainty")]
+    py = [e for e in do_reasoning(edges, axioms) if e["inferred"]]
+    js = [e for e in _node({"op": "reason", "edges": edges, "axioms": axioms})["edges"] if e["inferred"]]
+    assert [(e["weight"], e["type"], e["method"]) for e in js] == [(e["weight"], e["type"], e["method"]) for e in py]
+    assert py[0]["method"] == A + "GoedelLogic"
 
 
 LOGICS = [AMT_PFX + n for n in
