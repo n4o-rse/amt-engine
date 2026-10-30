@@ -32,6 +32,12 @@ Arbeitsplan für das Repo `amt-engine` (Academic Meta Tool, Python-Reasoner). Wi
 - `examples/skos-mapping-example.ttl` meldet beim Konsistenzcheck zwei Verletzungen (`exactMatch` und `questionableMatch` zum selben Ziel; Selbstschleife über `questionableMatch`). Das ist als Demo gewollt (A4). Der Runner beendet sich trotzdem mit Exit-Code 0, deshalb bleibt der Schritt `examples` auf `ok`.
 - Rückmeldung aus der Praxis (Karsten, AFE-Münzen, 2026-10-27): Eine per SPARQL CONSTRUCT erzeugte Datei bestand die Validierung, der Lauf endete aber mit `AssertionError: non existent node 'http://nomisma.org/id/vespasian'` in `amt/viz.py`. Ursache: nur die Münzen hatten `amt:instanceOf`, die Ziele der Kanten (`nm:vespasian` usw.) nicht; `load_amt` lädt nur Knoten mit `amt:instanceOf`, die Kanten blieben ohne Endknoten, `pyvis.add_edge` bricht dann ab (geprüft mit `AFE_all_cases_asAMT.ttl`: 4 Knoten, 7 Kanten, 7 Kantenenden ohne Knoten). Zweites Fehlerbild: `amt:instanceOf amt:Concept` löst „Each Concept must have at least one rdfs:label“ aus (der Bereich von `amt:instanceOf` ist `amt:Concept`, also zählt jedes Objekt als Konzept), und die Meldung nannte den Knoten nicht. `lado:hasAMT` stört nicht: die Engine liest Kanten nur über `amt:weight`.
 - `pyproject.toml` nannte als Autor „AMT contributors"; `LICENSE` nannte Florian Thiery | LEIZA | NFDI4Objects; `docs/index.htm` nennt Thiery und Unold (Software) sowie Thiery und Mees (Datenkonzept). Geklärt in S3 (A4).
+- Umzug der Repos (2026-10-30, Stand `987dd8d`): `amt-engine` und `amt-runner` liegen jetzt unter `https://github.com/alpaca-fair-framework/`. Im Quelltext stehen noch 137 Zeilen mit `n4o-rse` (102 in der Engine, 35 im Runner), in fünf Mustern: `n4o-rse/amt-engine`, `n4o-rse/amt-runner`, `n4o-rse/amt-explore`, `n4o-rse.github.io` (Adresse der Pages) und der Organisationsname allein. Betroffen sind Quellen (`py/site_*.py`, `amt/runner.py`), `CITATION.cff`, `README.md`, `deploy/redirects.yaml` samt erzeugten `.htaccess`, die Beispiel-TTLs, Tests und die erzeugten Seiten unter `docs/`; im Runner stehen `AMT_REPO_URL`, `EXPLORER_URL` und `HOWTO_URL` in `run_amt.py`. Gezählt mit `grep` ohne `.git` und `docs/vendor/`. Nicht geprüft: ob die alte Pages-Adresse weiter antwortet und ob die Zenodo-Anbindung an der neuen Organisation hängt.
+- Das Quadrupel in der Engine (2026-10-30): Eine Aussage ist ein reifizierter Knoten mit `rdf:subject`, `rdf:predicate`, `rdf:object` und `amt:weight`. `core.load_amt` liest jeden Knoten mit `amt:weight` in ein Kanten-Dict mit den Schlüsseln `role`, `from`, `to`, `weight`, `inferred`, `provenance`. Dieselben sechs Schlüssel laufen durch `reasoning.py` (`_add_or_strengthen_edge` legt abgeleitete Kanten nur mit ihnen an), `subsumption.py`, `export.py` (Turtle, Cypher, `edges.csv`), `viz.py`, den JS-Port `docs/js/amt-reasoner.js` und `amt:WeightShape`. Weitere Felder gibt es nirgends; das Wort „Quadrupel“ steht nur in Kommentaren von `amt.ttl` und `amt-shapes.ttl`.
+- FW-Ontologie (2026-10-30, `caa-datadragons/FW_Ontology`, Stand `15ae05f`): Namensraum `http://w3id.org/fw_ontology/` (mit `http`), Präfix `fw:`. Für eine Aussage gibt es `fw:hasDegreeOfConnection` (`owl:equivalentProperty amt:weight`), `fw:hasType` (Wert ist ein Individuum von `fw:FW_Type`: `fw:Vagueness`, `fw:Uncertainty`, `fw:FuzzinessWobbliness`; die beiden ersten haben `skos:broader fw:FuzzinessWobbliness`), `fw:hasMethod` (Wert ist ein Individuum von `fw:Method`, z. B. `fw:EqualShareRule`) und optional `fw:derivedFrom` auf `fw:Evidence` (`fw:TextEvidence` mit `fw:sourceString`). `fw:implementedBy` ist definiert, für `fw:EqualShareRule` aber noch nicht gesetzt. Die sechs AMT-Logiken als `fw:PropagationMethod` stehen dort nur als Vorschlag in `data/amt-alignment.ttl`, mit dem Vermerk, dass sie nach `amt.ttl` gehören. Die Zuordnung der Muster `?`, OR und AND zu den Typen liegt im Mini-AMT-Repo (`weights.py`), nicht hier.
+- Zwei Lücken im heutigen Reasoning, die der Hextupel-Schritt klären muss (2026-10-30): (1) `InverseAxiom` und `SubsumptionAxiom` legen abgeleitete Kanten über `_add_or_strengthen_edge` an, haben aber keine Logik; für `fw:hasMethod` gibt es dort keine naheliegende Methode. (2) Wird eine Kante auf mehreren Wegen abgeleitet, gilt das Maximum der Gewichte und die Herkunftslisten werden vereinigt (Kopf von `reasoning.py`); welcher Weg dann Typ und Methode liefert, ist offen. Beides in D14.
+- Die Turtle-Ausgabe besteht die eigene Validierung nicht (2026-10-30): `export.py` schreibt `amt:weight` als `"1.000000"^^xsd:double`, `amt:WeightShape` verlangt `xsd:decimal`. Lauf auf `examples/animals.ttl` (Linux, Python 3.13, rdflib und pyshacl in den aktuellen pip-Versionen): die Eingabe ist konform, `animals.reasoned.ttl` hat 152 Verstöße, alle mit derselben Meldung (46 behauptete plus 106 abgeleitete Kanten). Die Engine liest die Datei trotzdem, weil `core.load_amt` `float()` nimmt; nur die Validierung der eigenen Ausgabe scheitert. Das trifft den Roundtrip (Ausgabe wieder einlesen), den die AFE-Arbeit braucht. Beschlussvorschlag in D15.
+
 
 ### A2 Zielbild
 
@@ -123,6 +129,20 @@ Eigenschaften, die das Repo haben muss:
 | Exit-Codes des Runners | 0 fertig, 1 Validierung oder `--strict` gescheitert, 2 Eingabe fehlt, 3 unerwarteter Fehler (`--debug` zeigt den Traceback); Diagnose-Fehler ändern den Exit-Code nur mit `--strict`; D6 bleibt unverändert (Konsistenzverletzungen: 0) | 2026-10-27 |
 | `--check-only` | Validieren, laden, diagnostizieren, nichts schreiben; auch im Wrapper `amt-runner/run_amt.py` (kein Ausgabeordner, kein `latest`) | 2026-10-27 |
 | How-To-Sektion | `docs/howto/` (Übersicht, „bauen“, „prüfen“) aus `py/site_howto.py`; Beispiele und das SPARQL-Rezept stehen im Modul und werden von `tests/test_howto.py` ausgeführt; jeder Code von `amt/diagnostics.py` hat einen Eintrag mit Anker auf der Seite „prüfen“; weitere Unterseiten kommen als Einträge in `PAGES` | 2026-10-27 |
+| Hextupel: Begriff | Die AMT-Aussage ist heute ein Quadrupel (Subjekt, Rolle, Objekt, `amt:weight`). Das Hextupel ergänzt `fw:hasType` und `fw:hasMethod` aus `caa-datadragons/FW_Ontology` (Namensraum `http://w3id.org/fw_ontology/`, Präfix `fw:`). Die früher gedachten Namen `amt:type` und `amt:method` entfallen | 2026-10-30 |
+| Hextupel: Standard „vage“ | Jede AMT-Aussage ist, wenn nichts anderes angegeben ist, eine Vagheitsaussage; der wirksame Typ ist dann `fw:Vagueness`. Das gilt auch bei Gewicht 1.0 | 2026-10-30 |
+| Hextupel: Standard nur implizit | Die Engine nimmt `fw:Vagueness` an und schreibt `fw:hasType` in die Turtle-Ausgabe nur, wenn es in der Eingabe stand oder wenn eine abgeleitete Kante vom Standard abweicht. CSV, Cypher und Graph zeigen den wirksamen Typ. Eine Datei ohne Typ bleibt in der Ausgabe ohne Typ (verlustfreier Roundtrip) | 2026-10-30 |
+| Hextupel: Umsetzung des Standards | Vorschlag: im Kanten-Dict ist `type` ein IRI-String oder `None` (= Standard); `effective_type(edge)` liefert den wirksamen Typ. Eine abgeleitete Kante, deren Typ der Standard ist, bekommt `None`; ein ausdrücklich gesetztes `fw:Vagueness` an einer behaupteten Kante bleibt erhalten | Vorschlag |
+| Hextupel: Gewichts-Property | Eingabe: `amt:weight` und `fw:hasDegreeOfConnection` werden beide gelesen; Ausgabe: `amt:weight`. Die Äquivalenz steht in der FW-Ontologie (`owl:equivalentProperty`) | 2026-10-30 |
+| Hextupel: widersprüchliche Gewichte | Vorschlag: trägt eine Aussage beide Properties mit verschiedenen Werten, meldet die Diagnose einen Fehler (`AMT-E104`) und die Engine nimmt `amt:weight` | Vorschlag |
+| Hextupel: Pflicht | `fw:hasType` und `fw:hasMethod` sind optional. Ein Quadrupel ohne beide bleibt gültig und läuft wie in 0.5.0. Auffälligkeiten sind Diagnose-Befunde, weder SHACL-Verstöße noch Abbrüche | 2026-10-30 |
+| Hextupel: Diagnose-Codes | Vorschlag: `AMT-W205` (`fw:hasType` nennt keines der drei Individuen `fw:Vagueness`, `fw:Uncertainty`, `fw:FuzzinessWobbliness`) und `AMT-N303` (Typ ohne Methode); zusammen mit `AMT-E104` je ein Eintrag auf der Seite „prüfen“. Eine Methode ohne Typ ist kein Befund, weil der Standard gilt | Vorschlag |
+| Hextupel: abgeleitete Kanten | Methode: bei `RoleChainAxiom` die Logik der Achse (z. B. `amt:GoedelLogic`). Typ: haben alle Antezedens-Kanten denselben wirksamen Typ, gilt dieser, sonst `fw:FuzzinessWobbliness`; eine Kante ohne Typ zählt als `fw:Vagueness`. Die Regel steht nicht in der FW-Ontologie (D16) | 2026-10-30 |
+| Hextupel: Methoden-IRIs | Die sechs Logiken (`amt:GoedelLogic`, `amt:ProductLogic`, `amt:LukasiewiczLogic`, `amt:EinsteinProduct`, `amt:GeometricMean`, `amt:HamacherProduct`) werden in `ontology/amt.ttl` zusätzlich `fw:PropagationMethod`; `amt.ttl` bekommt den Präfix `fw:`. Der Vorschlag in `data/amt-alignment.ttl` der FW-Ontologie wird damit überflüssig (D16) | 2026-10-30 |
+| Hextupel: Datentyp der Gewichte | Vorschlag: die Turtle-Ausgabe schreibt `amt:weight` als `xsd:decimal` statt `xsd:double`, damit sie `amt:WeightShape` besteht (Befund 2026-10-30, D15); Alternative: die Shape akzeptiert beides | Vorschlag |
+| Hextupel: Evidenz | Vorschlag: `fw:derivedFrom` und der Evidenzknoten werden gelesen und unverändert in die Ausgabe geschrieben; die Engine rechnet nichts damit (D13) | Vorschlag |
+| Hextupel: Schnitt und Version | Vorschlag: S19 Adressen, S20 Festlegungen, S21 Python, S22 JS-Port und Explorer, S23 Runner und Release; die Änderung ist additiv, daher Engine 0.6.0 und Runner 0.5.0 | Vorschlag |
+| Folge für das Mini-AMT-Repo | `leiza-scit/CHNT2026-amt` ordnet sichere Aussagen laut Chat vom 2026-10-30 bisher „ohne Typ“ zu; mit dem Standard „vage“ muss das nachgezogen werden (D17) | 2026-10-30 |
 
 Jede Zeile bekommt ein Datum. Vorschläge heißen `Vorschlag` und werden in dem Schritt bestätigt, in dem sie zuerst wirken. Überholte Beschlüsse werden mit neuem Datum und Grund umgeschrieben, nicht gelöscht.
 
@@ -173,8 +193,15 @@ Entfällt in diesem Repo. Der Namensraum `http://academic-meta-tool.xyz/vocab#` 
 | S16 | Nutzerfreundliche Validierung: Diagnose (`AMT-E…`), SHACL-Meldungen mit Knoten, `--check-only`/`--strict`, viz ohne Absturz, How-To-Sektion | amt-engine, amt-runner | S15 | erledigt 2026-10-27 |
 | S17 | How-To-Seite „Run and look at the result“: klonen, Datei ablegen, prüfen, laufen lassen, Ergebnis lesen (Windows-`cmd`, Hinweise für Linux/macOS) | amt-engine | S16 | erledigt 2026-10-27 (Windows, Python 3.10) |
 | S18 | Release 0.5.0 (Engine) / 0.4.0 (Runner) samt Zenodo | amt-engine, amt-runner | S16, S17 | 18a und 18b erledigt (Tag `v0.5.0`, Release, Zenodo); 18c als Patch geliefert |
+| S19 | Adressen auf `alpaca-fair-framework` umstellen (Quellen, erzeugte Seiten, Tests, `CITATION.cff`, Weiterleitungen) | amt-engine, amt-runner | S18 | offen |
+| S20 | Hextupel: Festlegungen, kein Code (Datentyp der Gewichte, Konfliktfall, Diagnose-Codes, Methode bei Inverse und Subsumption, Mehrfachableitung, Evidenz) | amt-engine | – | offen |
+| S21 | Hextupel in der Python-Engine: laden, Reasoning, Export, SHACL, Diagnose, How-To, Tests, Roundtrip-Beispiel | amt-engine | S19, S20 | offen |
+| S22 | Hextupel im JS-Port und im Explorer, Paritätstest | amt-engine | S21 | offen |
+| S23 | Runner (Beispiel, Dokumentation, Versions-Hinweis), Release Engine 0.6.0 und Runner 0.5.0 samt Zenodo | amt-engine, amt-runner | S21, S22 | offen |
 
 S3, S4, S5 und S6 sind erledigt. Offen bleiben die Punkte in Teil D. Der Runner (S2) liest die Engine zur Laufzeit aus `main`; er braucht S5 erst, wenn er auf Tags pinnen soll.
+
+S19 und S20 sind voneinander unabhängig: S20 ist nur Text und Entscheidung und kann vor, nach oder neben S19 laufen. S19 sollte vor S21 liegen, damit die Patches lesbar bleiben (Adressen und Logik nicht in einem Diff). Der Runner folgt jeweils im eigenen Chat (S10 und S11 im Primer von `amt-runner`).
 
 Status ist `offen`, `erledigt <Datum>` oder `hinfällig`. Schritt-IDs werden nie umnummeriert.
 
@@ -492,6 +519,73 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 
 **Abnahme:** `python main.py --strict` zweimal grün (Windows), `git status` sauber; `git tag` zeigt die neuen Tags; „Releases“ zeigt sie; auf zenodo.org steht je eine neue Version; nach 18c nennt die README die Versions-DOI.
 
+### S19 – Adressen auf alpaca-fair-framework umstellen
+
+**Ziel:** Jeder Verweis auf `amt-engine`, `amt-runner` und `amt-explore` und auf die Pages-Adresse nennt die neue Organisation `alpaca-fair-framework`, ohne dass sich Verhalten oder Ergebnisdateien ändern.
+
+**Uploads:** `PRIMER.md` und das Bundle aus A5; ein Chat je Repo, Engine zuerst, dann der Runner (S10 dort).
+
+**Inhalt:**
+
+- Ersetzt werden Repo-URLs und die Pages-Adresse `n4o-rse.github.io/amt-engine/` in Quellen, `CITATION.cff`, `README.md`, `deploy/redirects.yaml`, Beispiel-TTLs und Tests. Was unter `docs/` erzeugt wird, entsteht durch `python main.py` neu; `docs/data/` zieht über `docs-sync` nach.
+- Treffer, bei denen die alte Adresse Teil des Belegs ist (Vorschlag: `data/bibliography.bib`, wo ein Werk seine Adresse zum Zeitpunkt der Veröffentlichung nennt), bleiben. Die Liste der belassenen Treffer steht im `PATCH-README.md`.
+- Die Frage der neuen Pages-Adresse, der Weiterleitungen (FTP, w3id) und der Zenodo-Anbindung steht in D18 und wird in diesem Schritt entschieden.
+- Keine Änderung an `amt/`-Verhalten, an der Ontologie oder an der Version; der Eintrag im `CHANGELOG.md` steht unter `[Unreleased]` als `Changed`.
+
+**Abnahme:** `git grep -n "n4o-rse" -- . ":!docs/vendor"` nennt nur Treffer aus der Liste der belassenen; `python main.py --strict` zweimal grün, `git status` danach sauber; die Weiterleitungsprüfung `py/check_redirects.py` (Netz, nicht Teil von `main.py`) meldet die erwarteten Ziele.
+
+### S20 – Hextupel: Festlegungen
+
+**Ziel:** Alle Entscheidungen, von denen Namen, Ausgabeformat und Verhalten des Hextupels abhängen, stehen mit Datum in A4; S21 muss nichts mehr klären.
+
+**Uploads:** `PRIMER.md`, die aktuelle FW-Ontologie (`caa-datadragons/FW_Ontology`) und ein Beispiel mit AFE-Daten von Karsten.
+
+**Inhalt:** Das Hextupel ist ein Quadrupel (Subjekt, Rolle, Objekt, Gewicht) plus `fw:hasType` und `fw:hasMethod`; beschlossen sind in A4 der Standard „vage“, das Lesen beider Gewichts-Properties, die Optionalität und die Regel für abgeleitete Kanten. Zu bestätigen oder umzuschreiben sind die als `Vorschlag` markierten Zeilen, als Formular mit Kommentarfeld:
+
+- Datentyp der Gewichte in der Ausgabe (D15).
+- Konfliktfall bei zwei verschiedenen Gewichten (`AMT-E104`) und die Codes `AMT-W205`, `AMT-N303`.
+- Methode bei `InverseAxiom` und `SubsumptionAxiom` sowie bei Mehrfachableitung (D14).
+- Evidenz (`fw:derivedFrom`) durchreichen oder mitrechnen (D13).
+- Umsetzung des Standards im Kanten-Dict (`type` als IRI oder `None`, `effective_type`).
+- Schnitt der Schritte und Versionssprung (0.6.0).
+
+**Abnahme:** Jede `Vorschlag`-Zeile zum Hextupel in A4 ist bestätigt oder umgeschrieben, mit Datum; in Teil D steht keine Frage mehr, die S21 blockiert.
+
+### S21 – Hextupel in der Python-Engine
+
+**Ziel:** Die Engine liest, berechnet und schreibt Typ und Methode je Aussage; ein Quadrupel ohne beide verhält sich wie in 0.5.0, und die Ausgabe lässt sich wieder einlesen und validieren.
+
+**Uploads:** `PRIMER.md`, das Bundle aus A5, die FW-Ontologie, die AFE-Beispieldatei von Karsten.
+
+**Inhalt (nach den Beschlüssen in A4, Stand des Schritts S20):**
+
+- `amt/core.py`: neben `amt:weight` auch `fw:hasDegreeOfConnection`; optional `fw:hasType`, `fw:hasMethod`, `fw:derivedFrom`; neue Schlüssel im Kanten-Dict (`type`, `method`, `evidence`, Standard `None`), `local_name` und die übrigen Helfer bleiben.
+- neues Modul für den FW-Teil (Namensraum, die drei Typen, `effective_type`, `combine_types`); der Name folgt der Regel aus A1 (kein Modulname, der von einer Funktion in `amt/__init__.py` verdeckt wird).
+- `amt/reasoning.py`: bei `RoleChainAxiom` Methode = Logik, Typ nach der Kombinationsregel; `InverseAxiom`, `SubsumptionAxiom` und Mehrfachableitung nach S20; die Reihenfolge bleibt nach IRI sortiert (Determinismus, A3).
+- `amt/export.py`: Turtle (Typ, Methode, Evidenz nur wo vorhanden; Datentyp der Gewichte nach D15), Cypher-Eigenschaften, `edges.csv` mit zusätzlichen Spalten **am Ende** (damit bestehende Leser weiterlaufen), `amt/viz.py` Tooltip.
+- `ontology/amt.ttl`: Präfix `fw:`, die sechs Logiken zusätzlich `fw:PropagationMethod`; `ontology/amt-shapes.ttl` bleibt für Typ und Methode ohne Pflicht; die erzeugten Vokabular-Seiten (`docs/vocab/`, `docs/ontology/`) ziehen über den Schritt `site` nach.
+- `amt/diagnostics.py` und `py/site_howto.py`: die neuen Codes mit Eintrag und Anker auf der Seite „prüfen“ (`tests/test_howto.py` verlangt das für jeden Code).
+- `examples/hextuple-demo.ttl` mit `.md` im Muster von `animals.md`: die drei Typen, eine Methode, eine Evidenz, erwartete Ableitungstabelle.
+- Python-Code unter 3.10 prüfen (Windows-Referenz; keine Backslashes in f-String-Ausdrücken).
+
+**Abnahme:** `python main.py --strict` zweimal grün, `git status` sauber; alle Tests aus 0.5.0 unverändert grün; ein Test liest `examples/hextuple-demo.ttl`, schreibt `*.reasoned.ttl`, liest sie wieder ein und findet dieselben Kanten mit Gewicht, Typ und Methode; die Ausgabe von `animals.ttl` besteht die Shapes (behebt den Befund vom 2026-10-30); die Kantenmenge der bestehenden Beispiele ist gegenüber 0.5.0 unverändert, in `edges.csv` kommen nur die neuen Spalten dazu.
+
+### S22 – Hextupel im JS-Port und im Explorer
+
+**Ziel:** Der Explorer rechnet und zeigt dasselbe wie die Python-Engine.
+
+**Inhalt:** `docs/js/amt-reasoner.js` bekommt Typ, Methode und die Kombinationsregel (Änderungen an der Python-Logik ziehen den Port nach, A4 vom 2026-10-26); `tests/test_js_reasoner.py` vergleicht beide auch für `type` und `method`; der Explorer zeigt Typ und Methode im Kanten-Tooltip und lädt `hextuple-demo.ttl` in der Beispielliste. Die Kopie im Playground (`leiza-rse/amt-playground`) folgt als eigener Patch dort.
+
+**Abnahme:** der Paritätstest ist grün (Node vorhanden), `tests/test_offline.py` bleibt grün, im Explorer zeigt `hextuple-demo` Typ und Methode an abgeleiteten und behaupteten Kanten.
+
+### S23 – Runner und Release 0.6.0 / 0.5.0
+
+**Ziel:** Hextupel-Dateien laufen über den Runner, beide Repos sind veröffentlicht und bei Zenodo archiviert.
+
+**Inhalt:** nach dem Muster von S18: 23a (Patch) Versionen in `pyproject.toml`, `amt/__init__.py`, `CITATION.cff`, `py/amt_dev_utils.py`, `CHANGELOG.md` (Engine 0.6.0; Runner 0.5.0 in `run_amt.py`, `CITATION.cff`, `py/amt_runner_dev_utils.py`, `CHANGELOG.md`); im Runner das Beispiel samt `.md`, ein README-Abschnitt und der Hinweis, dass Typ und Methode die Engine 0.6.0 brauchen (`--update`); 23b (manuell) Tag, GitHub-Release, Zenodo; 23c (Patch) Versions-DOIs.
+
+**Abnahme:** wie S18: `python main.py --strict` zweimal grün in beiden Repos, `git status` sauber, `python main.py --only smoke --strict` im Runner gegen die Engine `main`, Tags und Releases sichtbar, Versions-DOIs nach 23c in der README.
+
 ## Teil D – Offene Punkte
 
 - **D1** Autorenliste: erledigt in S3 (2026-10-26), siehe A4.
@@ -506,3 +600,9 @@ Der erste Windows-Lauf (Python 3.10) zeigte einen Fehler, den die Sandbox nicht 
 - **D11** Der Playground (`leiza-rse/amt-playground`) und der Explorer sind funktional fertig, dürfen aber später schöner und hübscher werden (Layout, Aufteilung, Startnetz mit echten Beispieldaten); der Playground bleibt im LEIZA-Blau.
 - **D6** Exit-Code des Runners bei Konsistenzverletzungen: heute immer 0. Wer den Runner in Skripten oder CI nutzt, kann Verletzungen nur am Text der Ausgabe erkennen. Entscheidung (2026-10-26): vorerst unverändert; falls geändert, dann als eigener Schritt mit Test, CHANGELOG-Eintrag und Versionsentscheidung.
 - **D12** Weitere How-To-Unterseiten (Rezepte: Rollen und Axiome Schritt für Schritt, AMT-Datei aus Wikibase/Wikidata; „Ergebnis lesen“ ist mit S17 erledigt) und ein Beispiel `examples/afe-coins.ttl` mit dem AFE-Fall; wartet auf Rückmeldung von Karsten und Lasse, ob das Rezept auf `howto/create/` für ihre Daten reicht.
+- **D13** Evidenz (`fw:derivedFrom`): Vorschlag für S21 ist durchreichen, nicht mitrechnen. Offen: bei abgeleiteten Kanten verlangt die FW-Ontologie einen Verweis auf die Aussagen, aus denen abgeleitet wurde; die Aussagen sind in der Ausgabe Blank Nodes (`_:a1`, `_:i1`) und bräuchten stabile IRIs. Frage in S20.
+- **D14** Methode und Typ bei `InverseAxiom`, `SubsumptionAxiom` und Mehrfachableitung (A1, Befund 2026-10-30). Vorschlag: Inverse und Subsumption tragen keine Methode und erben den Typ der Quellkante; bei Mehrfachableitung liefert der Weg mit dem höchsten Gewicht Typ und Methode, bei Gleichstand die kleinste Methoden-IRI (sortiert, Determinismus). Frage in S20.
+- **D15** Datentyp der Gewichte in der Turtle-Ausgabe (A1, Befund 2026-10-30). Vorschlag: `xsd:decimal` schreiben; das ändert die Ausgabedatei jedes Beispiels und ist deshalb im CHANGELOG zu nennen. Alternative: `amt:WeightShape` akzeptiert `xsd:double` und `xsd:decimal`. Frage in S20.
+- **D16** Rückmeldung an die FW-Ontologie (Repo gehört dem Autor, eigener Patch dort): (a) die Kombinationsregel für Typen abgeleiteter Aussagen, (b) die AMT-Logiken stehen jetzt in `amt.ttl`, `data/amt-alignment.ttl` kann entfallen, (c) `fw:implementedBy` für `fw:EqualShareRule`, (d) dass in AMT jede Aussage ohne Angabe als vage gilt, steht dort nirgends.
+- **D17** Mini-AMT-Repo (`leiza-scit/CHNT2026-amt`): die Zuordnung „sichere Aussage, kein Typ“ in `weights.py` entfällt mit dem Standard „vage“; dort in S3a mitnehmen. Der Schritt „Hextupel in amt-engine und amt-runner“ im Primer jenes Repos entspricht S20 bis S23 hier.
+- **D18** Nach dem Umzug (gehört zu S19): neue Pages-Adresse der Engine (Vorschlag `https://alpaca-fair-framework.github.io/amt-engine/`, nicht geprüft), `deploy/redirects.yaml` (FTP von `academic-meta-tool.xyz`, w3id), der w3id-Pull-Request `perma-id/w3id.org#6998` (zeigt auf die alte Pages-Adresse; Stand unbekannt), Zenodo-Anbindung an der neuen Organisation (die Concept-DOIs bleiben).
